@@ -3,9 +3,11 @@ package com.keyeswest.fourinline;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.keyeswest.core.GameBoard;
+import com.keyeswest.core.Move;
 import com.keyeswest.core.Player;
 
-public class Board {
+public class Board implements GameBoard {
 
     private static int EMPTY = 0;
     private static int MAX_ROWS = 6;
@@ -34,18 +36,46 @@ public class Board {
         }
     }
 
-    public List<Integer> getAvailableMoves(){
-        List<Integer> moves = new ArrayList<>();
+    private Board(Board board){
+        for(int row = 0; row< MAX_ROWS; row++){
+            for(int col = 0; col< MAX_COLS; col++){
+                mBoard[row][col] =board.mBoard[row][col];
+            }
+        }
+
+        mPositions = board.mPositions;
+    }
+
+    @Override
+    public List<FourInLineMove> getAvailableMoves(){
+        List<FourInLineMove> moves = new ArrayList<>();
         for (int column =0; column< MAX_COLS; column++){
             for (int row=0; row< MAX_ROWS; row++){
                 if (mBoard[row][column] == EMPTY){
-                    moves.add(column);
+                    moves.add(new FourInLineMove(column));
                     break;
                 }
             }
         }
 
         return moves;
+    }
+
+    @Override
+    public GameBoard getCopyOfBoard() {
+
+        return  new Board(this);
+
+    }
+
+    @Override
+    public boolean performMove(Player player, Move move) {
+        if (move instanceof FourInLineMove){
+            int column = ((FourInLineMove)move).getColumn();
+            MoveStatus status = addPiece(player,column);
+            return status.mValid;
+        }
+        return false;
     }
 
     List<CellOccupant> getBoardPositions(){
