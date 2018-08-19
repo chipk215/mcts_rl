@@ -33,10 +33,24 @@ public class Game {
         return mNextToMove;
     }
 
+    public void setWinner(Player player){
+        mStatus.setWinningPlayer(player);
+    }
 
+    public Player getWinner(){
+        return mStatus.getWinningPlayer();
+    }
+
+    public void setStatus(GameStatus.Status status){
+        mStatus.setStatus(status);
+    }
 
     public Game makeCopy(){
         return new Game(this);
+    }
+
+    public GameStatus.Status getStatus(){
+        return mStatus.getStatus();
     }
 
 
