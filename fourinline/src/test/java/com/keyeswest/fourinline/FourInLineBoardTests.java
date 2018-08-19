@@ -1,6 +1,7 @@
 package com.keyeswest.fourinline;
 
 import com.keyeswest.core.Move;
+import com.keyeswest.core.MoveStatus;
 import com.keyeswest.core.Player;
 import org.junit.Assert;
 import org.junit.Before;
@@ -8,39 +9,39 @@ import org.junit.Test;
 
 import java.util.List;
 
-public class BoardTests {
+public class FourInLineBoardTests {
 
-    private Board mBoard;
+    private FourInLineBoard mFourInLineBoard;
 
     @Before
     public void init(){
-        mBoard = new Board();
+        mFourInLineBoard = new FourInLineBoard();
     }
 
     @Test
     public void createEmptyBoardTest(){
 
-        List<Board.CellOccupant> occupants = mBoard.getBoardPositions();
+        List<FourInLineBoard.CellOccupant> occupants = mFourInLineBoard.getBoardPositions();
         Assert.assertTrue(occupants.isEmpty());
     }
 
     @Test
     public void availableMovesEmptyBoardTest(){
-        List<FourInLineMove> moves = mBoard.getAvailableMoves();
+        List<FourInLineMove> moves = mFourInLineBoard.getAvailableMoves();
         Assert.assertNotNull(moves);
-        Assert.assertEquals(moves.size(), Board.getMaxCols() );
+        Assert.assertEquals(moves.size(), FourInLineBoard.getMaxCols() );
     }
 
     @Test
     public void availableMovesTest(){
-        int expectedMoveCount = Board.getMaxCols();
+        int expectedMoveCount = FourInLineBoard.getMaxCols();
         List<FourInLineMove> moves;
-        for (int column=0; column< Board.getMaxCols(); column++){
-            moves = mBoard.getAvailableMoves();
+        for (int column = 0; column< FourInLineBoard.getMaxCols(); column++){
+            moves = mFourInLineBoard.getAvailableMoves();
             Assert.assertNotNull(moves);
             Assert.assertEquals(moves.size(),expectedMoveCount );
-            for(int row=0; row< Board.getMaxRows(); row++){
-                mBoard.addPiece(Player.P1,column);
+            for(int row = 0; row< FourInLineBoard.getMaxRows(); row++){
+                mFourInLineBoard.addPiece(Player.P1,column);
             }
             expectedMoveCount--;
 
@@ -50,15 +51,16 @@ public class BoardTests {
     @Test
     public void performValidMoveTest(){
         FourInLineMove move = new FourInLineMove(0);
-        boolean result = mBoard.performMove(Player.P1, move);
-        Assert.assertTrue(result);
+        MoveStatus result = mFourInLineBoard.performMove(Player.P1, move);
+
+        Assert.assertTrue(result.isValid());
     }
 
     @Test
     public void performBogusMoveTest(){
         BogusMove move = new BogusMove();
-        boolean result = mBoard.performMove(Player.P1, move);
-        Assert.assertFalse(result);
+        MoveStatus result  = mFourInLineBoard.performMove(Player.P1, move);
+        Assert.assertFalse(result.isValid());
     }
 
 
@@ -67,11 +69,11 @@ public class BoardTests {
     public void validMoveTest(){
         Player player = Player.P1;
         int expectedPosition = 0;
-        Board.MoveStatus status = mBoard.addPiece( player, 0);
+        FourInLineMoveStatus status = mFourInLineBoard.addPiece( player, 0);
         Assert.assertTrue(status.isValid());
-        List<Board.CellOccupant> occupants = mBoard.getBoardPositions();
+        List<FourInLineBoard.CellOccupant> occupants = mFourInLineBoard.getBoardPositions();
         Assert.assertTrue(occupants.size() == 1);
-        Board.CellOccupant occupant = occupants.get(0);
+        FourInLineBoard.CellOccupant occupant = occupants.get(0);
         Assert.assertEquals(player, occupant.getPlayer());
         Assert.assertEquals(expectedPosition, occupant.getCellNumber());
 
@@ -81,9 +83,9 @@ public class BoardTests {
     @Test
     public void invalidColumnTest(){
         Player player = Player.P1;
-        Board.MoveStatus status = mBoard.addPiece( player, -1);
+        FourInLineMoveStatus status = mFourInLineBoard.addPiece( player, -1);
         Assert.assertFalse(status.isValid());
-        status = mBoard.addPiece( player, Board.getMaxCols());
+        status = mFourInLineBoard.addPiece( player, FourInLineBoard.getMaxCols());
         Assert.assertFalse(status.isValid());
 
     }
@@ -93,18 +95,18 @@ public class BoardTests {
     @Test
     public void validStackTest(){
         int expectedPlayerOnePosition = 0;
-        int expectedPlayerTwoPosition = Board.getMaxCols();
+        int expectedPlayerTwoPosition = FourInLineBoard.getMaxCols();
         Player playerOne = Player.P1;
         Player playerTwo = Player.P2;
-        Board.MoveStatus status =mBoard.addPiece( playerOne, 0);
+        FourInLineMoveStatus status = mFourInLineBoard.addPiece( playerOne, 0);
         Assert.assertTrue(status.isValid());
-        status =mBoard.addPiece( playerTwo, 0);
+        status = mFourInLineBoard.addPiece( playerTwo, 0);
         Assert.assertTrue(status.isValid());
-        List<Board.CellOccupant> occupants = mBoard.getBoardPositions();
+        List<FourInLineBoard.CellOccupant> occupants = mFourInLineBoard.getBoardPositions();
         Assert.assertTrue(occupants.size() == 2);
 
         for (int i=0; i< 2; i++) {
-            Board.CellOccupant occupant = occupants.get(i);
+            FourInLineBoard.CellOccupant occupant = occupants.get(i);
             if (occupant.getPlayer() == playerOne) {
                Assert.assertEquals(expectedPlayerOnePosition,occupant.getCellNumber() );
             }else{
@@ -117,14 +119,14 @@ public class BoardTests {
     @Test
     public void horizontalWinTest(){
 
-        for(int testRow =0; testRow< Board.getMaxRows(); testRow++) {
-            for (int col = 0; col < Board.getMaxCols(); col++) {
+        for(int testRow = 0; testRow< FourInLineBoard.getMaxRows(); testRow++) {
+            for (int col = 0; col < FourInLineBoard.getMaxCols(); col++) {
                 TestBoard board = new TestBoard();
                // board.configureBoardForRowTests(testRow,Player.P1);
                 board.constructHorizontalLine(testRow,col, Player.P1);
 
                 WinLine result = board.checkBoardForWin(Player.P1, testRow, col);
-                if (col <= Board.getMaxCols() - Board.getWinConnection()) {
+                if (col <= FourInLineBoard.getMaxCols() - FourInLineBoard.getWinConnection()) {
                     // horizontal line is within board bounds
                     Assert.assertNotNull(result);
                     Assert.assertEquals(LineType.HORIZONTAL,result.getLineType());
@@ -137,13 +139,13 @@ public class BoardTests {
 
     @Test
     public void verticalWinTest(){
-        for(int testRow =0; testRow< Board.getMaxRows(); testRow++) {
-            for (int col = 0; col < Board.getMaxCols(); col++) {
+        for(int testRow = 0; testRow< FourInLineBoard.getMaxRows(); testRow++) {
+            for (int col = 0; col < FourInLineBoard.getMaxCols(); col++) {
                 TestBoard board = new TestBoard();
                 board.constructVerticalLine(testRow, col, Player.P1);
 
                 WinLine result = board.checkBoardForWin(Player.P1, testRow, col);
-                if (testRow <= Board.getMaxRows() - Board.getWinConnection()) {
+                if (testRow <= FourInLineBoard.getMaxRows() - FourInLineBoard.getWinConnection()) {
                     // vertical line is within the board bounds
                     Assert.assertNotNull(result);
                     Assert.assertEquals(LineType.VERTICAL,result.getLineType());
@@ -214,7 +216,7 @@ public class BoardTests {
         int expectedStartColumn = 0;
         int expectedEndRow= 5;
         int expectedEndColumn = 2;
-        LineSegment result  = Board.computePositiveDiagonalSegment(row,column);
+        LineSegment result  = FourInLineBoard.computePositiveDiagonalSegment(row,column);
         checkLineCoordinates(expectedStartRow, expectedStartColumn, expectedEndRow, expectedEndColumn,result);
 
 
@@ -228,7 +230,7 @@ public class BoardTests {
         expectedStartColumn = 0;
         expectedEndRow= 5;
         expectedEndColumn = 5;
-        result  = Board.computePositiveDiagonalSegment(row,column);
+        result  = FourInLineBoard.computePositiveDiagonalSegment(row,column);
         checkLineCoordinates(expectedStartRow, expectedStartColumn, expectedEndRow, expectedEndColumn,result);
 
         // Test Case Three:
@@ -241,7 +243,7 @@ public class BoardTests {
         expectedStartColumn = 3;
         expectedEndRow= 3;
         expectedEndColumn = 6;
-        result  = Board.computePositiveDiagonalSegment(row,column);
+        result  = FourInLineBoard.computePositiveDiagonalSegment(row,column);
         checkLineCoordinates(expectedStartRow, expectedStartColumn, expectedEndRow, expectedEndColumn,result);
 
         // Test Case Four:
@@ -253,7 +255,7 @@ public class BoardTests {
         expectedStartColumn = column;
         expectedEndRow= row;
         expectedEndColumn = column;
-        result  = Board.computePositiveDiagonalSegment(row,column);
+        result  = FourInLineBoard.computePositiveDiagonalSegment(row,column);
         checkLineCoordinates(expectedStartRow, expectedStartColumn, expectedEndRow, expectedEndColumn,result);
 
         // Test Case Five:
@@ -264,7 +266,7 @@ public class BoardTests {
         expectedStartColumn = column;
         expectedEndRow= 5;
         expectedEndColumn = 4;
-        result  = Board.computePositiveDiagonalSegment(row,column);
+        result  = FourInLineBoard.computePositiveDiagonalSegment(row,column);
         checkLineCoordinates(expectedStartRow, expectedStartColumn, expectedEndRow, expectedEndColumn,result);
 
     }
@@ -278,7 +280,7 @@ public class BoardTests {
         int expectedStartColumn = 0;
         int expectedEndRow= 0;
         int expectedEndColumn = 5;
-        LineSegment result  = Board.computeNegativeDiagonalSegment(row,column);
+        LineSegment result  = FourInLineBoard.computeNegativeDiagonalSegment(row,column);
         checkLineCoordinates(expectedStartRow, expectedStartColumn, expectedEndRow, expectedEndColumn,result);
 
         //Test Case 2
@@ -288,7 +290,7 @@ public class BoardTests {
         expectedStartColumn = 2;
         expectedEndRow= 1;
         expectedEndColumn = 6;
-        result  = Board.computeNegativeDiagonalSegment(row,column);
+        result  = FourInLineBoard.computeNegativeDiagonalSegment(row,column);
         checkLineCoordinates(expectedStartRow, expectedStartColumn, expectedEndRow, expectedEndColumn,result);
 
         //Test Case 3
@@ -298,7 +300,7 @@ public class BoardTests {
         expectedStartColumn =4;
         expectedEndRow= 3;
         expectedEndColumn = 6;
-        result  = Board.computeNegativeDiagonalSegment(row,column);
+        result  = FourInLineBoard.computeNegativeDiagonalSegment(row,column);
         checkLineCoordinates(expectedStartRow, expectedStartColumn, expectedEndRow, expectedEndColumn,result);
 
 
@@ -311,7 +313,7 @@ public class BoardTests {
         expectedStartColumn = column;
         expectedEndRow= row;
         expectedEndColumn = column;
-        result  = Board.computeNegativeDiagonalSegment(row,column);
+        result  = FourInLineBoard.computeNegativeDiagonalSegment(row,column);
         checkLineCoordinates(expectedStartRow, expectedStartColumn, expectedEndRow, expectedEndColumn,result);
 
     }
@@ -329,7 +331,7 @@ public class BoardTests {
         boolean gameOver = false;
         Player player = Player.P1;
         while (! gameOver){
-            List<FourInLineMove> moves = mBoard.getAvailableMoves();
+            List<FourInLineMove> moves = mFourInLineBoard.getAvailableMoves();
             if (moves.isEmpty()){
                 gameOver = true;
             }else {
@@ -337,11 +339,11 @@ public class BoardTests {
                 int randomSelection = (int) (Math.random() * range);
 
                 FourInLineMove randomMove = moves.get(randomSelection);
-                Board.MoveStatus status = mBoard.addPiece(player, randomMove.getColumn());
+                FourInLineMoveStatus status = mFourInLineBoard.addPiece(player, randomMove.getColumn());
                 Assert.assertTrue(status.isValid());
                 moveCount++;
-                Assert.assertTrue(moveCount<= (Board.getMaxRows() * Board.getMaxCols()));
-                WinLine winner = mBoard.checkBoardForWin(player, status.getRow(), status.getColumn());
+                Assert.assertTrue(moveCount<= (FourInLineBoard.getMaxRows() * FourInLineBoard.getMaxCols()));
+                WinLine winner = mFourInLineBoard.checkBoardForWin(player, status.getRow(), status.getColumn());
                 if (winner != null) {
                     gameOver = true;
                 }else{

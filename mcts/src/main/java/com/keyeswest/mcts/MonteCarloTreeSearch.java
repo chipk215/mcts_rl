@@ -1,6 +1,7 @@
 package com.keyeswest.mcts;
 
 import com.keyeswest.core.Game;
+import com.keyeswest.core.GameStatus;
 import com.keyeswest.core.Move;
 
 import java.util.logging.Logger;
@@ -18,8 +19,10 @@ public class MonteCarloTreeSearch {
 
     public Game runSimulation(Game game){
 
-        LOGGER.info("Run game simulation");
+        LOGGER.info("Starting game simulation");
         // make a copy of the game
+        Game gameCopy = game.makeCopy();
+
 
         // alternate moves until game terminates
         return game;

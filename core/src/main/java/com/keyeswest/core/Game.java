@@ -1,9 +1,7 @@
 package com.keyeswest.core;
 
 
-
 public class Game {
-
 
     private Player mNextToMove;
 
@@ -53,5 +51,7 @@ public class Game {
         return mStatus.getStatus();
     }
 
-
+    //public GameStatus.Status playRandomGame(){
+       // while()
+    //}
 }

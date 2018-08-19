@@ -1,5 +1,7 @@
 package com.keyeswest.core;
 
+
+
 import java.util.List;
 
 public class GameTestBoard implements GameBoard {
@@ -21,7 +23,13 @@ public class GameTestBoard implements GameBoard {
     }
 
     @Override
-    public boolean performMove(Player player, Move move) {
-        return false;
+    public MoveStatus performMove(Player player, Move move) {
+
+        return new TestGameMoveStatus(player,true);
+    }
+
+    @Override
+    public GameStatus updateGameStatus(GameStatus gameStatus, MoveStatus lastMove) {
+        return null;
     }
 }

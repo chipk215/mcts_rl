@@ -2,7 +2,7 @@ package com.keyeswest.fourinline;
 
 import com.keyeswest.core.Player;
 
-public class TestBoard extends Board {
+public class TestBoard extends FourInLineBoard {
 
     public TestBoard(){
         super();
@@ -15,9 +15,9 @@ public class TestBoard extends Board {
 
 
     public void constructHorizontalLine( int row,int startColumn, Player player){
-        int endColumn = startColumn + Board.getWinConnection();
-        if (endColumn >= Board.getMaxCols()){
-            endColumn = Board.getMaxCols();
+        int endColumn = startColumn + FourInLineBoard.getWinConnection();
+        if (endColumn >= FourInLineBoard.getMaxCols()){
+            endColumn = FourInLineBoard.getMaxCols();
         }
 
         for (int col=startColumn; col< endColumn; col++ ){
@@ -26,9 +26,9 @@ public class TestBoard extends Board {
     }
 
     public void constructVerticalLine(int startRow, int column, Player player){
-        int endRow = startRow + Board.getWinConnection();
-        if (endRow >= Board.getMaxRows()){
-            endRow = Board.getMaxRows();
+        int endRow = startRow + FourInLineBoard.getWinConnection();
+        if (endRow >= FourInLineBoard.getMaxRows()){
+            endRow = FourInLineBoard.getMaxRows();
         }
 
         for(int row = startRow; row< endRow; row++){
@@ -37,8 +37,8 @@ public class TestBoard extends Board {
     }
 
     public void constructPositiveDiagonal(int startRow, int startColumn, Player player){
-        for(int index=0;index< Board.getWinConnection();index++){
-            if ((startRow+index >=  Board.getMaxRows() ) || (startColumn+index > Board.getMaxCols()) ){
+        for(int index = 0; index< FourInLineBoard.getWinConnection(); index++){
+            if ((startRow+index >=  FourInLineBoard.getMaxRows() ) || (startColumn+index > FourInLineBoard.getMaxCols()) ){
                 break;
             }
             setPosition(startRow+index, startColumn+index,player.value());
@@ -46,8 +46,8 @@ public class TestBoard extends Board {
     }
 
     public void constructNegativeDiagonal(int startRow, int startColumn, Player player){
-        for(int index=0;index< Board.getWinConnection();index++){
-            if ((startRow-index <0 ) || (startColumn+index > Board.getMaxCols())  ){
+        for(int index = 0; index< FourInLineBoard.getWinConnection(); index++){
+            if ((startRow-index <0 ) || (startColumn+index > FourInLineBoard.getMaxCols())  ){
                 break;
             }
             setPosition(startRow-index, startColumn+index,player.value());
@@ -62,16 +62,16 @@ public class TestBoard extends Board {
         }
 
         // Fill the board alternating opponent and player positions across all rows
-        for(int rowIndex=0; rowIndex< Board.getMaxRows(); rowIndex++){
+        for(int rowIndex = 0; rowIndex< FourInLineBoard.getMaxRows(); rowIndex++){
             activePlayer = startPlayer;
-           for(int colIndex =0; colIndex < Board.getMaxCols(); colIndex++){
+           for(int colIndex = 0; colIndex < FourInLineBoard.getMaxCols(); colIndex++){
                mBoard[rowIndex][colIndex] = activePlayer.value();
                activePlayer = activePlayer.getOpponent();
            }
         }
 
         // set the diagonal using the player value
-        for (int index=0; index< Board.getWinConnection(); index++){
+        for (int index = 0; index< FourInLineBoard.getWinConnection(); index++){
             mBoard[row+index][column+index] = player.value();
         }
 

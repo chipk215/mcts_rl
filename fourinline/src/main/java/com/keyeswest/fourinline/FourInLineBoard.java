@@ -3,11 +3,9 @@ package com.keyeswest.fourinline;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.keyeswest.core.GameBoard;
-import com.keyeswest.core.Move;
-import com.keyeswest.core.Player;
+import com.keyeswest.core.*;
 
-public class Board implements GameBoard {
+public class FourInLineBoard implements GameBoard {
 
     private static int EMPTY = 0;
     private static int MAX_ROWS = 6;
@@ -28,7 +26,7 @@ public class Board implements GameBoard {
 
     private List<CellOccupant> mPositions = new ArrayList<>();
 
-    public Board(){
+    public FourInLineBoard(){
         for(int row = 0; row< MAX_ROWS; row++){
             for(int col = 0; col< MAX_COLS; col++){
                 mBoard[row][col] =EMPTY;
@@ -36,14 +34,14 @@ public class Board implements GameBoard {
         }
     }
 
-    private Board(Board board){
+    private FourInLineBoard(FourInLineBoard fourInLineBoard){
         for(int row = 0; row< MAX_ROWS; row++){
             for(int col = 0; col< MAX_COLS; col++){
-                mBoard[row][col] =board.mBoard[row][col];
+                mBoard[row][col] = fourInLineBoard.mBoard[row][col];
             }
         }
 
-        mPositions = board.mPositions;
+        mPositions = fourInLineBoard.mPositions;
     }
 
     @Override
@@ -64,18 +62,27 @@ public class Board implements GameBoard {
     @Override
     public GameBoard getCopyOfBoard() {
 
-        return  new Board(this);
+        return  new FourInLineBoard(this);
 
     }
 
     @Override
-    public boolean performMove(Player player, Move move) {
+    public MoveStatus performMove(Player player, Move move) {
+        FourInLineMoveStatus status=null;
         if (move instanceof FourInLineMove){
             int column = ((FourInLineMove)move).getColumn();
-            MoveStatus status = addPiece(player,column);
-            return status.mValid;
+            status = addPiece(player,column);
+
         }
-        return false;
+        return status;
+    }
+
+    @Override
+    public GameStatus updateGameStatus(GameStatus gameStatus, MoveStatus lastMove) {
+        // check for winner
+
+
+        return gameStatus;
     }
 
     List<CellOccupant> getBoardPositions(){
@@ -83,24 +90,23 @@ public class Board implements GameBoard {
     }
 
 
-    MoveStatus addPiece(Player player, int column){
-
+    FourInLineMoveStatus addPiece(Player player, int column){
 
         if ( (column < 0) || (column >= MAX_COLS)){
 
-            return new MoveStatus(-1, column, false);
+            return new FourInLineMoveStatus(player, -1, column, false);
         }
 
         int row = getNextAvailableRow(column);
         if (row == -1){
-            return new MoveStatus(-1, column, false);
+            return new FourInLineMoveStatus(player,-1, column, false);
         }
 
         mBoard[row][column] = player.value();
 
         mPositions.add(new CellOccupant(player,computeCellNumber(row,column)));
 
-        return new MoveStatus(row, column, true);
+        return new  FourInLineMoveStatus(player, row, column, true);
 
     }
 
@@ -127,30 +133,7 @@ public class Board implements GameBoard {
         return checkDiagonalsForWin(player, row, column);
     }
 
-    class MoveStatus{
-        private int mRow;
-        private int mColumn;
-        private boolean mValid;
 
-        MoveStatus(int row, int column, boolean valid){
-            mRow = row;
-            mColumn = column;
-            mValid = valid;
-        }
-
-
-        public int getRow() {
-            return mRow;
-        }
-
-        public int getColumn() {
-            return mColumn;
-        }
-
-        public boolean isValid() {
-            return mValid;
-        }
-    }
 
     class CellOccupant{
 
@@ -169,8 +152,6 @@ public class Board implements GameBoard {
         int getCellNumber() {
             return mCellNumber;
         }
-
-
 
     }
 
