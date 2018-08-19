@@ -6,6 +6,7 @@ import java.util.List;
 
 public interface GameBoard {
 
+    // Note: This method may require a player for some games.
     List<? extends Move> getAvailableMoves();
 
     GameBoard getCopyOfBoard();

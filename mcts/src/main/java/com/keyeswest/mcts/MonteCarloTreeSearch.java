@@ -17,15 +17,16 @@ public class MonteCarloTreeSearch {
         return null;
     }
 
-    public Game runSimulation(Game game){
+    public GameStatus runSimulation(Game game){
 
         LOGGER.info("Starting game simulation");
         // make a copy of the game
         Game gameCopy = game.makeCopy();
 
+        GameStatus gameStatus = gameCopy.playRandomGame();
 
         // alternate moves until game terminates
-        return game;
+        return gameStatus;
     }
 
 }

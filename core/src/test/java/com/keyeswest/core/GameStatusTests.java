@@ -8,7 +8,7 @@ public class GameStatusTests {
     @Test
     public void makeCopyTest(){
         Player player = Player.P1;
-        GameStatus gameStatus = new GameStatus();
+        GameStatus gameStatus = new GameStatus(player);
         gameStatus.setWinningPlayer(null);
 
         GameStatus copyStatus = gameStatus.makeCopy();

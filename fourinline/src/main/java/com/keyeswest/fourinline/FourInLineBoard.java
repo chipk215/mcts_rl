@@ -2,10 +2,14 @@ package com.keyeswest.fourinline;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import com.keyeswest.core.*;
 
 public class FourInLineBoard implements GameBoard {
+
+    private static final Logger LOGGER = Logger.getLogger(FourInLineBoard.class.getName());
 
     private static int EMPTY = 0;
     private static int MAX_ROWS = 6;
@@ -73,14 +77,46 @@ public class FourInLineBoard implements GameBoard {
             int column = ((FourInLineMove)move).getColumn();
             status = addPiece(player,column);
 
+        }else{
+            LOGGER.log(Level.SEVERE,"Unable to downcast game move.");
+            throw new IllegalStateException("Unrecognized game move.");
         }
         return status;
     }
 
+    private void logWinMessage(WinLine winner, Player player){
+        LOGGER.info("***** Game won by player: " + player.toString());
+        LOGGER.info("Win line type: " + winner.getLineType().toString());
+        String startRow = "Row = " + Integer.toString(winner.getStartRow());
+        String startColumn = " Column= " + Integer.toString(winner.getStartColumn());
+        LOGGER.info("Win Line starting coordinates: " + startRow +  startColumn);
+    }
+
+
+    /**
+     * Evaluates the board after a move to determine if the game has ended with a win.
+     * @param gameStatus - the game's status object to update
+     * @param lastMove - the last executed move status
+     * @return - updated game status
+     */
     @Override
     public GameStatus updateGameStatus(GameStatus gameStatus, MoveStatus lastMove) {
-        // check for winner
+        FourInLineMoveStatus moveStatus=null;
+        if (lastMove instanceof FourInLineMoveStatus){
+            moveStatus = (FourInLineMoveStatus)lastMove;
+            //check for winner
+            WinLine winner = checkBoardForWin(moveStatus.getPlayer(),moveStatus.getRow(), moveStatus.getColumn());
 
+            if (winner != null){
+                logWinMessage(winner,moveStatus.getPlayer() );
+                gameStatus.setWinningPlayer(moveStatus.getPlayer());
+                gameStatus.setStatus(GameStatus.Status.GAME_WON);
+                gameStatus.nextPlayersTurn();
+            }
+        }else{
+            LOGGER.log(Level.SEVERE,"Unable to downcast move status.");
+            throw new IllegalStateException("Unrecognized move status");
+        }
 
         return gameStatus;
     }
