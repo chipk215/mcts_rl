@@ -333,25 +333,25 @@ public class FourInLineBoard implements GameBoard {
                 rowIndex++;
                 colIndex++;
             }
-        }else{
-            // check negativeDiagonal
-            LineSegment negativeDiagonal = computeNegativeDiagonalSegment(row, column);
-            if (negativeDiagonal.getLength() >= WIN_CONNECTION ) {
-                // check for 4 adjacent positions along diagonal
-                int rowIndex = negativeDiagonal.getStartRow();
-                int colIndex = negativeDiagonal.getStartColumn();
-                while(  (rowIndex >=negativeDiagonal.getEndRow()+ WIN_CONNECTION -1) &&
-                        (colIndex <= negativeDiagonal.getEndColumn()-WIN_CONNECTION +1) ){
+        }
+        // check negativeDiagonal
+        LineSegment negativeDiagonal = computeNegativeDiagonalSegment(row, column);
+        if (negativeDiagonal.getLength() >= WIN_CONNECTION ) {
+            // check for 4 adjacent positions along diagonal
+            int rowIndex = negativeDiagonal.getStartRow();
+            int colIndex = negativeDiagonal.getStartColumn();
+            while(  (rowIndex >=negativeDiagonal.getEndRow()+ WIN_CONNECTION -1) &&
+                    (colIndex <= negativeDiagonal.getEndColumn()-WIN_CONNECTION +1) ){
 
-                    WinLine winner = checkAdjacentPositions(rowIndex, colIndex, player,true);
-                    if (winner != null){
-                        return winner;
-                    }
-                    rowIndex--;
-                    colIndex++;
+                WinLine winner = checkAdjacentPositions(rowIndex, colIndex, player,true);
+                if (winner != null){
+                    return winner;
                 }
+                rowIndex--;
+                colIndex++;
             }
         }
+
         return null;
     }
 

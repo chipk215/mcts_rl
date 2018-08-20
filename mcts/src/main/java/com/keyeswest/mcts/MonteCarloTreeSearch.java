@@ -13,7 +13,7 @@ public class MonteCarloTreeSearch {
     private static final double LOSS_VALUE = 0.0d;
     private static final double TIE_VALUE = 0.5d;
 
-    private static final int MAX_ITERATIONS = 1000;
+    private static final int MAX_ITERATIONS = 3000;
 
     private static final Logger LOGGER = Logger.getLogger(MonteCarloTreeSearch.class.getName());
 

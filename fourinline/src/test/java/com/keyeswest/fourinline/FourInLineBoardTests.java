@@ -1,5 +1,6 @@
 package com.keyeswest.fourinline;
 
+import com.keyeswest.core.GameStatus;
 import com.keyeswest.core.Move;
 import com.keyeswest.core.MoveStatus;
 import com.keyeswest.core.Player;
@@ -56,11 +57,59 @@ public class FourInLineBoardTests {
         Assert.assertTrue(result.isValid());
     }
 
-    @Test
+    @Test(expected = IllegalStateException.class)
     public void performBogusMoveTest(){
         BogusMove move = new BogusMove();
         MoveStatus result  = mFourInLineBoard.performMove(Player.P1, move);
-        Assert.assertFalse(result.isValid());
+
+    }
+
+    @Test
+    public void diagonalTestCaseTest(){
+        // setup board with test case moves
+        mFourInLineBoard.addPiece( Player.P1, 3);
+        mFourInLineBoard.addPiece( Player.P2, 0);
+
+        mFourInLineBoard.addPiece( Player.P1, 3);
+        mFourInLineBoard.addPiece( Player.P2, 0);
+
+        mFourInLineBoard.addPiece( Player.P1, 4);
+        mFourInLineBoard.addPiece( Player.P2, 0);
+
+        mFourInLineBoard.addPiece( Player.P1, 0);
+        mFourInLineBoard.addPiece( Player.P2, 1);
+
+        mFourInLineBoard.addPiece( Player.P1, 3);
+        mFourInLineBoard.addPiece( Player.P2, 3);
+
+        mFourInLineBoard.addPiece( Player.P1, 1);
+        mFourInLineBoard.addPiece( Player.P2, 2);
+
+        mFourInLineBoard.addPiece( Player.P1, 1);
+        mFourInLineBoard.addPiece( Player.P2, 0);
+
+        mFourInLineBoard.addPiece( Player.P1, 4);
+        mFourInLineBoard.addPiece( Player.P2, 1);
+
+        mFourInLineBoard.addPiece( Player.P1, 4);
+        mFourInLineBoard.addPiece( Player.P2, 4);
+
+        mFourInLineBoard.addPiece( Player.P1, 5);
+        mFourInLineBoard.addPiece( Player.P2, 2);
+
+        mFourInLineBoard.addPiece( Player.P1, 5);
+        mFourInLineBoard.addPiece( Player.P2, 5);
+
+        mFourInLineBoard.addPiece( Player.P1, 4);
+        mFourInLineBoard.addPiece( Player.P2, 6);
+
+        mFourInLineBoard.addPiece( Player.P1, 5);
+        mFourInLineBoard.addPiece( Player.P2, 2);
+
+
+        // this is a winning negative diagonal move
+        FourInLineMoveStatus status = mFourInLineBoard.addPiece( Player.P1, 2);
+        Assert.assertEquals(GameStatus.GAME_WON, status.getGameStatus());
     }
 
 
@@ -319,11 +368,7 @@ public class FourInLineBoardTests {
     }
 
 
-    @Test
-    public void getBoardPositionsTest(){
 
-
-    }
 
     @Test
     public void playRandomGameTest(){
