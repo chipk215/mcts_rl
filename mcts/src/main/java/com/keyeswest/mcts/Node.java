@@ -13,12 +13,24 @@ public class Node {
     private Node mParent;
     private List<Node> mChildNodes;
     private GameBoard mBoard;
+
+    // mPlayer represents the player making a move from this node to a child node.
+    // mPlayer of the root node moved first in the game.
     private Player mPlayer;
-    private int mVisitCount;
-    private double mValue;
+
+    //mMove is the move made from this node, it will be to one of the child nodes unless
+    // moving to this node ended the game and this node is a terminal node
     private Move mMove;
 
+
+    private int mVisitCount;
+    private double mValue;
+
+
     // Terminal if the move associated with node ends the game or the node has no available moves
+    // If the node is a terminal node mMove should be null
+    // mPlayer would represent the next player to move if the game hadn't ended
+    // If the game ended in a win, mPlayer associated with a terminal node is the loser.
     private boolean mTerminalNode;
 
     public String getName() {
@@ -27,6 +39,10 @@ public class Node {
 
     private String mName;
     private List<? extends Move> mAvailableMoves;
+
+    // Constructors
+
+    // The root node is constructed prior to making a move
 
     public Node( GameBoard board){
         this(null, board, null, null, GameStatus.IN_PROGRESS);
