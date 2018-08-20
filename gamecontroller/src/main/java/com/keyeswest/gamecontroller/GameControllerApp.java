@@ -5,8 +5,7 @@ import com.keyeswest.fourinline.FourInLineBoard;
 import com.keyeswest.fourinline.FourInLineMove;
 import com.keyeswest.mcts.MonteCarloTreeSearch;
 
-import java.util.LinkedList;
-import java.util.Queue;
+
 import java.util.Scanner;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -19,10 +18,6 @@ public class GameControllerApp {
     public static void main(String[] args){
         Scanner in = new Scanner(System.in);
         //runSimulations();
-
-        //Queue<Integer> player2Moves = new LinkedList<>();
-       // player2Moves.add(2);
-
 
         Game fourInLineGame = new Game(new FourInLineBoard(),Player.P1);
 
@@ -39,7 +34,6 @@ public class GameControllerApp {
                 done = updateGameState(fourInLineGame, moveStatus);
                 if (! done){
                     // P2 moves
-                    // int selectedColumn = player2Moves.remove();
                     System.out.println("Enter P2 move: ");
                     int selectedColumn = in.nextInt();
                   //  System.out.println("Enter P2 move: " + Integer.toString(selectedColumn));

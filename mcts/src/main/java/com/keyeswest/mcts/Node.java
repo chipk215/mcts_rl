@@ -63,18 +63,11 @@ public class Node {
     }
 
 
-    public boolean isLeafNode(){
-        return mChildNodes.isEmpty();
-    }
-
 
     public int getVisitCount() {
         return mVisitCount;
     }
 
-    public void setVisitCount(int visitCount) {
-        mVisitCount = visitCount;
-    }
 
     public double getValue() {
         return mValue;

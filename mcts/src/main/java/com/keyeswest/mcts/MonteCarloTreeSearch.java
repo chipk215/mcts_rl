@@ -11,6 +11,9 @@ public class MonteCarloTreeSearch {
 
 
     private static final double Cp = 1/ Math.sqrt(2);
+    private static final double WIN_VALUE = 1.0d;
+    private static final double LOSS_VALUE = 0.0d;
+    private static final double TIE_VALUE = 0.5d;
 
     private static final Logger LOGGER = Logger.getLogger(MonteCarloTreeSearch.class.getName());
 
@@ -57,16 +60,13 @@ public class MonteCarloTreeSearch {
     }
 
     private void backPropagation(Node node, GameState gameState){
-        double winValue = 1.0d;
-        double tieValue = 0.5d;
-        double lossValue = 0.0d;
-        double value = tieValue;
+        double value =  TIE_VALUE;
 
         if (gameState.getStatus() == GameState.Status.GAME_WON) {
             if (gameState.getWinningPlayer() == Player.P1) {
-                value = winValue;
+                value = WIN_VALUE;
             } else {
-                value = lossValue;
+                value = LOSS_VALUE ;
             }
         }
 
