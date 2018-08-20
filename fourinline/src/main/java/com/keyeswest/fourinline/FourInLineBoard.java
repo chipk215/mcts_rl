@@ -111,7 +111,7 @@ public class FourInLineBoard implements GameBoard {
             if (winner != null){
               //  logWinMessage(winner,moveStatus.getPlayer() );
                 gameState.setWinningPlayer(moveStatus.getPlayer());
-                gameState.setStatus(GameState.Status.GAME_WON);
+                gameState.setStatus(GameStatus.GAME_WON);
 
             }else{
                 gameState.nextPlayersTurn();
@@ -133,19 +133,31 @@ public class FourInLineBoard implements GameBoard {
 
         if ( (column < 0) || (column >= MAX_COLS)){
 
-            return new FourInLineMoveStatus(player, -1, column, false);
+            return new FourInLineMoveStatus(player, -1, column, false, GameStatus.IN_PROGRESS);
         }
 
         int row = getNextAvailableRow(column);
         if (row == -1){
-            return new FourInLineMoveStatus(player,-1, column, false);
+            return new FourInLineMoveStatus(player,-1, column, false, GameStatus.IN_PROGRESS);
         }
 
         mBoard[row][column] = player.value();
 
         mPositions.add(new CellOccupant(player,computeCellNumber(row,column)));
 
-        return new  FourInLineMoveStatus(player, row, column, true);
+        GameStatus gameStatus = GameStatus.IN_PROGRESS;
+
+        WinLine winLine = checkBoardForWin(player, row, column);
+        if (winLine != null){
+            gameStatus = GameStatus.GAME_WON;
+        }
+
+        int availableMoveCount = getAvailableMoves().size();
+        if ((availableMoveCount == 0) && (gameStatus == GameStatus.IN_PROGRESS)){
+            gameStatus = GameStatus.GAME_TIED;
+        }
+
+        return new  FourInLineMoveStatus(player, row, column, true, gameStatus);
 
     }
 
@@ -423,6 +435,23 @@ public class FourInLineBoard implements GameBoard {
         int endColumn = Math.min(MAX_COLS-1,startRow+startColumn);
 
         return  new LineSegment(startRow, startColumn, endRow, endColumn);
+    }
+
+    @Override
+    public void display(){
+
+         for (int row=MAX_ROWS-1; row>=0; row--){
+             for (int column=0; column< MAX_COLS; column++){
+                 if (mBoard[row][column] == Player.P1.value()){
+                     System.out.print("[X]  ");
+                 }else if(mBoard[row][column] == Player.P2.value()){
+                     System.out.print("[O]  ");
+                 }else{
+                     System.out.print("[ ]  ");
+                 }
+             }
+             System.out.println();
+         }
     }
 
 }

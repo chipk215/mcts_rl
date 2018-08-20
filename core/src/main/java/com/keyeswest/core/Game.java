@@ -35,7 +35,7 @@ public class Game {
         return mGameState.getWinningPlayer();
     }
 
-    public void setGameStatus(GameState.Status gameStatus){
+    public void setGameStatus(GameStatus gameStatus){
         mGameState.setStatus(gameStatus);
     }
 
@@ -43,16 +43,16 @@ public class Game {
         return new Game(this);
     }
 
-    public GameState.Status getGameStatus(){
+    public GameStatus getGameStatus(){
         return mGameState.getStatus();
     }
 
     public GameState playRandomGame(){
-        while(mGameState.getStatus() == GameState.Status.IN_PROGRESS){
+        while(mGameState.getStatus() == GameStatus.IN_PROGRESS){
             List<? extends Move> availableMoves =  mGameBoard.getAvailableMoves();
             int numberMovesAvailable = availableMoves.size();
             if (numberMovesAvailable ==0){
-                mGameState.setStatus(GameState.Status.GAME_TIED);
+                mGameState.setStatus(GameStatus.GAME_TIED);
             }else{
                 int randomSelection = (int)(Math.random() * numberMovesAvailable);
                 Move selectedMove = availableMoves.get(randomSelection);

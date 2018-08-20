@@ -1,6 +1,7 @@
 package com.keyeswest.mcts;
 
 import com.keyeswest.core.GameBoard;
+import com.keyeswest.core.GameStatus;
 import com.keyeswest.core.Move;
 import com.keyeswest.core.Player;
 
@@ -17,13 +18,21 @@ public class Node {
     private double mValue;
     private Move mMove;
 
+    // Terminal if the move associated with node ends the game or the node has no available moves
+    private boolean mTerminalNode;
+
+    public String getName() {
+        return mName;
+    }
+
+    private String mName;
     private List<? extends Move> mAvailableMoves;
 
     public Node( GameBoard board){
-        this(null, board, null, null);
+        this(null, board, null, null, GameStatus.IN_PROGRESS);
     }
 
-    private Node(Node parent, GameBoard board, Player player, Move move){
+    public Node(Node parent, GameBoard board, Player player, Move move, GameStatus gameStatus){
 
         mParent = parent;
         mChildNodes = new ArrayList<>();
@@ -38,6 +47,16 @@ public class Node {
         }
         mAvailableMoves =  mBoard.getAvailableMoves();
 
+        // terminal node if game ended
+        mTerminalNode = gameStatus != GameStatus.IN_PROGRESS;
+
+
+        if (parent==null){
+            mName="ROOT";
+        }else{
+            mName= parent.mName + " + " + mMove.getName();
+        }
+
     }
 
 
@@ -49,17 +68,10 @@ public class Node {
         mBoard = board.getCopyOfBoard();
     }
 
-    public Node expand(){
-
+    public Move getRandomAvailableMove(){
         int randomSelection = (int)(Math.random() * mAvailableMoves.size());
-        Move selectedMove = mAvailableMoves.remove(randomSelection);
-        GameBoard board = mBoard.getCopyOfBoard();
-        board.performMove(mPlayer, selectedMove );
-        Node childNode = new Node(this, board, mPlayer.getOpponent(), selectedMove);
-        mChildNodes.add(childNode);
+        return mAvailableMoves.remove(randomSelection);
 
-
-        return childNode;
     }
 
 
@@ -106,11 +118,20 @@ public class Node {
     }
 
     public boolean isNonTerminal(){
-       // return ! mChildNodes.isEmpty();
-        return mBoard.getAvailableMoves().size() > 0;
+        // a node is terminal if there are no more moves available or the state of the
+        // board is won or loss when the corresponding  move is executed
+
+        return !mTerminalNode;
     }
 
     public boolean fullyExpanded(){
         return mChildNodes.size() == mBoard.getAvailableMoves().size();
+    }
+
+
+    public void addChild(Node childNode){
+        // ensure parent pointer is set
+        childNode.mParent = this;
+        mChildNodes.add(childNode);
     }
 }

@@ -30,8 +30,8 @@ public class GameControllerApp {
                 int column = ((FourInLineMove) suggestedMove).getColumn();
                 LOGGER.info("Executing suggested move for P1= " + Integer.toString(column));
                 MoveStatus moveStatus = fourInLineGame.getGameBoard().performMove(Player.P1,suggestedMove);
-
                 done = updateGameState(fourInLineGame, moveStatus);
+                fourInLineGame.getGameBoard().display();
                 if (! done){
                     // P2 moves
                     System.out.println("Enter P2 move: ");
@@ -41,6 +41,7 @@ public class GameControllerApp {
                     FourInLineMove p2Move = new FourInLineMove(selectedColumn);
                     moveStatus = fourInLineGame.getGameBoard().performMove(Player.P2,p2Move);
                     done = updateGameState(fourInLineGame, moveStatus);
+                    fourInLineGame.getGameBoard().display();
 
                 }
             }else{
@@ -56,11 +57,11 @@ public class GameControllerApp {
     private static boolean updateGameState(Game game, MoveStatus moveStatus){
         GameState gameState =  game.getGameState();
         gameState = game.getGameBoard().updateGameStatus(gameState, moveStatus);
-        if (gameState.getStatus() == GameState.Status.GAME_WON){
+        if (gameState.getStatus() == GameStatus.GAME_WON){
             LOGGER.info("Game over. Winner: " + gameState.getWinningPlayer().toString());
             return true;
         }
-        if(gameState.getStatus() == GameState.Status.GAME_TIED) {
+        if(gameState.getStatus() == GameStatus.GAME_TIED) {
             LOGGER.info("Game over. Winner: " + gameState.getWinningPlayer().toString());
             return true;
         }
@@ -91,7 +92,7 @@ public class GameControllerApp {
 
             GameState gameState = searchAgent.runSimulation(game);
 
-            if (gameState.getStatus() == GameState.Status.GAME_WON) {
+            if (gameState.getStatus() == GameStatus.GAME_WON) {
                 LOGGER.info("Game over. Winner: " + gameState.getWinningPlayer().toString());
             } else {
                 LOGGER.info("Game over. Tie game");

@@ -369,6 +369,9 @@ public class FourInLineBoardTests {
 
     public class BogusMove extends Move {
 
+       public BogusMove(){
+           super("Bogus");
+       }
     }
 
 

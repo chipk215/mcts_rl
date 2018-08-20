@@ -9,6 +9,16 @@ public abstract class MoveStatus {
     // Player making move.
     protected Player mPlayer;
 
+    public GameStatus getGameStatus() {
+        return mGameStatus;
+    }
+
+    public void setGameStatus(GameStatus gameStatus) {
+        mGameStatus = gameStatus;
+    }
+
+    protected GameStatus mGameStatus;
+
     // Indicates whether move was valid/legal.
     protected boolean mValid;
 

@@ -11,12 +11,8 @@ package com.keyeswest.core;
  */
 public class GameState {
 
-    public enum Status{
-        IN_PROGRESS, GAME_WON, GAME_TIED
-    }
-
     //The enumerated status value for the game.
-    private Status mStatus;
+    private GameStatus mStatus;
 
     // Winning player if game was won, null otherwise.
     private Player mWinningPlayer;
@@ -34,7 +30,7 @@ public class GameState {
     }
 
     GameState(Player initialPlayer){
-        mStatus = Status.IN_PROGRESS;
+        mStatus = GameStatus.IN_PROGRESS;
         mWinningPlayer = null;
         mNextToMove = initialPlayer;
         mNumberMoves = 0;
@@ -45,7 +41,7 @@ public class GameState {
     }
 
 
-    public Status getStatus() {
+    public GameStatus getStatus() {
         return mStatus;
     }
 
@@ -53,7 +49,7 @@ public class GameState {
         return mWinningPlayer;
     }
 
-    public void setStatus(Status status) {
+    public void setStatus(GameStatus status) {
         mStatus = status;
     }
 

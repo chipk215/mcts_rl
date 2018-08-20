@@ -7,7 +7,7 @@ public class FourInLineMove extends Move {
     private int mColumn;
 
     public FourInLineMove (int column){
-        super();
+        super(Integer.toString(column));
         mColumn = column;
     }
 

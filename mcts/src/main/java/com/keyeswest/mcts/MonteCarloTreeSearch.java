@@ -1,10 +1,8 @@
 package com.keyeswest.mcts;
 
-import com.keyeswest.core.Game;
-import com.keyeswest.core.GameState;
-import com.keyeswest.core.Move;
-import com.keyeswest.core.Player;
+import com.keyeswest.core.*;
 
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class MonteCarloTreeSearch {
@@ -14,6 +12,8 @@ public class MonteCarloTreeSearch {
     private static final double WIN_VALUE = 1.0d;
     private static final double LOSS_VALUE = 0.0d;
     private static final double TIE_VALUE = 0.5d;
+
+    private static final int MAX_ITERATIONS = 1000;
 
     private static final Logger LOGGER = Logger.getLogger(MonteCarloTreeSearch.class.getName());
 
@@ -29,7 +29,7 @@ public class MonteCarloTreeSearch {
 
 
         int iterationCount = 0;
-        while(iterationCount < 3000){
+        while(iterationCount < MAX_ITERATIONS){
 
             Node candidateNode = treePolicy(rootNode);
             Game gameCopy = new Game(candidateNode.getCopyOfBoard(), candidateNode.getPlayer());
@@ -37,6 +37,22 @@ public class MonteCarloTreeSearch {
             backPropagation(candidateNode, gameState);
             iterationCount++;
 
+            StringBuilder sBuilder = new StringBuilder(System.lineSeparator());
+            sBuilder.append("***Iteration:"+ iterationCount + System.lineSeparator());
+            Node nodeInfo = candidateNode;
+            int level=0;
+            while(nodeInfo != null){
+                sBuilder.append("level= "+ level + System.lineSeparator());
+                sBuilder.append("Name= ").append(nodeInfo.getName() + System.lineSeparator());
+                sBuilder.append("Value= " + nodeInfo.getValue() + System.lineSeparator());
+                sBuilder.append("Visits= ").append(nodeInfo.getVisitCount()).append(System.lineSeparator());
+                sBuilder.append("---"+System.lineSeparator());
+                nodeInfo = nodeInfo.getParent();
+                level++;
+
+            }
+
+            LOGGER.log(Level.INFO,sBuilder.toString());
         }
 
         Node bestChild = UCB1.findChildNodeWithBestUCBValue(rootNode,0);
@@ -62,7 +78,7 @@ public class MonteCarloTreeSearch {
     private void backPropagation(Node node, GameState gameState){
         double value =  TIE_VALUE;
 
-        if (gameState.getStatus() == GameState.Status.GAME_WON) {
+        if (gameState.getStatus() == GameStatus.GAME_WON) {
             if (gameState.getWinningPlayer() == Player.P1) {
                 value = WIN_VALUE;
             } else {
@@ -75,17 +91,45 @@ public class MonteCarloTreeSearch {
             backPropNode.incrementVisit();
             backPropNode.addValue(value);
             backPropNode = backPropNode.getParent();
-            value = value * -1;
+            //value = value * -1;
         }
     }
 
 
 
+    private Node expand(Node node){
+
+        GameBoard board = node.getCopyOfBoard();
+
+        Move availableMove = node.getRandomAvailableMove();
+        MoveStatus moveStatus= board.performMove(node.getPlayer(), availableMove );
+        Node childNode = new Node(node, board, node.getPlayer(), availableMove, moveStatus.getGameStatus());
+
+        node.addChild(childNode);
+
+        return childNode;
+    }
+
+
+    /**
+     * Starting at the provided node (generally the root node), expand the node if the
+     * node can be expanded and return the expanded node for simulation.
+     *
+     * If the node is fully expanded choose a child node for consideration and locate either
+     * a terminal node or a non-fully expanded node in the child branch to simulate.
+     *
+     */
     private Node treePolicy(Node node){
+
+        // while a node has actions (steps) that can be taken
         while(node.isNonTerminal()){
+            // Is each available action represented by a child node?
             if (! node.fullyExpanded()){
-                return node.expand();
+                // add a child node corresponding to one of the unrepresented actions
+                return expand(node);
             }else{
+                // all actions are represented so choose a child node to run
+                // the simulation on based upon exploitation and exploration
                 node = UCB1.findChildNodeWithBestUCBValue(node, Cp);
             }
         }

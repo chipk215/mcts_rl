@@ -32,4 +32,9 @@ public class GameTestBoard implements GameBoard {
     public GameState updateGameStatus(GameState gameState, MoveStatus lastMove) {
         return null;
     }
+
+    @Override
+    public void display() {
+
+    }
 }

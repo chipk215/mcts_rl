@@ -12,11 +12,11 @@ public class GameTests {
         Game game = new Game(board, player);
 
         Game copyGame = game.makeCopy();
-        copyGame.setGameStatus(GameState.Status.GAME_WON);
+        copyGame.setGameStatus(GameStatus.GAME_WON);
         copyGame.setWinner(Player.P1.getOpponent());
 
-        Assert.assertEquals(GameState.Status.IN_PROGRESS, game.getGameStatus());
-        Assert.assertEquals(GameState.Status.GAME_WON, copyGame.getGameStatus());
+        Assert.assertEquals(GameStatus.IN_PROGRESS, game.getGameStatus());
+        Assert.assertEquals(GameStatus.GAME_WON, copyGame.getGameStatus());
 
         Assert.assertNull(game.getWinner());
         Assert.assertEquals(Player.P1.getOpponent(), copyGame.getWinner());

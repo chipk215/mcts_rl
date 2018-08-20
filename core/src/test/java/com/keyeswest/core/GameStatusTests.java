@@ -13,10 +13,10 @@ public class GameStatusTests {
 
         GameState copyStatus = gameStatus.makeCopy();
         copyStatus.setWinningPlayer(player);
-        copyStatus.setStatus(GameState.Status.GAME_WON);
+        copyStatus.setStatus(GameStatus.GAME_WON);
 
-        Assert.assertEquals(GameState.Status.IN_PROGRESS,gameStatus.getStatus());
-        Assert.assertEquals(GameState.Status.GAME_WON, copyStatus.getStatus());
+        Assert.assertEquals(GameStatus.IN_PROGRESS,gameStatus.getStatus());
+        Assert.assertEquals(GameStatus.GAME_WON, copyStatus.getStatus());
 
         Assert.assertNull(gameStatus.getWinningPlayer());
         Assert.assertEquals(player,copyStatus.getWinningPlayer());
