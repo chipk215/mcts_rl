@@ -13,6 +13,6 @@ public interface GameBoard {
 
     MoveStatus performMove(Player player, Move move);
 
-    GameStatus updateGameStatus(GameStatus gameStatus, MoveStatus lastMove);
+    GameState updateGameStatus(GameState gameState, MoveStatus lastMove);
 
 }

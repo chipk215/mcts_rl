@@ -8,15 +8,15 @@ public class GameStatusTests {
     @Test
     public void makeCopyTest(){
         Player player = Player.P1;
-        GameStatus gameStatus = new GameStatus(player);
+        GameState gameStatus = new GameState(player);
         gameStatus.setWinningPlayer(null);
 
-        GameStatus copyStatus = gameStatus.makeCopy();
+        GameState copyStatus = gameStatus.makeCopy();
         copyStatus.setWinningPlayer(player);
-        copyStatus.setStatus(GameStatus.Status.GAME_WON);
+        copyStatus.setStatus(GameState.Status.GAME_WON);
 
-        Assert.assertEquals(GameStatus.Status.IN_PROGRESS,gameStatus.getStatus());
-        Assert.assertEquals(GameStatus.Status.GAME_WON, copyStatus.getStatus());
+        Assert.assertEquals(GameState.Status.IN_PROGRESS,gameStatus.getStatus());
+        Assert.assertEquals(GameState.Status.GAME_WON, copyStatus.getStatus());
 
         Assert.assertNull(gameStatus.getWinningPlayer());
         Assert.assertEquals(player,copyStatus.getWinningPlayer());

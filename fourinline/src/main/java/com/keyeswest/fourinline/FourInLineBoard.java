@@ -45,7 +45,8 @@ public class FourInLineBoard implements GameBoard {
             }
         }
 
-        mPositions = fourInLineBoard.mPositions;
+        mPositions.addAll(fourInLineBoard.mPositions);
+
     }
 
     @Override
@@ -95,12 +96,12 @@ public class FourInLineBoard implements GameBoard {
 
     /**
      * Evaluates the board after a move to determine if the game has ended with a win.
-     * @param gameStatus - the game's status object to update
+     * @param gameState - the game's status object to update
      * @param lastMove - the last executed move status
      * @return - updated game status
      */
     @Override
-    public GameStatus updateGameStatus(GameStatus gameStatus, MoveStatus lastMove) {
+    public GameState updateGameStatus(GameState gameState, MoveStatus lastMove) {
         FourInLineMoveStatus moveStatus=null;
         if (lastMove instanceof FourInLineMoveStatus){
             moveStatus = (FourInLineMoveStatus)lastMove;
@@ -109,16 +110,16 @@ public class FourInLineBoard implements GameBoard {
 
             if (winner != null){
                 logWinMessage(winner,moveStatus.getPlayer() );
-                gameStatus.setWinningPlayer(moveStatus.getPlayer());
-                gameStatus.setStatus(GameStatus.Status.GAME_WON);
-                gameStatus.nextPlayersTurn();
+                gameState.setWinningPlayer(moveStatus.getPlayer());
+                gameState.setStatus(GameState.Status.GAME_WON);
+                gameState.nextPlayersTurn();
             }
         }else{
             LOGGER.log(Level.SEVERE,"Unable to downcast move status.");
             throw new IllegalStateException("Unrecognized move status");
         }
 
-        return gameStatus;
+        return gameState;
     }
 
     List<CellOccupant> getBoardPositions(){

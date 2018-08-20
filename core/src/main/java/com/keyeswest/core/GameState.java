@@ -2,14 +2,14 @@ package com.keyeswest.core;
 
 
 /**
- * GameStatus represents the state of both a game in progress and the final state of a completed game.
+ * GameState represents the state of both a game in progress and the final state of a completed game.
  *
- * While in progress, GameStatus returns the 'IN_PROGRESS' status value.
+ * While in progress, GameState returns the 'IN_PROGRESS' status value.
  *
  * When complete, the progress is either 'GAME_WON' or 'GAME_TIED'. The winning player
  * is identified if the game has a winner.
  */
-public class GameStatus {
+public class GameState {
 
     public enum Status{
         IN_PROGRESS, GAME_WON, GAME_TIED
@@ -26,14 +26,14 @@ public class GameStatus {
     private int mNumberMoves;
 
     //Copy constructor for used when making copies of games.
-    private GameStatus(GameStatus status){
+    private GameState(GameState status){
         mStatus = status.mStatus;
         mWinningPlayer = status.mWinningPlayer;
         mNextToMove = status.mNextToMove;
         mNumberMoves = status.mNumberMoves;
     }
 
-    GameStatus(Player initialPlayer){
+    GameState(Player initialPlayer){
         mStatus = Status.IN_PROGRESS;
         mWinningPlayer = null;
         mNextToMove = initialPlayer;
@@ -57,8 +57,8 @@ public class GameStatus {
         mStatus = status;
     }
 
-    public GameStatus makeCopy(){
-        return new GameStatus(this);
+    public GameState makeCopy(){
+        return new GameState(this);
     }
 
     public void nextPlayersTurn(){

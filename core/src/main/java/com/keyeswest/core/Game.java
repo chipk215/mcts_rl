@@ -8,17 +8,17 @@ public class Game {
 
     private GameBoard mGameBoard;
 
-    private GameStatus mStatus;
+    private GameState mGameState;
 
     private Game(Game game){
 
         mGameBoard = game.mGameBoard.getCopyOfBoard();
-        mStatus = game.mStatus.makeCopy();
+        mGameState = game.mGameState.makeCopy();
     }
 
     public Game(GameBoard board,Player initialPlayer ){
         mGameBoard = board;
-        mStatus = new GameStatus(initialPlayer);
+        mGameState = new GameState(initialPlayer);
     }
 
     public GameBoard getGameBoard() {
@@ -28,46 +28,54 @@ public class Game {
 
 
     public void setWinner(Player player){
-        mStatus.setWinningPlayer(player);
+        mGameState.setWinningPlayer(player);
     }
 
     public Player getWinner(){
-        return mStatus.getWinningPlayer();
+        return mGameState.getWinningPlayer();
     }
 
-    public void setStatus(GameStatus.Status status){
-        mStatus.setStatus(status);
+    public void setGameStatus(GameState.Status gameStatus){
+        mGameState.setStatus(gameStatus);
     }
 
     public Game makeCopy(){
         return new Game(this);
     }
 
-    public GameStatus.Status getStatus(){
-        return mStatus.getStatus();
+    public GameState.Status getGameStatus(){
+        return mGameState.getStatus();
     }
 
-    public GameStatus playRandomGame(){
-        while(mStatus.getStatus() == GameStatus.Status.IN_PROGRESS){
+    public GameState playRandomGame(){
+        while(mGameState.getStatus() == GameState.Status.IN_PROGRESS){
             List<? extends Move> availableMoves =  mGameBoard.getAvailableMoves();
             int numberMovesAvailable = availableMoves.size();
             if (numberMovesAvailable ==0){
-                mStatus.setStatus(GameStatus.Status.GAME_TIED);
+                mGameState.setStatus(GameState.Status.GAME_TIED);
             }else{
                 int randomSelection = (int)(Math.random() * numberMovesAvailable);
                 Move selectedMove = availableMoves.get(randomSelection);
 
-                MoveStatus moveStatus = mGameBoard.performMove(mStatus.getNextToMove(), selectedMove);
+                MoveStatus moveStatus = mGameBoard.performMove(mGameState.getNextToMove(), selectedMove);
                 if (! moveStatus.mValid){
                     throw new IllegalStateException("Invalid game move");
                 }
-                mStatus.incrementMoveCount();
-                mStatus = mGameBoard.updateGameStatus(mStatus, moveStatus);
+                mGameState.incrementMoveCount();
+                mGameState = mGameBoard.updateGameStatus(mGameState, moveStatus);
 
 
             }
         }
 
-        return mStatus;
+        return mGameState;
+    }
+
+    public Player getNextPlayerToMove(){
+        return mGameState.getNextToMove();
+    }
+
+    public GameState getGameState(){
+        return mGameState;
     }
 }

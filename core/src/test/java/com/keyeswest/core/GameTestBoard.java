@@ -29,7 +29,7 @@ public class GameTestBoard implements GameBoard {
     }
 
     @Override
-    public GameStatus updateGameStatus(GameStatus gameStatus, MoveStatus lastMove) {
+    public GameState updateGameStatus(GameState gameState, MoveStatus lastMove) {
         return null;
     }
 }
