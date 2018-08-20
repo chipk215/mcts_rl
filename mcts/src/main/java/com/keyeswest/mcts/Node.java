@@ -17,9 +17,10 @@ public class Node {
     private double mValue;
     private Move mMove;
 
-    // constructors
-    public Node(){
-        this(null, null,null,null);
+    private List<? extends Move> mAvailableMoves;
+
+    public Node( GameBoard board){
+        this(null, board, null, null);
     }
 
     private Node(Node parent, GameBoard board, Player player, Move move){
@@ -31,6 +32,12 @@ public class Node {
         mVisitCount = 0;
         mValue = 0d;
         mMove = move;
+
+        if (board == null){
+            throw new IllegalArgumentException("Game board can not be null");
+        }
+        mAvailableMoves =  mBoard.getAvailableMoves();
+
     }
 
 
@@ -42,18 +49,17 @@ public class Node {
         mBoard = board.getCopyOfBoard();
     }
 
-    public int expand(){
+    public Node expand(){
 
-        List<? extends Move> availableMoves = mBoard.getAvailableMoves();
-        int nodesAdded = availableMoves.size();
-        for (Move move : availableMoves){
-            GameBoard board = mBoard.getCopyOfBoard();
-            board.performMove(mPlayer, move);
-            Node childNode = new Node(this, board, mPlayer.getOpponent(), move);
-            mChildNodes.add(childNode);
-        }
+        int randomSelection = (int)(Math.random() * mAvailableMoves.size());
+        Move selectedMove = mAvailableMoves.remove(randomSelection);
+        GameBoard board = mBoard.getCopyOfBoard();
+        board.performMove(mPlayer, selectedMove );
+        Node childNode = new Node(this, board, mPlayer.getOpponent(), selectedMove);
+        mChildNodes.add(childNode);
 
-        return nodesAdded;
+
+        return childNode;
     }
 
 
@@ -104,5 +110,14 @@ public class Node {
 
     public Node getParent(){
         return mParent;
+    }
+
+    public boolean isNonTerminal(){
+       // return ! mChildNodes.isEmpty();
+        return mBoard.getAvailableMoves().size() > 0;
+    }
+
+    public boolean fullyExpanded(){
+        return mChildNodes.size() == mBoard.getAvailableMoves().size();
     }
 }

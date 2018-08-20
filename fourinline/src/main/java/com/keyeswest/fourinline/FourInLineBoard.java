@@ -109,9 +109,11 @@ public class FourInLineBoard implements GameBoard {
             WinLine winner = checkBoardForWin(moveStatus.getPlayer(),moveStatus.getRow(), moveStatus.getColumn());
 
             if (winner != null){
-                logWinMessage(winner,moveStatus.getPlayer() );
+              //  logWinMessage(winner,moveStatus.getPlayer() );
                 gameState.setWinningPlayer(moveStatus.getPlayer());
                 gameState.setStatus(GameState.Status.GAME_WON);
+
+            }else{
                 gameState.nextPlayersTurn();
             }
         }else{
