@@ -441,7 +441,11 @@ public class FourInLineBoard implements GameBoard {
     }
 
     @Override
-    public void display(){
+    public void display(Logger clientLogger){
+         Logger logger = clientLogger;
+         if (logger == null){
+             logger = LOGGER;
+         }
 
          StringBuilder sBuilder = new StringBuilder(System.lineSeparator());
          for (int row=MAX_ROWS-1; row>=0; row--){
@@ -458,7 +462,7 @@ public class FourInLineBoard implements GameBoard {
              //System.out.println();
          }
 
-         LOGGER.info(sBuilder.toString());
+         logger.info(sBuilder.toString());
     }
 
 }

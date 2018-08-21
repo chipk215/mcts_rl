@@ -3,6 +3,7 @@ package com.keyeswest.core;
 
 
 import java.util.List;
+import java.util.logging.Logger;
 
 public interface GameBoard {
 
@@ -15,6 +16,6 @@ public interface GameBoard {
 
     GameState updateGameStatus(GameState gameState, MoveStatus lastMove);
 
-    void display();
+    void display(Logger logger);
 
 }

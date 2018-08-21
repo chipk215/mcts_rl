@@ -3,6 +3,7 @@ package com.keyeswest.core;
 
 
 import java.util.List;
+import java.util.logging.Logger;
 
 public class GameTestBoard implements GameBoard {
 
@@ -34,7 +35,7 @@ public class GameTestBoard implements GameBoard {
     }
 
     @Override
-    public void display() {
+    public void display(Logger logger) {
 
     }
 }

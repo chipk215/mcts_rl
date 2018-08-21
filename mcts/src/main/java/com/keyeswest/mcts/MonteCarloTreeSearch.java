@@ -2,8 +2,16 @@ package com.keyeswest.mcts;
 
 import com.keyeswest.core.*;
 
+import java.io.IOException;
+import java.nio.file.FileSystems;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.logging.FileHandler;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.logging.SimpleFormatter;
 
 public class MonteCarloTreeSearch {
 
@@ -15,30 +23,65 @@ public class MonteCarloTreeSearch {
     private static final double TIE_VALUE =0.5d;
     private static final int MAX_ITERATIONS = 40;
 
+    private static FileHandler fh = null;
+
+    public static void setupLogging(){
+        Path currentPath = FileSystems.getDefault().getPath(".");
+
+        SimpleDateFormat format = new SimpleDateFormat("M-d_HHmmss");
+        String fileName = "/logs/SearchLog_" + format.format(Calendar.getInstance().getTime()) + ".log";
+        Path filePath = Paths.get(currentPath.toString(), fileName);
+        try{
+            fh = new FileHandler(filePath.toString());
+        }catch (IOException e){
+            e.printStackTrace();
+        }
+
+        fh.setFormatter(new SimpleFormatter());
+        LOGGER.addHandler(fh);
+
+        LOGGER.setUseParentHandlers(false);
+
+    }
+
     public Move findNextMove(Game game){
+
 
         // create the search tree
         Tree tree = new Tree(game.getGameBoard(), game.getNextPlayerToMove());
+        game.getGameBoard().display(LOGGER);
 
         int iterationCount = 0;
         while(iterationCount < MAX_ITERATIONS){
+            StringBuilder sBuilder = new StringBuilder(System.lineSeparator());
+            sBuilder.append("***Iteration:"+ iterationCount + System.lineSeparator());
             GameState gameState;
             Node candidateNode = treePolicy(tree.getRootNode());
+            sBuilder.append("Candidate Selection: " + candidateNode.getName() + System.lineSeparator());
             Game gameCopy = new Game(candidateNode.getCopyOfBoard(), candidateNode.getPlayer());
             if (candidateNode.isNonTerminal()) {
                 gameState = runSimulation(gameCopy);
+                sBuilder.append("Simulation results: " + System.lineSeparator());
+                sBuilder.append("   " + gameState.describe());
+                sBuilder.append(System.lineSeparator());
             }else {
                 gameState = gameCopy.getGameState();
                 gameState.setStatus(GameStatus.GAME_WON);
                 gameState.setWinningPlayer(candidateNode.getPlayer().getOpponent());
                 gameState.setNumberMoves(candidateNode.getGameMoves());
 
+                // if the terminal node represents a winning move for root node player
+                // then return the move as the selected move.
+                if (candidateNode.getParent().getPlayer() == tree.getRootNode().getPlayer()){
+                    LOGGER.log(Level.INFO,"Selected Move: " + candidateNode.getMove().getName() + System.lineSeparator() );
+                    return candidateNode.getMove();
+                }
+
             }
             backPropagation(candidateNode, gameState);
-            iterationCount++;
 
-            StringBuilder sBuilder = new StringBuilder(System.lineSeparator());
-            sBuilder.append("***Iteration:"+ iterationCount + System.lineSeparator());
+
+
             Node nodeInfo = candidateNode;
             int level=0;
             while(nodeInfo != null){
@@ -53,14 +96,14 @@ public class MonteCarloTreeSearch {
             }
 
             LOGGER.log(Level.INFO,sBuilder.toString());
-            // if the terminal node represents a winning move for root node player
-            // then return the move as the selected move.
-            if (candidateNode.getParent().getPlayer() == tree.getRootNode().getPlayer()){
-                return candidateNode.getMove();
-            }
+
+
+
+            iterationCount++;
         }
 
         Node bestChild = UCB1.findChildNodeWithBestUCBValue(tree.getRootNode(),0);
+        LOGGER.log(Level.INFO,"Selected Move: " + bestChild.getMove().getName() + System.lineSeparator() );
         return bestChild.getMove();
     }
 

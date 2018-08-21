@@ -76,4 +76,15 @@ public class GameState {
     public void incrementMoveCount(){
         mNumberMoves++;
     }
+
+    public String describe(){
+        StringBuilder sBuilder = new StringBuilder("Game State" + System.lineSeparator());
+        sBuilder.append("Status= " + mStatus.toString() + System.lineSeparator());
+        if (mWinningPlayer != null){
+            sBuilder.append("Winner= " +  mWinningPlayer.toString()+ System.lineSeparator());
+        }
+        sBuilder.append("Number of Moves= " +Integer.toString(mNumberMoves) + System.lineSeparator());
+
+        return sBuilder.toString();
+    }
 }

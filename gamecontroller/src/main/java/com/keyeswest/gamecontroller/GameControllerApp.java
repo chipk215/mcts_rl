@@ -46,7 +46,7 @@ public class GameControllerApp {
         fourInLineGame.getGameBoard().display();
 
 */
-
+        MonteCarloTreeSearch.setupLogging();
         MonteCarloTreeSearch searchAgent = new MonteCarloTreeSearch();
 
         boolean done = false;
@@ -57,7 +57,7 @@ public class GameControllerApp {
                 LOGGER.info("Executing suggested move for P1= " + Integer.toString(column));
                 MoveStatus moveStatus = fourInLineGame.getGameBoard().performMove(Player.P1,suggestedMove);
                 done = updateGameState(fourInLineGame, moveStatus);
-                fourInLineGame.getGameBoard().display();
+                fourInLineGame.getGameBoard().display(null);
                 if (! done){
                     // P2 moves
                     System.out.println("Enter P2 move: ");
@@ -69,7 +69,7 @@ public class GameControllerApp {
                     FourInLineMove p2Move = new FourInLineMove(selectedColumn);
                     moveStatus = fourInLineGame.getGameBoard().performMove(Player.P2,p2Move);
                     done = updateGameState(fourInLineGame, moveStatus);
-                    fourInLineGame.getGameBoard().display();
+                    fourInLineGame.getGameBoard().display(null);
 
                 }
             }else{
