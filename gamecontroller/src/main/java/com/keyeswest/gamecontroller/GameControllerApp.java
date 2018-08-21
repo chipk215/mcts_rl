@@ -22,6 +22,31 @@ public class GameControllerApp {
 
         Game fourInLineGame = new Game(new FourInLineBoard(),Player.P1);
 
+        /*
+        FourInLineMove p1Move = new FourInLineMove(3);
+        FourInLineMove p2MoveInit = new FourInLineMove(0);
+
+
+        // set up initial condition
+        MoveStatus p1Status = fourInLineGame.getGameBoard().performMove(Player.P1,p1Move);
+        updateGameState(fourInLineGame, p1Status);
+        MoveStatus p2Status = fourInLineGame.getGameBoard().performMove(Player.P2,p2MoveInit);
+        updateGameState(fourInLineGame, p2Status);
+
+        p1Status = fourInLineGame.getGameBoard().performMove(Player.P1,p1Move);
+        updateGameState(fourInLineGame, p1Status);
+        p2Status = fourInLineGame.getGameBoard().performMove(Player.P2,p2MoveInit);
+        updateGameState(fourInLineGame, p2Status);
+
+        p1Status = fourInLineGame.getGameBoard().performMove(Player.P1,p1Move);
+        updateGameState(fourInLineGame, p1Status);
+        p2MoveInit = new FourInLineMove(1);
+        p2Status = fourInLineGame.getGameBoard().performMove(Player.P2,p2MoveInit);
+        updateGameState(fourInLineGame, p2Status);
+        fourInLineGame.getGameBoard().display();
+
+        */
+
         MonteCarloTreeSearch searchAgent = new MonteCarloTreeSearch();
 
         boolean done = false;

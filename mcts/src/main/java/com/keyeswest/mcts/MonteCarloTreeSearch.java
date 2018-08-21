@@ -12,8 +12,8 @@ public class MonteCarloTreeSearch {
     private static final double Cp = 1/ Math.sqrt(2);
     private static final double WIN_VALUE = 1.0d;
     private static final double LOSS_VALUE = 0.0d;
-    private static final double TIE_VALUE = 0.5d;
-    private static final int MAX_ITERATIONS = 3000;
+    private static final double TIE_VALUE =0.5d;
+    private static final int MAX_ITERATIONS = 40;
 
     public Move findNextMove(Game game){
 
@@ -22,10 +22,17 @@ public class MonteCarloTreeSearch {
 
         int iterationCount = 0;
         while(iterationCount < MAX_ITERATIONS){
-
+            GameState gameState;
             Node candidateNode = treePolicy(tree.getRootNode());
             Game gameCopy = new Game(candidateNode.getCopyOfBoard(), candidateNode.getPlayer());
-            GameState gameState = runSimulation(gameCopy);
+            if (candidateNode.isNonTerminal()) {
+                gameState = runSimulation(gameCopy);
+            }else{
+                gameState = gameCopy.getGameState();
+                gameState.setStatus(GameStatus.GAME_WON);
+                gameState.setWinningPlayer(candidateNode.getPlayer().getOpponent());
+                gameState.setNumberMoves(candidateNode.getGameMoves());
+            }
             backPropagation(candidateNode, gameState);
             iterationCount++;
 
@@ -53,7 +60,8 @@ public class MonteCarloTreeSearch {
 
     public GameState runSimulation(Game game){
 
-       // LOGGER.info("Starting game simulation");
+        // evaluate the game state, the expanded node may have ended the game
+
 
         GameState gameStatus = game.playRandomGame();
 
@@ -77,8 +85,6 @@ public class MonteCarloTreeSearch {
                 value = LOSS_VALUE;
             }
         }
-
-
 
 
 

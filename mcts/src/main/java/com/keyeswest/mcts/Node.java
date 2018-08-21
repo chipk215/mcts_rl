@@ -23,7 +23,7 @@ public class Node {
     // parent player for 2 player games.
     private Player mPlayer;
 
-    // mMoveToGetHere saves teh move made from the parent to reach this node state.
+    // mMoveToGetHere saves the move made from the parent to reach this node state.
     // It is used to identify the recommended move in the MCTS search when this node
     // is selected by the search algorithm.
     private Move mMoveToGetHere;
@@ -150,5 +150,16 @@ public class Node {
         childNode.mName = this.mName + " + " + moveToReachChild.getName();
         this.mChildNodes.add(childNode);
         return childNode;
+    }
+
+    public int getGameMoves(){
+        int count = 0;
+        Node node = this.mParent;
+        while(node != null){
+            node = node.mParent;
+            count++;
+        }
+
+        return count;
     }
 }

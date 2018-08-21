@@ -19,6 +19,10 @@ public class GameState {
 
     private Player mNextToMove;
 
+    public void setNumberMoves(int numberMoves) {
+        mNumberMoves = numberMoves;
+    }
+
     private int mNumberMoves;
 
     //Copy constructor for used when making copies of games.
