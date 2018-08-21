@@ -16,6 +16,7 @@ public class GameControllerApp {
 
 
     public static void main(String[] args){
+
         Scanner in = new Scanner(System.in);
         //runSimulations();
 
@@ -35,8 +36,10 @@ public class GameControllerApp {
                 if (! done){
                     // P2 moves
                     System.out.println("Enter P2 move: ");
+                    System.out.flush();
                     int selectedColumn = in.nextInt();
-                  //  System.out.println("Enter P2 move: " + Integer.toString(selectedColumn));
+                    in.nextLine();
+                    //  System.out.println("Enter P2 move: " + Integer.toString(selectedColumn));
 
                     FourInLineMove p2Move = new FourInLineMove(selectedColumn);
                     moveStatus = fourInLineGame.getGameBoard().performMove(Player.P2,p2Move);

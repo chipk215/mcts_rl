@@ -77,6 +77,9 @@ public class FourInLineBoard implements GameBoard {
         if (move instanceof FourInLineMove){
             int column = ((FourInLineMove)move).getColumn();
             status = addPiece(player,column);
+            if (! status.isValid()){
+                throw new IllegalStateException("Illegal and unexpected game move executed.");
+            }
 
         }else{
             LOGGER.log(Level.SEVERE,"Unable to downcast game move.");
@@ -440,18 +443,22 @@ public class FourInLineBoard implements GameBoard {
     @Override
     public void display(){
 
+         StringBuilder sBuilder = new StringBuilder(System.lineSeparator());
          for (int row=MAX_ROWS-1; row>=0; row--){
              for (int column=0; column< MAX_COLS; column++){
                  if (mBoard[row][column] == Player.P1.value()){
-                     System.out.print("[X]  ");
+                     sBuilder.append("[X]  ");
                  }else if(mBoard[row][column] == Player.P2.value()){
-                     System.out.print("[O]  ");
+                     sBuilder.append("[O]  ");
                  }else{
-                     System.out.print("[ ]  ");
+                     sBuilder.append("[ ]  ");
                  }
              }
-             System.out.println();
+             sBuilder.append(System.lineSeparator());
+             //System.out.println();
          }
+
+         LOGGER.info(sBuilder.toString());
     }
 
 }

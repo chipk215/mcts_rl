@@ -7,31 +7,23 @@ import java.util.logging.Logger;
 
 public class MonteCarloTreeSearch {
 
+    private static final Logger LOGGER = Logger.getLogger(MonteCarloTreeSearch.class.getName());
 
     private static final double Cp = 1/ Math.sqrt(2);
     private static final double WIN_VALUE = 1.0d;
     private static final double LOSS_VALUE = 0.0d;
     private static final double TIE_VALUE = 0.5d;
-
     private static final int MAX_ITERATIONS = 3000;
-
-    private static final Logger LOGGER = Logger.getLogger(MonteCarloTreeSearch.class.getName());
-
 
     public Move findNextMove(Game game){
 
         // create the search tree
-        Tree tree = new Tree(game.getGameBoard());
-        Node rootNode = tree.getRootNode();
-        // Do we need to save the player in the node?
-        // The active player is in the game state.
-        rootNode.setPlayer(game.getNextPlayerToMove());
-
+        Tree tree = new Tree(game.getGameBoard(), game.getNextPlayerToMove());
 
         int iterationCount = 0;
         while(iterationCount < MAX_ITERATIONS){
 
-            Node candidateNode = treePolicy(rootNode);
+            Node candidateNode = treePolicy(tree.getRootNode());
             Game gameCopy = new Game(candidateNode.getCopyOfBoard(), candidateNode.getPlayer());
             GameState gameState = runSimulation(gameCopy);
             backPropagation(candidateNode, gameState);
@@ -55,7 +47,7 @@ public class MonteCarloTreeSearch {
             LOGGER.log(Level.INFO,sBuilder.toString());
         }
 
-        Node bestChild = UCB1.findChildNodeWithBestUCBValue(rootNode,0);
+        Node bestChild = UCB1.findChildNodeWithBestUCBValue(tree.getRootNode(),0);
         return bestChild.getMove();
     }
 
@@ -81,33 +73,38 @@ public class MonteCarloTreeSearch {
         if (gameState.getStatus() == GameStatus.GAME_WON) {
             if (gameState.getWinningPlayer() == Player.P1) {
                 value = WIN_VALUE;
-            } else {
-                value = LOSS_VALUE ;
+            } else{
+                value = LOSS_VALUE;
             }
         }
+
+
+
+
 
         Node backPropNode = node;
         while (backPropNode != null){
             backPropNode.incrementVisit();
             backPropNode.addValue(value);
             backPropNode = backPropNode.getParent();
-            //value = value * -1;
+          /*
+            if (value==WIN_VALUE){
+                value = LOSS_VALUE;
+            }else{
+                value = WIN_VALUE;
+            }
+            */
         }
     }
 
 
 
     private Node expand(Node node){
-
         GameBoard board = node.getCopyOfBoard();
-
-        Move availableMove = node.getRandomAvailableMove();
-        MoveStatus moveStatus= board.performMove(node.getPlayer(), availableMove );
-        Node childNode = new Node(node, board, node.getPlayer(), availableMove, moveStatus.getGameStatus());
-
-        node.addChild(childNode);
-
-        return childNode;
+        Move availableMoveFromParent = node.getRandomAvailableMove();
+        MoveStatus moveStatus= board.performMove(node.getPlayer(),availableMoveFromParent);
+        boolean terminalStatus = moveStatus.getGameStatus() != GameStatus.IN_PROGRESS;
+        return node.addChild(board,terminalStatus,availableMoveFromParent);
     }
 
 
