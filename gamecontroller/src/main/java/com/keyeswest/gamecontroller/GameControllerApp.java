@@ -22,7 +22,7 @@ public class GameControllerApp {
 
         Game fourInLineGame = new Game(new FourInLineBoard(),Player.P1);
 
-        /*
+/*
         FourInLineMove p1Move = new FourInLineMove(3);
         FourInLineMove p2MoveInit = new FourInLineMove(0);
 
@@ -45,7 +45,7 @@ public class GameControllerApp {
         updateGameState(fourInLineGame, p2Status);
         fourInLineGame.getGameBoard().display();
 
-        */
+*/
 
         MonteCarloTreeSearch searchAgent = new MonteCarloTreeSearch();
 

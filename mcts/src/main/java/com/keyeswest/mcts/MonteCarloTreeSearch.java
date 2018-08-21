@@ -27,11 +27,12 @@ public class MonteCarloTreeSearch {
             Game gameCopy = new Game(candidateNode.getCopyOfBoard(), candidateNode.getPlayer());
             if (candidateNode.isNonTerminal()) {
                 gameState = runSimulation(gameCopy);
-            }else{
+            }else {
                 gameState = gameCopy.getGameState();
                 gameState.setStatus(GameStatus.GAME_WON);
                 gameState.setWinningPlayer(candidateNode.getPlayer().getOpponent());
                 gameState.setNumberMoves(candidateNode.getGameMoves());
+
             }
             backPropagation(candidateNode, gameState);
             iterationCount++;
@@ -52,6 +53,11 @@ public class MonteCarloTreeSearch {
             }
 
             LOGGER.log(Level.INFO,sBuilder.toString());
+            // if the terminal node represents a winning move for root node player
+            // then return the move as the selected move.
+            if (candidateNode.getParent().getPlayer() == tree.getRootNode().getPlayer()){
+                return candidateNode.getMove();
+            }
         }
 
         Node bestChild = UCB1.findChildNodeWithBestUCBValue(tree.getRootNode(),0);
