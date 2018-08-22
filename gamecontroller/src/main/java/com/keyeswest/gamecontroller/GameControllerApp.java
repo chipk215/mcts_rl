@@ -21,37 +21,13 @@ public class GameControllerApp {
         //runSimulations();
 
         Game fourInLineGame = new Game(new FourInLineBoard(),Player.P1);
+        //setupInitialConditions(fourInLineGame );
 
-/*
-        FourInLineMove p1Move = new FourInLineMove(3);
-        FourInLineMove p2MoveInit = new FourInLineMove(0);
-
-
-        // set up initial condition
-        MoveStatus p1Status = fourInLineGame.getGameBoard().performMove(Player.P1,p1Move);
-        updateGameState(fourInLineGame, p1Status);
-        MoveStatus p2Status = fourInLineGame.getGameBoard().performMove(Player.P2,p2MoveInit);
-        updateGameState(fourInLineGame, p2Status);
-
-        p1Status = fourInLineGame.getGameBoard().performMove(Player.P1,p1Move);
-        updateGameState(fourInLineGame, p1Status);
-        p2Status = fourInLineGame.getGameBoard().performMove(Player.P2,p2MoveInit);
-        updateGameState(fourInLineGame, p2Status);
-
-        p1Status = fourInLineGame.getGameBoard().performMove(Player.P1,p1Move);
-        updateGameState(fourInLineGame, p1Status);
-        p2MoveInit = new FourInLineMove(1);
-        p2Status = fourInLineGame.getGameBoard().performMove(Player.P2,p2MoveInit);
-        updateGameState(fourInLineGame, p2Status);
-        fourInLineGame.getGameBoard().display();
-
-*/
-
-        MonteCarloTreeSearch searchAgent = new MonteCarloTreeSearch(fourInLineGame);
+        MonteCarloTreeSearch searchAgent = new MonteCarloTreeSearch();
 
         boolean done = false;
         while(! done){
-            Move suggestedMove = searchAgent.findNextMove();
+            Move suggestedMove = searchAgent.findNextMove(fourInLineGame);
             LOGGER.info("Executing suggested move for P1= " + suggestedMove.getName());
             fourInLineGame.performMove(suggestedMove);
             fourInLineGame.getGameBoard().display(null);
@@ -89,25 +65,24 @@ public class GameControllerApp {
         return firstToMove;
     }
 
-    private static void runSimulations(){
-        for (int i=0; i<10; i++) {
-            LOGGER.info("Start new game: " + Integer.toString(i+1));
-
-            Game game = new Game(new FourInLineBoard(), chooseFirstMove());
-
-            MonteCarloTreeSearch searchAgent = new MonteCarloTreeSearch(game);
-
-            GameState gameState = searchAgent.runSimulation(game);
-
-            if (gameState.getStatus() == GameStatus.GAME_WON) {
-                LOGGER.info("Game over. Winner: " + gameState.getWinningPlayer().toString());
-            } else {
-                LOGGER.info("Game over. Tie game");
-            }
-
-            LOGGER.info("Number of moves in game: " + gameState.getNumberOfMoves());
 
 
-        }
+    private static void setupInitialConditions(Game fourInLineGame){
+        FourInLineMove p1Move = new FourInLineMove(3);
+        FourInLineMove p2MoveInit = new FourInLineMove(0);
+
+
+        // set up initial condition
+        fourInLineGame.performMove(p1Move);
+        fourInLineGame.performMove(p2MoveInit);
+
+        fourInLineGame.performMove(p1Move);
+        fourInLineGame.performMove(p2MoveInit);
+
+        fourInLineGame.performMove(p1Move);
+        p2MoveInit = new FourInLineMove(1);
+        fourInLineGame.performMove(p2MoveInit);
+
+        fourInLineGame.getGameBoard().display(null);
     }
 }

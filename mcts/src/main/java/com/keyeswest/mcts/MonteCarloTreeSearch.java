@@ -21,13 +21,12 @@ public class MonteCarloTreeSearch {
     private static final double WIN_VALUE = 1.0d;
     private static final double LOSS_VALUE = 0.0d;
     private static final double TIE_VALUE =0.5d;
-    private static final int MAX_ITERATIONS = 40;
+    private static final int MAX_ITERATIONS = 750;
 
-    private Game mGame;
+
     private FileHandler fh = null;
 
-    public MonteCarloTreeSearch(Game game){
-        mGame = game;
+    public MonteCarloTreeSearch(){
         setupLogging();
     }
 
@@ -50,20 +49,21 @@ public class MonteCarloTreeSearch {
 
     }
 
-    public Move findNextMove(){
+    public Move findNextMove(Game game){
 
         // create the search tree
-        Tree tree = new Tree(mGame.getGameBoard(), mGame.getNextPlayerToMove());
-        mGame.getGameBoard().display(LOGGER);
+        Tree tree = new Tree(game.getGameBoard(), game.getNextPlayerToMove());
+        game.getGameBoard().display(LOGGER);
 
         int iterationCount = 0;
         while(iterationCount < MAX_ITERATIONS){
             StringBuilder sBuilder = new StringBuilder(System.lineSeparator());
             sBuilder.append("***Iteration:"+ iterationCount + System.lineSeparator());
             GameState gameState;
-            Node candidateNode = treePolicy(tree.getRootNode());
+            Game gameCopy = game.makeCopy();
+            Node candidateNode = treePolicy(tree.getRootNode(), gameCopy);
             sBuilder.append("Candidate Selection: " + candidateNode.getName() + System.lineSeparator());
-            Game gameCopy = new Game(candidateNode.getCopyOfBoard(), candidateNode.getPlayer());
+
             if (candidateNode.isNonTerminal()) {
                 gameState = runSimulation(gameCopy);
                 sBuilder.append("Simulation results: " + System.lineSeparator());
@@ -77,7 +77,8 @@ public class MonteCarloTreeSearch {
                 // if the terminal node represents a winning move for root node player
                 // then return the move as the selected move.
                 //TODO - require the terminal node to be child of rode in order to terminate search
-                if (candidateNode.getParent().getPlayer() == tree.getRootNode().getPlayer()){
+                if ((candidateNode.getParent().equals(tree.getRootNode())) &&
+                        (candidateNode.getParent().getPlayer() == tree.getRootNode().getPlayer())){
                     LOGGER.log(Level.INFO,"Selected Move: " + candidateNode.getMove().getName() + System.lineSeparator() );
                     return candidateNode.getMove();
                 }
@@ -123,11 +124,6 @@ public class MonteCarloTreeSearch {
         return gameStatus;
     }
 
-    private GameState rollOut(Node node){
-        Game game = new Game(node.getCopyOfBoard(), node.getPlayer());
-        return runSimulation(game);
-
-    }
 
     private void backPropagation(Node node, GameState gameState){
         double value =  TIE_VALUE;
@@ -139,8 +135,6 @@ public class MonteCarloTreeSearch {
                 value = LOSS_VALUE;
             }
         }
-
-
 
         Node backPropNode = node;
         while (backPropNode != null){
@@ -159,11 +153,11 @@ public class MonteCarloTreeSearch {
 
 
 
-    private Node expand(Node node){
+    private Node expand(Node node, Game game){
         GameBoard board = node.getCopyOfBoard();
         Move availableMoveFromParent = node.getRandomAvailableMove();
-        mGame.performMove(availableMoveFromParent);
-        boolean terminalStatus = mGame.getGameState().getStatus() != GameStatus.IN_PROGRESS;
+        game.performMove(availableMoveFromParent);
+        boolean terminalStatus = game.getGameState().getStatus() != GameStatus.IN_PROGRESS;
         return node.addChild(board,terminalStatus,availableMoveFromParent);
     }
 
@@ -176,14 +170,14 @@ public class MonteCarloTreeSearch {
      * a terminal node or a non-fully expanded node in the child branch to simulate.
      *
      */
-    private Node treePolicy(Node node){
+    private Node treePolicy(Node node, Game game){
 
         // while a node has actions (steps) that can be taken
         while(node.isNonTerminal()){
             // Is each available action represented by a child node?
             if (! node.fullyExpanded()){
                 // add a child node corresponding to one of the unrepresented actions
-                return expand(node);
+                return expand(node, game);
             }else{
                 // all actions are represented so choose a child node to run
                 // the simulation on based upon exploitation and exploration
