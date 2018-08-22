@@ -12,9 +12,7 @@ public interface GameBoard {
 
     GameBoard getCopyOfBoard();
 
-    MoveStatus performMove(Player player, Move move);
-
-    GameState updateGameStatus(GameState gameState, MoveStatus lastMove);
+    GameStatus performMove(Move move,Player player);
 
     void display(Logger logger);
 

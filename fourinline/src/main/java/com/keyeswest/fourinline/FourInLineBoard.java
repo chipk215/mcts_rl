@@ -44,9 +44,7 @@ public class FourInLineBoard implements GameBoard {
                 mBoard[row][col] = fourInLineBoard.mBoard[row][col];
             }
         }
-
         mPositions.addAll(fourInLineBoard.mPositions);
-
     }
 
     @Override
@@ -60,32 +58,36 @@ public class FourInLineBoard implements GameBoard {
                 }
             }
         }
-
         return moves;
     }
 
     @Override
     public GameBoard getCopyOfBoard() {
-
         return  new FourInLineBoard(this);
-
     }
 
     @Override
-    public MoveStatus performMove(Player player, Move move) {
-        FourInLineMoveStatus status=null;
+    public GameStatus performMove(Move move, Player player) {
+
+        WinLine winLine;
+
         if (move instanceof FourInLineMove){
             int column = ((FourInLineMove)move).getColumn();
-            status = addPiece(player,column);
-            if (! status.isValid()){
-                throw new IllegalStateException("Illegal and unexpected game move executed.");
+            winLine = addPiece(player,column);
+            GameStatus gameStatus = GameStatus.IN_PROGRESS;
+            if (winLine != null){
+                gameStatus = GameStatus.GAME_WON;
+            }else{
+                // check for tie
+                if (getAvailableMoves().size() == 0){
+                    gameStatus = GameStatus.GAME_TIED;
+                }
             }
-
+            return gameStatus;
         }else{
             LOGGER.log(Level.SEVERE,"Unable to downcast game move.");
             throw new IllegalStateException("Unrecognized game move.");
         }
-        return status;
     }
 
     private void logWinMessage(WinLine winner, Player player){
@@ -97,71 +99,23 @@ public class FourInLineBoard implements GameBoard {
     }
 
 
-    /**
-     * Evaluates the board after a move to determine if the game has ended with a win.
-     * @param gameState - the game's status object to update
-     * @param lastMove - the last executed move status
-     * @return - updated game status
-     */
-    @Override
-    public GameState updateGameStatus(GameState gameState, MoveStatus lastMove) {
-        FourInLineMoveStatus moveStatus=null;
-        if (lastMove instanceof FourInLineMoveStatus){
-            moveStatus = (FourInLineMoveStatus)lastMove;
-            //check for winner
-            WinLine winner = checkBoardForWin(moveStatus.getPlayer(),moveStatus.getRow(), moveStatus.getColumn());
-
-            if (winner != null){
-              //  logWinMessage(winner,moveStatus.getPlayer() );
-                gameState.setWinningPlayer(moveStatus.getPlayer());
-                gameState.setStatus(GameStatus.GAME_WON);
-
-            }else{
-                gameState.nextPlayersTurn();
-            }
-        }else{
-            LOGGER.log(Level.SEVERE,"Unable to downcast move status.");
-            throw new IllegalStateException("Unrecognized move status");
-        }
-
-        return gameState;
-    }
-
     List<CellOccupant> getBoardPositions(){
         return mPositions;
     }
 
-
-    FourInLineMoveStatus addPiece(Player player, int column){
+    public WinLine addPiece(Player player, int column){
 
         if ( (column < 0) || (column >= MAX_COLS)){
-
-            return new FourInLineMoveStatus(player, -1, column, false, GameStatus.IN_PROGRESS);
+            throw new IllegalStateException("Illegal and unexpected game move executed.");
         }
-
         int row = getNextAvailableRow(column);
         if (row == -1){
-            return new FourInLineMoveStatus(player,-1, column, false, GameStatus.IN_PROGRESS);
+            throw new IllegalStateException("Illegal and unexpected game move executed.");
         }
-
         mBoard[row][column] = player.value();
-
         mPositions.add(new CellOccupant(player,computeCellNumber(row,column)));
 
-        GameStatus gameStatus = GameStatus.IN_PROGRESS;
-
-        WinLine winLine = checkBoardForWin(player, row, column);
-        if (winLine != null){
-            gameStatus = GameStatus.GAME_WON;
-        }
-
-        int availableMoveCount = getAvailableMoves().size();
-        if ((availableMoveCount == 0) && (gameStatus == GameStatus.IN_PROGRESS)){
-            gameStatus = GameStatus.GAME_TIED;
-        }
-
-        return new  FourInLineMoveStatus(player, row, column, true, gameStatus);
-
+        return checkBoardForWin(player, row, column);
     }
 
     /**
@@ -206,9 +160,7 @@ public class FourInLineBoard implements GameBoard {
         int getCellNumber() {
             return mCellNumber;
         }
-
     }
-
 
 
     private int getNextAvailableRow(int column){
@@ -461,8 +413,6 @@ public class FourInLineBoard implements GameBoard {
              sBuilder.append(System.lineSeparator());
              //System.out.println();
          }
-
          logger.info(sBuilder.toString());
     }
-
 }

@@ -24,15 +24,12 @@ public class GameTestBoard implements GameBoard {
     }
 
     @Override
-    public MoveStatus performMove(Player player, Move move) {
+    public GameStatus performMove( Move move,Player player) {
 
-        return new TestGameMoveStatus(player,true);
+        return GameStatus.IN_PROGRESS;
     }
 
-    @Override
-    public GameState updateGameStatus(GameState gameState, MoveStatus lastMove) {
-        return null;
-    }
+
 
     @Override
     public void display(Logger logger) {

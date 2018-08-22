@@ -7,7 +7,7 @@ import com.keyeswest.mcts.MonteCarloTreeSearch;
 
 
 import java.util.Scanner;
-import java.util.logging.Level;
+
 import java.util.logging.Logger;
 
 public class GameControllerApp {
@@ -46,56 +46,35 @@ public class GameControllerApp {
         fourInLineGame.getGameBoard().display();
 
 */
-        MonteCarloTreeSearch.setupLogging();
-        MonteCarloTreeSearch searchAgent = new MonteCarloTreeSearch();
+
+        MonteCarloTreeSearch searchAgent = new MonteCarloTreeSearch(fourInLineGame);
 
         boolean done = false;
         while(! done){
-            Move suggestedMove = searchAgent.findNextMove(fourInLineGame);
-            if (suggestedMove instanceof FourInLineMove) {
-                int column = ((FourInLineMove) suggestedMove).getColumn();
-                LOGGER.info("Executing suggested move for P1= " + Integer.toString(column));
-                MoveStatus moveStatus = fourInLineGame.getGameBoard().performMove(Player.P1,suggestedMove);
-                done = updateGameState(fourInLineGame, moveStatus);
+            Move suggestedMove = searchAgent.findNextMove();
+            LOGGER.info("Executing suggested move for P1= " + suggestedMove.getName());
+            fourInLineGame.performMove(suggestedMove);
+            fourInLineGame.getGameBoard().display(null);
+            if (fourInLineGame.getGameState().getStatus() == GameStatus.IN_PROGRESS){
+                // P2 moves
+                System.out.println("Enter P2 move: ");
+                System.out.flush();
+                int selectedColumn = in.nextInt();
+                in.nextLine();
+
+                FourInLineMove p2Move = new FourInLineMove(selectedColumn);
+                fourInLineGame.performMove(p2Move);
                 fourInLineGame.getGameBoard().display(null);
-                if (! done){
-                    // P2 moves
-                    System.out.println("Enter P2 move: ");
-                    System.out.flush();
-                    int selectedColumn = in.nextInt();
-                    in.nextLine();
-                    //  System.out.println("Enter P2 move: " + Integer.toString(selectedColumn));
-
-                    FourInLineMove p2Move = new FourInLineMove(selectedColumn);
-                    moveStatus = fourInLineGame.getGameBoard().performMove(Player.P2,p2Move);
-                    done = updateGameState(fourInLineGame, moveStatus);
-                    fourInLineGame.getGameBoard().display(null);
-
+                if (fourInLineGame.getGameState().getStatus() != GameStatus.IN_PROGRESS){
+                    done = true;
                 }
+
             }else{
-                LOGGER.log(Level.SEVERE,"Unexpected move error");
-                System.exit(1);
+                done = true;
             }
-
         }
-
     }
 
-
-    private static boolean updateGameState(Game game, MoveStatus moveStatus){
-        GameState gameState =  game.getGameState();
-        gameState = game.getGameBoard().updateGameStatus(gameState, moveStatus);
-        if (gameState.getStatus() == GameStatus.GAME_WON){
-            LOGGER.info("Game over. Winner: " + gameState.getWinningPlayer().toString());
-            return true;
-        }
-        if(gameState.getStatus() == GameStatus.GAME_TIED) {
-            LOGGER.info("Game over. Winner: " + gameState.getWinningPlayer().toString());
-            return true;
-        }
-
-        return false;
-    }
 
     private static Player chooseFirstMove(){
         Player firstToMove;
@@ -116,7 +95,7 @@ public class GameControllerApp {
 
             Game game = new Game(new FourInLineBoard(), chooseFirstMove());
 
-            MonteCarloTreeSearch searchAgent = new MonteCarloTreeSearch();
+            MonteCarloTreeSearch searchAgent = new MonteCarloTreeSearch(game);
 
             GameState gameState = searchAgent.runSimulation(game);
 

@@ -2,7 +2,7 @@ package com.keyeswest.fourinline;
 
 import com.keyeswest.core.GameStatus;
 import com.keyeswest.core.Move;
-import com.keyeswest.core.MoveStatus;
+
 import com.keyeswest.core.Player;
 import org.junit.Assert;
 import org.junit.Before;
@@ -52,15 +52,15 @@ public class FourInLineBoardTests {
     @Test
     public void performValidMoveTest(){
         FourInLineMove move = new FourInLineMove(0);
-        MoveStatus result = mFourInLineBoard.performMove(Player.P1, move);
+        GameStatus result = mFourInLineBoard.performMove(move,Player.P1);
 
-        Assert.assertTrue(result.isValid());
+        Assert.assertTrue(result == GameStatus.IN_PROGRESS);
     }
 
     @Test(expected = IllegalStateException.class)
     public void performBogusMoveTest(){
         BogusMove move = new BogusMove();
-        MoveStatus result  = mFourInLineBoard.performMove(Player.P1, move);
+        mFourInLineBoard.performMove(move,Player.P1);
 
     }
 
@@ -108,8 +108,8 @@ public class FourInLineBoardTests {
 
 
         // this is a winning negative diagonal move
-        FourInLineMoveStatus status = mFourInLineBoard.addPiece( Player.P1, 2);
-        Assert.assertEquals(GameStatus.GAME_WON, status.getGameStatus());
+        WinLine winLine = mFourInLineBoard.addPiece( Player.P1, 2);
+        Assert.assertNotNull(winLine);
     }
 
 
@@ -118,8 +118,7 @@ public class FourInLineBoardTests {
     public void validMoveTest(){
         Player player = Player.P1;
         int expectedPosition = 0;
-        FourInLineMoveStatus status = mFourInLineBoard.addPiece( player, 0);
-        Assert.assertTrue(status.isValid());
+        mFourInLineBoard.addPiece( player, 0);
         List<FourInLineBoard.CellOccupant> occupants = mFourInLineBoard.getBoardPositions();
         Assert.assertTrue(occupants.size() == 1);
         FourInLineBoard.CellOccupant occupant = occupants.get(0);
@@ -129,13 +128,16 @@ public class FourInLineBoardTests {
     }
 
 
-    @Test
-    public void invalidColumnTest(){
+    @Test(expected = IllegalStateException.class)
+    public void invalidSmallColumnTest(){
         Player player = Player.P1;
-        FourInLineMoveStatus status = mFourInLineBoard.addPiece( player, -1);
-        Assert.assertFalse(status.isValid());
-        status = mFourInLineBoard.addPiece( player, FourInLineBoard.getMaxCols());
-        Assert.assertFalse(status.isValid());
+        mFourInLineBoard.addPiece( player, -1);
+    }
+
+    @Test(expected = IllegalStateException.class)
+    public void invalidLargeColumnTest(){
+        Player player = Player.P1;
+        mFourInLineBoard.addPiece( player, FourInLineBoard.getMaxCols());
 
     }
 
@@ -147,10 +149,9 @@ public class FourInLineBoardTests {
         int expectedPlayerTwoPosition = FourInLineBoard.getMaxCols();
         Player playerOne = Player.P1;
         Player playerTwo = Player.P2;
-        FourInLineMoveStatus status = mFourInLineBoard.addPiece( playerOne, 0);
-        Assert.assertTrue(status.isValid());
-        status = mFourInLineBoard.addPiece( playerTwo, 0);
-        Assert.assertTrue(status.isValid());
+         mFourInLineBoard.addPiece( playerOne, 0);
+         mFourInLineBoard.addPiece( playerTwo, 0);
+
         List<FourInLineBoard.CellOccupant> occupants = mFourInLineBoard.getBoardPositions();
         Assert.assertTrue(occupants.size() == 2);
 
@@ -384,11 +385,11 @@ public class FourInLineBoardTests {
                 int randomSelection = (int) (Math.random() * range);
 
                 FourInLineMove randomMove = moves.get(randomSelection);
-                FourInLineMoveStatus status = mFourInLineBoard.addPiece(player, randomMove.getColumn());
-                Assert.assertTrue(status.isValid());
+                WinLine winner = mFourInLineBoard.addPiece(player, randomMove.getColumn());
+
                 moveCount++;
                 Assert.assertTrue(moveCount<= (FourInLineBoard.getMaxRows() * FourInLineBoard.getMaxCols()));
-                WinLine winner = mFourInLineBoard.checkBoardForWin(player, status.getRow(), status.getColumn());
+
                 if (winner != null) {
                     gameOver = true;
                 }else{

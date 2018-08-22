@@ -26,7 +26,6 @@ public class Game {
 
     }
 
-
     public void setWinner(Player player){
         mGameState.setWinningPlayer(player);
     }
@@ -56,15 +55,7 @@ public class Game {
             }else{
                 int randomSelection = (int)(Math.random() * numberMovesAvailable);
                 Move selectedMove = availableMoves.get(randomSelection);
-
-                MoveStatus moveStatus = mGameBoard.performMove(mGameState.getNextToMove(), selectedMove);
-                if (! moveStatus.mValid){
-                    throw new IllegalStateException("Invalid game move");
-                }
-                mGameState.incrementMoveCount();
-                mGameState = mGameBoard.updateGameStatus(mGameState, moveStatus);
-
-
+                performMove(selectedMove);
             }
         }
 
@@ -77,5 +68,18 @@ public class Game {
 
     public GameState getGameState(){
         return mGameState;
+    }
+
+    public void performMove(Move move) {
+
+        Player player = mGameState.getNextToMove();
+        GameStatus gameStatus =mGameBoard.performMove(move,player);
+        Player gameWinner = null;
+        if (gameStatus == GameStatus.GAME_WON){
+           gameWinner =  player;
+        }
+        mGameState.update(gameStatus, gameWinner);
+
+
     }
 }

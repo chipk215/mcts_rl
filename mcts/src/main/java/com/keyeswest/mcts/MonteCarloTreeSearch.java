@@ -23,9 +23,15 @@ public class MonteCarloTreeSearch {
     private static final double TIE_VALUE =0.5d;
     private static final int MAX_ITERATIONS = 40;
 
-    private static FileHandler fh = null;
+    private Game mGame;
+    private FileHandler fh = null;
 
-    public static void setupLogging(){
+    public MonteCarloTreeSearch(Game game){
+        mGame = game;
+        setupLogging();
+    }
+
+    public void setupLogging(){
         Path currentPath = FileSystems.getDefault().getPath(".");
 
         SimpleDateFormat format = new SimpleDateFormat("M-d_HHmmss");
@@ -44,12 +50,11 @@ public class MonteCarloTreeSearch {
 
     }
 
-    public Move findNextMove(Game game){
-
+    public Move findNextMove(){
 
         // create the search tree
-        Tree tree = new Tree(game.getGameBoard(), game.getNextPlayerToMove());
-        game.getGameBoard().display(LOGGER);
+        Tree tree = new Tree(mGame.getGameBoard(), mGame.getNextPlayerToMove());
+        mGame.getGameBoard().display(LOGGER);
 
         int iterationCount = 0;
         while(iterationCount < MAX_ITERATIONS){
@@ -65,13 +70,13 @@ public class MonteCarloTreeSearch {
                 sBuilder.append("   " + gameState.describe());
                 sBuilder.append(System.lineSeparator());
             }else {
+                gameCopy.getGameState().update(GameStatus.GAME_WON,candidateNode.getPlayer().getOpponent());
                 gameState = gameCopy.getGameState();
                 gameState.setStatus(GameStatus.GAME_WON);
-                gameState.setWinningPlayer(candidateNode.getPlayer().getOpponent());
-                gameState.setNumberMoves(candidateNode.getGameMoves());
 
                 // if the terminal node represents a winning move for root node player
                 // then return the move as the selected move.
+                //TODO - require the terminal node to be child of rode in order to terminate search
                 if (candidateNode.getParent().getPlayer() == tree.getRootNode().getPlayer()){
                     LOGGER.log(Level.INFO,"Selected Move: " + candidateNode.getMove().getName() + System.lineSeparator() );
                     return candidateNode.getMove();
@@ -157,8 +162,8 @@ public class MonteCarloTreeSearch {
     private Node expand(Node node){
         GameBoard board = node.getCopyOfBoard();
         Move availableMoveFromParent = node.getRandomAvailableMove();
-        MoveStatus moveStatus= board.performMove(node.getPlayer(),availableMoveFromParent);
-        boolean terminalStatus = moveStatus.getGameStatus() != GameStatus.IN_PROGRESS;
+        mGame.performMove(availableMoveFromParent);
+        boolean terminalStatus = mGame.getGameState().getStatus() != GameStatus.IN_PROGRESS;
         return node.addChild(board,terminalStatus,availableMoveFromParent);
     }
 

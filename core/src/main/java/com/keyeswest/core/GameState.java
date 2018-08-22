@@ -19,10 +19,6 @@ public class GameState {
 
     private Player mNextToMove;
 
-    public void setNumberMoves(int numberMoves) {
-        mNumberMoves = numberMoves;
-    }
-
     private int mNumberMoves;
 
     //Copy constructor for used when making copies of games.
@@ -61,9 +57,6 @@ public class GameState {
         return new GameState(this);
     }
 
-    public void nextPlayersTurn(){
-        mNextToMove = mNextToMove.getOpponent();
-    }
 
     public Player getNextToMove(){
         return mNextToMove;
@@ -71,10 +64,6 @@ public class GameState {
 
     public int getNumberOfMoves(){
         return mNumberMoves;
-    }
-
-    public void incrementMoveCount(){
-        mNumberMoves++;
     }
 
     public String describe(){
@@ -86,5 +75,13 @@ public class GameState {
         sBuilder.append("Number of Moves= " +Integer.toString(mNumberMoves) + System.lineSeparator());
 
         return sBuilder.toString();
+    }
+
+    public void update(GameStatus gameStatus, Player winningPlayer){
+        mStatus = gameStatus;
+        mWinningPlayer = winningPlayer;
+        mNextToMove = mNextToMove.getOpponent();
+        mNumberMoves++;
+
     }
 }
