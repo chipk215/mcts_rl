@@ -142,27 +142,6 @@ public class FourInLineBoard implements GameBoard {
     }
 
 
-
-    class CellOccupant{
-
-        private Player mPlayer;
-        private int mCellNumber;
-
-        CellOccupant(Player player, int cellNumber){
-            mPlayer = player;
-            mCellNumber = cellNumber;
-        }
-
-        Player getPlayer() {
-            return mPlayer;
-        }
-
-        int getCellNumber() {
-            return mCellNumber;
-        }
-    }
-
-
     private int getNextAvailableRow(int column){
         for (int row = 0; row< MAX_ROWS; row++){
             if (mBoard[row][column] == 0){

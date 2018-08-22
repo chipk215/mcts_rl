@@ -38,6 +38,7 @@
         <module>fourinline</module>
         <module>core</module>
         <module>gamecontroller</module>
+        <module>tictactoe</module>
     </modules>
 
 
