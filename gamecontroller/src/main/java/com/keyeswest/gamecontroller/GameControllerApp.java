@@ -21,7 +21,7 @@ public class GameControllerApp {
         //runSimulations();
 
         Game fourInLineGame = new Game(new FourInLineBoard(),Player.P1);
-        //setupInitialConditions(fourInLineGame );
+        setupInitialConditions(fourInLineGame );
 
         MonteCarloTreeSearch searchAgent = new MonteCarloTreeSearch();
 
@@ -68,19 +68,19 @@ public class GameControllerApp {
 
 
     private static void setupInitialConditions(Game fourInLineGame){
-        FourInLineMove p1Move = new FourInLineMove(3);
-        FourInLineMove p2MoveInit = new FourInLineMove(0);
+        FourInLineMove p1Move = new FourInLineMove(1);
+        FourInLineMove p2MoveInit = new FourInLineMove(6);
 
 
         // set up initial condition
         fourInLineGame.performMove(p1Move);
         fourInLineGame.performMove(p2MoveInit);
 
+        p1Move = new FourInLineMove(3);
         fourInLineGame.performMove(p1Move);
         fourInLineGame.performMove(p2MoveInit);
 
         fourInLineGame.performMove(p1Move);
-        p2MoveInit = new FourInLineMove(1);
         fourInLineGame.performMove(p2MoveInit);
 
         fourInLineGame.getGameBoard().display(null);

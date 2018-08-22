@@ -4,6 +4,8 @@ import sun.jvm.hotspot.utilities.Assert;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 
 public class UCB1 {
@@ -18,7 +20,7 @@ public class UCB1 {
         return (nodeValue / (double)nodeVisit) + cValue * Math.sqrt(2 * Math.log(totalVisit)/ (double) nodeVisit);
     }
 
-    public static Node findChildNodeWithBestUCBValue(Node node, double cValue){
+    public static Node findChildNodeWithBestUCBValue(Node node, double cValue, Logger logger){
         List<Node> candidates = new ArrayList<>();
         int parentVisit = node.getVisitCount();
         int childCount = node.getChildNodes().size();
@@ -48,6 +50,14 @@ public class UCB1 {
         }
 
         if (candidates.size()> 1){
+            if (logger != null){
+                StringBuilder sb = new StringBuilder("Multiple Max UCB1 scores." +  System.lineSeparator());
+                for (Node highNode : candidates){
+                    sb.append(highNode.getName() + " ");
+                }
+                sb.append(System.lineSeparator());
+                logger.log(Level.INFO,sb.toString());
+            }
             int randomSelection = (int)(Math.random() * candidates.size());
             candidateNode = candidates.get(randomSelection);
         }

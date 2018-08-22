@@ -21,7 +21,7 @@ public class MonteCarloTreeSearch {
     private static final double WIN_VALUE = 1.0d;
     private static final double LOSS_VALUE = 0.0d;
     private static final double TIE_VALUE =0.5d;
-    private static final int MAX_ITERATIONS = 750;
+    private static final int MAX_ITERATIONS = 280;
 
 
     private FileHandler fh = null;
@@ -65,7 +65,7 @@ public class MonteCarloTreeSearch {
             sBuilder.append("Candidate Selection: " + candidateNode.getName() + System.lineSeparator());
 
             if (candidateNode.isNonTerminal()) {
-                gameState = runSimulation(gameCopy);
+                gameState = gameCopy.playRandomGame();
                 sBuilder.append("Simulation results: " + System.lineSeparator());
                 sBuilder.append("   " + gameState.describe());
                 sBuilder.append(System.lineSeparator());
@@ -108,21 +108,11 @@ public class MonteCarloTreeSearch {
             iterationCount++;
         }
 
-        Node bestChild = UCB1.findChildNodeWithBestUCBValue(tree.getRootNode(),0);
+        Node bestChild = UCB1.findChildNodeWithBestUCBValue(tree.getRootNode(),0,LOGGER);
         LOGGER.log(Level.INFO,"Selected Move: " + bestChild.getMove().getName() + System.lineSeparator() );
         return bestChild.getMove();
     }
 
-    public GameState runSimulation(Game game){
-
-        // evaluate the game state, the expanded node may have ended the game
-
-
-        GameState gameStatus = game.playRandomGame();
-
-        // alternate moves until game terminates
-        return gameStatus;
-    }
 
 
     private void backPropagation(Node node, GameState gameState){
@@ -181,7 +171,7 @@ public class MonteCarloTreeSearch {
             }else{
                 // all actions are represented so choose a child node to run
                 // the simulation on based upon exploitation and exploration
-                node = UCB1.findChildNodeWithBestUCBValue(node, Cp);
+                node = UCB1.findChildNodeWithBestUCBValue(node, Cp, null);
             }
         }
 
