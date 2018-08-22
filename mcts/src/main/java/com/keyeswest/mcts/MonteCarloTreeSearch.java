@@ -23,7 +23,6 @@ public class MonteCarloTreeSearch {
     private static final double TIE_VALUE =0.5d;
     private static final int MAX_ITERATIONS = 280;
 
-
     private FileHandler fh = null;
 
     public MonteCarloTreeSearch(){
@@ -86,8 +85,6 @@ public class MonteCarloTreeSearch {
             }
             backPropagation(candidateNode, gameState);
 
-
-
             Node nodeInfo = candidateNode;
             int level=0;
             while(nodeInfo != null){
@@ -102,9 +99,6 @@ public class MonteCarloTreeSearch {
             }
 
             LOGGER.log(Level.INFO,sBuilder.toString());
-
-
-
             iterationCount++;
         }
 
@@ -112,8 +106,6 @@ public class MonteCarloTreeSearch {
         LOGGER.log(Level.INFO,"Selected Move: " + bestChild.getMove().getName() + System.lineSeparator() );
         return bestChild.getMove();
     }
-
-
 
     private void backPropagation(Node node, GameState gameState){
         double value =  TIE_VALUE;
@@ -131,16 +123,9 @@ public class MonteCarloTreeSearch {
             backPropNode.incrementVisit();
             backPropNode.addValue(value);
             backPropNode = backPropNode.getParent();
-          /*
-            if (value==WIN_VALUE){
-                value = LOSS_VALUE;
-            }else{
-                value = WIN_VALUE;
-            }
-            */
+
         }
     }
-
 
 
     private Node expand(Node node, Game game){
@@ -153,11 +138,10 @@ public class MonteCarloTreeSearch {
 
 
     /**
-     * Starting at the provided node (generally the root node), expand the node if the
-     * node can be expanded and return the expanded node for simulation.
+     * Ensure each available action/move is chosen at least one time to run with a simulation (exploration).
      *
-     * If the node is fully expanded choose a child node for consideration and locate either
-     * a terminal node or a non-fully expanded node in the child branch to simulate.
+     * After child nodes a re fully expanded, choose a candidate for simulation or further expansion via the
+     * UCB1 value (exploitation).
      *
      */
     private Node treePolicy(Node node, Game game){
