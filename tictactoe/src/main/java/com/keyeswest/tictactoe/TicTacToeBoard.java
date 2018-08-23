@@ -5,6 +5,18 @@ import com.keyeswest.core.*;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Iteration Analysis
+ *
+ * There are possible 9 possible first moves requiring 9 iterations to fully expand level level 1.
+ *
+ * There are 9*8 possible 2nd move states corresponding to 9 + 9*8 = 81 iteration.
+ *
+ * Third level = 9*8*7 = 504
+ *
+ *
+ */
+
 
 public class TicTacToeBoard extends GameBoard {
 

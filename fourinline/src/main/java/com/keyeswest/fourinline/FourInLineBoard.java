@@ -4,8 +4,32 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 
-
 import com.keyeswest.core.*;
+
+/**
+ * Iteration Analysis
+ *
+ * Since there a 7 columns on the board, there are 7 possible moves or actions that can be taken
+ * by a player until a column becomes filled.
+ *
+ * From the empty board (level 1) state there are 7 possible moves.  To fully expand the 2nd level of the search tree
+ * requires 7 + 7^2 = 56 moves.
+ *
+ * Third level expansion requires an additional 7^2 iteration = 7 + 7^2 + 7^2
+ *
+ * Generally for the nth level 7^n + 7^(n-1) + 7^(n-2) + ... + 7^1
+ *
+ * For reference:
+ * n       7^n       total iterations
+ * 1         7               7
+ * 2        49              56
+ * 3       343             399
+ * 4     2,401           2,800
+ * 5    16,807          19,607
+ * 6
+ *
+ * 3000 iterations looks ahead past 4 moves but doesn't fully expand the 5th level.
+ **/
 
 public class FourInLineBoard extends GameBoard {
 

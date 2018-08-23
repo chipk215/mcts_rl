@@ -13,12 +13,14 @@ public class MonteCarloTreeSearch {
     private static final double WIN_VALUE = 1.0d;
     private static final double LOSS_VALUE = 0.0d;
     private static final double TIE_VALUE =0.5d;
-    private static final int MAX_ITERATIONS = 280;
+    private final int MAX_ITERATIONS;
 
-    public MonteCarloTreeSearch(Logger clientLogger){
+    public MonteCarloTreeSearch(int iterations, Logger clientLogger){
         if (clientLogger != null){
             LOGGER = clientLogger;
         }
+
+        MAX_ITERATIONS = iterations;
     }
 
 

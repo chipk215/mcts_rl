@@ -28,12 +28,17 @@ public class GameControllerApp {
     private static final Logger LOGGER = Logger.getLogger(GameControllerApp.class.getName());
     private static FileHandler fh = null;
 
+    private static final int MAX_FOUR_IN_LINE_ITERATIONS = 3000;
+
+    private static final int MAX_TIC_TAC_TOE_ITERATIONS = 3000;
+
+
     public static void main(String[] args){
 
         setupLogging();
 
-        //runFourInLine();
-        runTicTacToe();
+        runFourInLine(2801);
+        //runTicTacToe(MAX_TIC_TAC_TOE_ITERATIONS);
 
     }
 
@@ -92,12 +97,12 @@ public class GameControllerApp {
     }
 
 
-    private static void runTicTacToe(){
+    private static void runTicTacToe(int maxIterations){
         Scanner in = new Scanner(System.in);
 
         Game ticTacGame = new Game(new TicTacToeBoard(), P1);
 
-        MonteCarloTreeSearch searchAgent = new MonteCarloTreeSearch(LOGGER);
+        MonteCarloTreeSearch searchAgent = new MonteCarloTreeSearch(maxIterations,LOGGER);
 
         boolean done = false;
         while(! done){
@@ -142,14 +147,14 @@ public class GameControllerApp {
     }
 
 
-    private static void runFourInLine(){
+    private static void runFourInLine(int maxIterations){
         Scanner in = new Scanner(System.in);
         //runSimulations();
 
         Game fourInLineGame = new Game(new FourInLineBoard(), P1);
-        setupInitialConditions(fourInLineGame );
+        //setupInitialConditions(fourInLineGame );
 
-        MonteCarloTreeSearch searchAgent = new MonteCarloTreeSearch(LOGGER);
+        MonteCarloTreeSearch searchAgent = new MonteCarloTreeSearch(maxIterations,LOGGER);
 
         boolean done = false;
         while(! done){
