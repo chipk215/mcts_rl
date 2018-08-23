@@ -28,18 +28,18 @@ public class FourInLineBoardTests {
     public void availableMovesEmptyBoardTest(){
         List<FourInLineMove> moves = mFourInLineBoard.getAvailableMoves();
         Assert.assertNotNull(moves);
-        Assert.assertEquals(moves.size(), FourInLineBoard.getMaxCols() );
+        Assert.assertEquals(moves.size(), mFourInLineBoard.getMAX_COLS() );
     }
 
     @Test
     public void availableMovesTest(){
-        int expectedMoveCount = FourInLineBoard.getMaxCols();
+        int expectedMoveCount = mFourInLineBoard.getMAX_COLS();
         List<FourInLineMove> moves;
-        for (int column = 0; column< FourInLineBoard.getMaxCols(); column++){
+        for (int column = 0; column< mFourInLineBoard.getMAX_COLS(); column++){
             moves = mFourInLineBoard.getAvailableMoves();
             Assert.assertNotNull(moves);
             Assert.assertEquals(moves.size(),expectedMoveCount );
-            for(int row = 0; row< FourInLineBoard.getMaxRows(); row++){
+            for(int row = 0; row< mFourInLineBoard.getMAX_ROWS(); row++){
                 mFourInLineBoard.addPiece(Player.P1,column);
             }
             expectedMoveCount--;
@@ -135,7 +135,7 @@ public class FourInLineBoardTests {
     @Test(expected = IllegalStateException.class)
     public void invalidLargeColumnTest(){
         Player player = Player.P1;
-        mFourInLineBoard.addPiece( player, FourInLineBoard.getMaxCols());
+        mFourInLineBoard.addPiece( player, mFourInLineBoard.getMAX_COLS());
 
     }
 
@@ -144,7 +144,7 @@ public class FourInLineBoardTests {
     @Test
     public void validStackTest(){
         int expectedPlayerOnePosition = 0;
-        int expectedPlayerTwoPosition = FourInLineBoard.getMaxCols();
+        int expectedPlayerTwoPosition = mFourInLineBoard.getMAX_COLS();
         Player playerOne = Player.P1;
         Player playerTwo = Player.P2;
          mFourInLineBoard.addPiece( playerOne, 0);
@@ -167,14 +167,14 @@ public class FourInLineBoardTests {
     @Test
     public void horizontalWinTest(){
 
-        for(int testRow = 0; testRow< FourInLineBoard.getMaxRows(); testRow++) {
-            for (int col = 0; col < FourInLineBoard.getMaxCols(); col++) {
+        for(int testRow = 0; testRow< mFourInLineBoard.getMAX_ROWS(); testRow++) {
+            for (int col = 0; col < mFourInLineBoard.getMAX_COLS(); col++) {
                 TestBoard board = new TestBoard();
                // board.configureBoardForRowTests(testRow,Player.P1);
                 board.constructHorizontalLine(testRow,col, Player.P1);
 
                 WinLine result = board.checkBoardForWin(Player.P1, testRow, col);
-                if (col <= FourInLineBoard.getMaxCols() - FourInLineBoard.getWinConnection()) {
+                if (col <= mFourInLineBoard.getMAX_COLS() - FourInLineBoard.getWinConnection()) {
                     // horizontal line is within board bounds
                     Assert.assertNotNull(result);
                     Assert.assertEquals(LineType.HORIZONTAL,result.getLineType());
@@ -187,13 +187,13 @@ public class FourInLineBoardTests {
 
     @Test
     public void verticalWinTest(){
-        for(int testRow = 0; testRow< FourInLineBoard.getMaxRows(); testRow++) {
-            for (int col = 0; col < FourInLineBoard.getMaxCols(); col++) {
+        for(int testRow = 0; testRow< mFourInLineBoard.getMAX_ROWS(); testRow++) {
+            for (int col = 0; col <mFourInLineBoard.getMAX_COLS(); col++) {
                 TestBoard board = new TestBoard();
                 board.constructVerticalLine(testRow, col, Player.P1);
 
                 WinLine result = board.checkBoardForWin(Player.P1, testRow, col);
-                if (testRow <= FourInLineBoard.getMaxRows() - FourInLineBoard.getWinConnection()) {
+                if (testRow <= mFourInLineBoard.getMAX_ROWS() - FourInLineBoard.getWinConnection()) {
                     // vertical line is within the board bounds
                     Assert.assertNotNull(result);
                     Assert.assertEquals(LineType.VERTICAL,result.getLineType());
@@ -264,7 +264,7 @@ public class FourInLineBoardTests {
         int expectedStartColumn = 0;
         int expectedEndRow= 5;
         int expectedEndColumn = 2;
-        LineSegment result  = FourInLineBoard.computePositiveDiagonalSegment(row,column);
+        LineSegment result  = mFourInLineBoard.computePositiveDiagonalSegment(row,column);
         checkLineCoordinates(expectedStartRow, expectedStartColumn, expectedEndRow, expectedEndColumn,result);
 
 
@@ -278,7 +278,7 @@ public class FourInLineBoardTests {
         expectedStartColumn = 0;
         expectedEndRow= 5;
         expectedEndColumn = 5;
-        result  = FourInLineBoard.computePositiveDiagonalSegment(row,column);
+        result  = mFourInLineBoard.computePositiveDiagonalSegment(row,column);
         checkLineCoordinates(expectedStartRow, expectedStartColumn, expectedEndRow, expectedEndColumn,result);
 
         // Test Case Three:
@@ -291,7 +291,7 @@ public class FourInLineBoardTests {
         expectedStartColumn = 3;
         expectedEndRow= 3;
         expectedEndColumn = 6;
-        result  = FourInLineBoard.computePositiveDiagonalSegment(row,column);
+        result  = mFourInLineBoard.computePositiveDiagonalSegment(row,column);
         checkLineCoordinates(expectedStartRow, expectedStartColumn, expectedEndRow, expectedEndColumn,result);
 
         // Test Case Four:
@@ -303,7 +303,7 @@ public class FourInLineBoardTests {
         expectedStartColumn = column;
         expectedEndRow= row;
         expectedEndColumn = column;
-        result  = FourInLineBoard.computePositiveDiagonalSegment(row,column);
+        result  = mFourInLineBoard.computePositiveDiagonalSegment(row,column);
         checkLineCoordinates(expectedStartRow, expectedStartColumn, expectedEndRow, expectedEndColumn,result);
 
         // Test Case Five:
@@ -314,7 +314,7 @@ public class FourInLineBoardTests {
         expectedStartColumn = column;
         expectedEndRow= 5;
         expectedEndColumn = 4;
-        result  = FourInLineBoard.computePositiveDiagonalSegment(row,column);
+        result  = mFourInLineBoard.computePositiveDiagonalSegment(row,column);
         checkLineCoordinates(expectedStartRow, expectedStartColumn, expectedEndRow, expectedEndColumn,result);
 
     }
@@ -328,7 +328,7 @@ public class FourInLineBoardTests {
         int expectedStartColumn = 0;
         int expectedEndRow= 0;
         int expectedEndColumn = 5;
-        LineSegment result  = FourInLineBoard.computeNegativeDiagonalSegment(row,column);
+        LineSegment result  = mFourInLineBoard.computeNegativeDiagonalSegment(row,column);
         checkLineCoordinates(expectedStartRow, expectedStartColumn, expectedEndRow, expectedEndColumn,result);
 
         //Test Case 2
@@ -338,7 +338,7 @@ public class FourInLineBoardTests {
         expectedStartColumn = 2;
         expectedEndRow= 1;
         expectedEndColumn = 6;
-        result  = FourInLineBoard.computeNegativeDiagonalSegment(row,column);
+        result  = mFourInLineBoard.computeNegativeDiagonalSegment(row,column);
         checkLineCoordinates(expectedStartRow, expectedStartColumn, expectedEndRow, expectedEndColumn,result);
 
         //Test Case 3
@@ -348,7 +348,7 @@ public class FourInLineBoardTests {
         expectedStartColumn =4;
         expectedEndRow= 3;
         expectedEndColumn = 6;
-        result  = FourInLineBoard.computeNegativeDiagonalSegment(row,column);
+        result  = mFourInLineBoard.computeNegativeDiagonalSegment(row,column);
         checkLineCoordinates(expectedStartRow, expectedStartColumn, expectedEndRow, expectedEndColumn,result);
 
 
@@ -361,7 +361,7 @@ public class FourInLineBoardTests {
         expectedStartColumn = column;
         expectedEndRow= row;
         expectedEndColumn = column;
-        result  = FourInLineBoard.computeNegativeDiagonalSegment(row,column);
+        result  = mFourInLineBoard.computeNegativeDiagonalSegment(row,column);
         checkLineCoordinates(expectedStartRow, expectedStartColumn, expectedEndRow, expectedEndColumn,result);
 
     }
@@ -386,7 +386,7 @@ public class FourInLineBoardTests {
                 WinLine winner = mFourInLineBoard.addPiece(player, randomMove.getColumn());
 
                 moveCount++;
-                Assert.assertTrue(moveCount<= (FourInLineBoard.getMaxRows() * FourInLineBoard.getMaxCols()));
+                Assert.assertTrue(moveCount<= (mFourInLineBoard.getMAX_ROWS() * mFourInLineBoard.getMAX_COLS()));
 
                 if (winner != null) {
                     gameOver = true;

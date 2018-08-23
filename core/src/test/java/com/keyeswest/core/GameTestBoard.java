@@ -5,11 +5,12 @@ package com.keyeswest.core;
 import java.util.List;
 import java.util.logging.Logger;
 
-public class GameTestBoard implements GameBoard {
+public class GameTestBoard extends GameBoard {
 
     private Integer mBoard;
 
-    public GameTestBoard(){
+    public GameTestBoard() {
+        super(1,1);
         mBoard = 1;
     }
 
@@ -29,8 +30,7 @@ public class GameTestBoard implements GameBoard {
         return GameStatus.IN_PROGRESS;
     }
 
-
-
+    
     @Override
     public void display(Logger logger) {
 

@@ -3,34 +3,23 @@ package com.keyeswest.fourinline;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
-import java.util.logging.Logger;
+
 
 import com.keyeswest.core.*;
 
-public class FourInLineBoard implements GameBoard {
+public class FourInLineBoard extends GameBoard {
 
-    private static final Logger LOGGER = Logger.getLogger(FourInLineBoard.class.getName());
-
-    private static int EMPTY = 0;
-    private static int MAX_ROWS = 6;
-    private static int MAX_COLS = 7;
+    private static int MAXIMUM_ROWS = 6;
+    private static int MAXIMUM_COLS = 7;
     private static int WIN_CONNECTION = 4;
 
     static int getWinConnection() {
         return WIN_CONNECTION;
     }
 
-    //Test helpers
-    static int getMaxRows(){return MAX_ROWS;}
-    static int getMaxCols(){return MAX_COLS;}
-
-
-    // index (0,0) corresponds to bottom left of board
-    protected int[] [] mBoard = new int[MAX_ROWS][MAX_COLS];
-
-    private List<CellOccupant> mPositions = new ArrayList<>();
 
     public FourInLineBoard(){
+        super(MAXIMUM_ROWS,MAXIMUM_COLS );
         for(int row = 0; row< MAX_ROWS; row++){
             for(int col = 0; col< MAX_COLS; col++){
                 mBoard[row][col] =EMPTY;
@@ -39,6 +28,7 @@ public class FourInLineBoard implements GameBoard {
     }
 
     private FourInLineBoard(FourInLineBoard fourInLineBoard){
+        this();
         for(int row = 0; row< MAX_ROWS; row++){
             for(int col = 0; col< MAX_COLS; col++){
                 mBoard[row][col] = fourInLineBoard.mBoard[row][col];
@@ -99,9 +89,6 @@ public class FourInLineBoard implements GameBoard {
     }
 
 
-    List<CellOccupant> getBoardPositions(){
-        return mPositions;
-    }
 
     public WinLine addPiece(Player player, int column){
 
@@ -294,7 +281,7 @@ public class FourInLineBoard implements GameBoard {
         return Math.max(0, row-column);
     }
 
-    private static int computeStartRowForNegativeDiagonal(int row, int column){
+    private int computeStartRowForNegativeDiagonal(int row, int column){
         return Math.min(row+column, MAX_ROWS-1);
     }
 
@@ -302,7 +289,7 @@ public class FourInLineBoard implements GameBoard {
         return Math.max(0, column-row);
     }
 
-    private static int computeStartColumnForNegativeDiagonal(int row, int column){
+    private int computeStartColumnForNegativeDiagonal(int row, int column){
         return Math.max(0,row+column - MAX_ROWS +1 );
     }
 
@@ -337,7 +324,7 @@ public class FourInLineBoard implements GameBoard {
      * @param column column coordinate of intersecting point
      * @return positive diagonal which intersects specified point
      */
-    static LineSegment computePositiveDiagonalSegment(int row, int column){
+    LineSegment computePositiveDiagonalSegment(int row, int column){
         int endRow, endColumn;
         //Process the positive slope diagonal going through the point
         // - the start of the positive diagonal is:
@@ -360,7 +347,7 @@ public class FourInLineBoard implements GameBoard {
      * @param column column coordinate of intersecting point
      * @return negative diagonal which intersects specified point
      */
-     static LineSegment computeNegativeDiagonalSegment(int row, int column){
+     LineSegment computeNegativeDiagonalSegment(int row, int column){
         //Process the negative slope diagonal going through the point
 
         int startRow = computeStartRowForNegativeDiagonal(row, column);
@@ -371,27 +358,5 @@ public class FourInLineBoard implements GameBoard {
         return  new LineSegment(startRow, startColumn, endRow, endColumn);
     }
 
-    @Override
-    public void display(Logger clientLogger){
-         Logger logger = clientLogger;
-         if (logger == null){
-             logger = LOGGER;
-         }
 
-         StringBuilder sBuilder = new StringBuilder(System.lineSeparator());
-         for (int row=MAX_ROWS-1; row>=0; row--){
-             for (int column=0; column< MAX_COLS; column++){
-                 if (mBoard[row][column] == Player.P1.value()){
-                     sBuilder.append("[X]  ");
-                 }else if(mBoard[row][column] == Player.P2.value()){
-                     sBuilder.append("[O]  ");
-                 }else{
-                     sBuilder.append("[ ]  ");
-                 }
-             }
-             sBuilder.append(System.lineSeparator());
-             //System.out.println();
-         }
-         logger.info(sBuilder.toString());
-    }
 }

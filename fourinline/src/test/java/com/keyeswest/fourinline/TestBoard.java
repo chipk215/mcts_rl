@@ -16,8 +16,8 @@ public class TestBoard extends FourInLineBoard {
 
     public void constructHorizontalLine( int row,int startColumn, Player player){
         int endColumn = startColumn + FourInLineBoard.getWinConnection();
-        if (endColumn >= FourInLineBoard.getMaxCols()){
-            endColumn = FourInLineBoard.getMaxCols();
+        if (endColumn >= getMAX_COLS()){
+            endColumn = getMAX_COLS();
         }
 
         for (int col=startColumn; col< endColumn; col++ ){
@@ -27,8 +27,8 @@ public class TestBoard extends FourInLineBoard {
 
     public void constructVerticalLine(int startRow, int column, Player player){
         int endRow = startRow + FourInLineBoard.getWinConnection();
-        if (endRow >= FourInLineBoard.getMaxRows()){
-            endRow = FourInLineBoard.getMaxRows();
+        if (endRow >= getMAX_ROWS()){
+            endRow = getMAX_ROWS();
         }
 
         for(int row = startRow; row< endRow; row++){
@@ -38,7 +38,7 @@ public class TestBoard extends FourInLineBoard {
 
     public void constructPositiveDiagonal(int startRow, int startColumn, Player player){
         for(int index = 0; index< FourInLineBoard.getWinConnection(); index++){
-            if ((startRow+index >=  FourInLineBoard.getMaxRows() ) || (startColumn+index > FourInLineBoard.getMaxCols()) ){
+            if ((startRow+index >=  getMAX_ROWS() ) || (startColumn+index > getMAX_COLS()) ){
                 break;
             }
             setPosition(startRow+index, startColumn+index,player.value());
@@ -47,7 +47,7 @@ public class TestBoard extends FourInLineBoard {
 
     public void constructNegativeDiagonal(int startRow, int startColumn, Player player){
         for(int index = 0; index< FourInLineBoard.getWinConnection(); index++){
-            if ((startRow-index <0 ) || (startColumn+index > FourInLineBoard.getMaxCols())  ){
+            if ((startRow-index <0 ) || (startColumn+index > getMAX_COLS())  ){
                 break;
             }
             setPosition(startRow-index, startColumn+index,player.value());
@@ -62,9 +62,9 @@ public class TestBoard extends FourInLineBoard {
         }
 
         // Fill the board alternating opponent and player positions across all rows
-        for(int rowIndex = 0; rowIndex< FourInLineBoard.getMaxRows(); rowIndex++){
+        for(int rowIndex = 0; rowIndex< getMAX_ROWS(); rowIndex++){
             activePlayer = startPlayer;
-           for(int colIndex = 0; colIndex < FourInLineBoard.getMaxCols(); colIndex++){
+           for(int colIndex = 0; colIndex < getMAX_COLS(); colIndex++){
                mBoard[rowIndex][colIndex] = activePlayer.value();
                activePlayer = activePlayer.getOpponent();
            }
