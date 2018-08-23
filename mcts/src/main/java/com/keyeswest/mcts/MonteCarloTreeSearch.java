@@ -1,21 +1,13 @@
 package com.keyeswest.mcts;
 
 import com.keyeswest.core.*;
-
-import java.io.IOException;
-import java.nio.file.FileSystems;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.text.SimpleDateFormat;
-import java.util.Calendar;
-import java.util.logging.FileHandler;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import java.util.logging.SimpleFormatter;
+
 
 public class MonteCarloTreeSearch {
 
-    private static final Logger LOGGER = Logger.getLogger(MonteCarloTreeSearch.class.getName());
+    private static Logger LOGGER = Logger.getLogger(MonteCarloTreeSearch.class.getName());
 
     private static final double Cp = 1/ Math.sqrt(2);
     private static final double WIN_VALUE = 1.0d;
@@ -23,30 +15,12 @@ public class MonteCarloTreeSearch {
     private static final double TIE_VALUE =0.5d;
     private static final int MAX_ITERATIONS = 280;
 
-    private FileHandler fh = null;
-
-    public MonteCarloTreeSearch(){
-        setupLogging();
-    }
-
-    public void setupLogging(){
-        Path currentPath = FileSystems.getDefault().getPath(".");
-
-        SimpleDateFormat format = new SimpleDateFormat("M-d_HHmmss");
-        String fileName = "/logs/SearchLog_" + format.format(Calendar.getInstance().getTime()) + ".log";
-        Path filePath = Paths.get(currentPath.toString(), fileName);
-        try{
-            fh = new FileHandler(filePath.toString());
-        }catch (IOException e){
-            e.printStackTrace();
+    public MonteCarloTreeSearch(Logger clientLogger){
+        if (clientLogger != null){
+            LOGGER = clientLogger;
         }
-
-        fh.setFormatter(new SimpleFormatter());
-        LOGGER.addHandler(fh);
-
-        LOGGER.setUseParentHandlers(false);
-
     }
+
 
     public Move findNextMove(Game game){
 

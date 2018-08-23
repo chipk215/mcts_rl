@@ -8,9 +8,17 @@ import com.keyeswest.tictactoe.TicTacToeBoard;
 import com.keyeswest.tictactoe.TicTacToeMove;
 
 
+import java.io.IOException;
+import java.nio.file.FileSystems;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Scanner;
 
+import java.util.logging.FileHandler;
 import java.util.logging.Logger;
+import java.util.logging.SimpleFormatter;
 
 import static com.keyeswest.core.Player.P1;
 import static com.keyeswest.core.Player.P2;
@@ -18,9 +26,12 @@ import static com.keyeswest.core.Player.P2;
 public class GameControllerApp {
 
     private static final Logger LOGGER = Logger.getLogger(GameControllerApp.class.getName());
-
+    private static FileHandler fh = null;
 
     public static void main(String[] args){
+
+        setupLogging();
+
         //runFourInLine();
         runTicTacToe();
 
@@ -40,6 +51,25 @@ public class GameControllerApp {
         return firstToMove;
     }
 
+
+    private static void setupLogging(){
+        Path currentPath = FileSystems.getDefault().getPath(".");
+
+        SimpleDateFormat format = new SimpleDateFormat("M-d_HHmmss");
+        String fileName = "/logs/SearchLog_" + format.format(Calendar.getInstance().getTime()) + ".log";
+        Path filePath = Paths.get(currentPath.toString(), fileName);
+        try{
+            fh = new FileHandler(filePath.toString());
+        }catch (IOException e){
+            e.printStackTrace();
+        }
+
+        fh.setFormatter(new SimpleFormatter());
+        LOGGER.addHandler(fh);
+
+        LOGGER.setUseParentHandlers(false);
+
+    }
 
 
     private static void setupInitialConditions(Game fourInLineGame){
@@ -67,7 +97,7 @@ public class GameControllerApp {
 
         Game ticTacGame = new Game(new TicTacToeBoard(), P1);
 
-        MonteCarloTreeSearch searchAgent = new MonteCarloTreeSearch();
+        MonteCarloTreeSearch searchAgent = new MonteCarloTreeSearch(LOGGER);
 
         boolean done = false;
         while(! done){
@@ -119,7 +149,7 @@ public class GameControllerApp {
         Game fourInLineGame = new Game(new FourInLineBoard(), P1);
         setupInitialConditions(fourInLineGame );
 
-        MonteCarloTreeSearch searchAgent = new MonteCarloTreeSearch();
+        MonteCarloTreeSearch searchAgent = new MonteCarloTreeSearch(LOGGER);
 
         boolean done = false;
         while(! done){
