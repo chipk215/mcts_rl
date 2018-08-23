@@ -1,9 +1,7 @@
 package com.keyeswest.fourinline;
 
-import com.keyeswest.core.GameStatus;
-import com.keyeswest.core.Move;
+import com.keyeswest.core.*;
 
-import com.keyeswest.core.Player;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -22,7 +20,7 @@ public class FourInLineBoardTests {
     @Test
     public void createEmptyBoardTest(){
 
-        List<FourInLineBoard.CellOccupant> occupants = mFourInLineBoard.getBoardPositions();
+        List<CellOccupant> occupants = mFourInLineBoard.getBoardPositions();
         Assert.assertTrue(occupants.isEmpty());
     }
 
@@ -119,9 +117,9 @@ public class FourInLineBoardTests {
         Player player = Player.P1;
         int expectedPosition = 0;
         mFourInLineBoard.addPiece( player, 0);
-        List<FourInLineBoard.CellOccupant> occupants = mFourInLineBoard.getBoardPositions();
+        List<CellOccupant> occupants = mFourInLineBoard.getBoardPositions();
         Assert.assertTrue(occupants.size() == 1);
-        FourInLineBoard.CellOccupant occupant = occupants.get(0);
+        CellOccupant occupant = occupants.get(0);
         Assert.assertEquals(player, occupant.getPlayer());
         Assert.assertEquals(expectedPosition, occupant.getCellNumber());
 
@@ -152,11 +150,11 @@ public class FourInLineBoardTests {
          mFourInLineBoard.addPiece( playerOne, 0);
          mFourInLineBoard.addPiece( playerTwo, 0);
 
-        List<FourInLineBoard.CellOccupant> occupants = mFourInLineBoard.getBoardPositions();
+        List<CellOccupant> occupants = mFourInLineBoard.getBoardPositions();
         Assert.assertTrue(occupants.size() == 2);
 
         for (int i=0; i< 2; i++) {
-            FourInLineBoard.CellOccupant occupant = occupants.get(i);
+            CellOccupant occupant = occupants.get(i);
             if (occupant.getPlayer() == playerOne) {
                Assert.assertEquals(expectedPlayerOnePosition,occupant.getCellNumber() );
             }else{

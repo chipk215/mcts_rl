@@ -1,4 +1,4 @@
-package com.keyeswest.fourinline;
+package com.keyeswest.core;
 
 public enum LineType {
     HORIZONTAL, VERTICAL, DIAGONAL

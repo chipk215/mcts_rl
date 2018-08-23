@@ -1,4 +1,4 @@
-package com.keyeswest.fourinline;
+package com.keyeswest.core;
 
 public class WinLine {
 
