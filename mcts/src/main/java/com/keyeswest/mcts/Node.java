@@ -47,6 +47,10 @@ public class Node {
     //
     private boolean mTerminalNode;
 
+
+    // Indicates that if the opponent's next move is into this position the opponent will win the game.
+    private boolean mDefensiveTerminalNode;
+
     public String getName() {
         return mName;
     }
@@ -62,10 +66,11 @@ public class Node {
     // All other nodes are child nodes and can be constructed with a private constructor
     // and using an add node method
     public Node(GameBoard gameBoard, Player firstToMove){
-        mBoard =gameBoard;
+        mBoard = gameBoard;
         mPlayer = firstToMove;
         mParent = null;
         mTerminalNode = false;
+        mDefensiveTerminalNode = false;
 
         if (mBoard == null){
             throw new IllegalArgumentException("Game board can not be null");
@@ -79,10 +84,6 @@ public class Node {
         mName="ROOT";
     }
 
-
-    public void setPlayer(Player player){
-        mPlayer = player;
-    }
 
     public void setBoard(GameBoard board){
         mBoard = board.getCopyOfBoard();
@@ -166,5 +167,17 @@ public class Node {
         }
 
         return count;
+    }
+
+    public void setDefensiveTerminalNode(){
+        mDefensiveTerminalNode = true;
+    }
+
+    public void clearDefensiveTerminalNode(){
+        mDefensiveTerminalNode = false;
+    }
+
+    public boolean getDefensiveTerminalNode(){
+        return mDefensiveTerminalNode;
     }
 }

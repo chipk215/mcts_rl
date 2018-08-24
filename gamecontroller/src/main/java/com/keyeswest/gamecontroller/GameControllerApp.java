@@ -33,15 +33,14 @@ public class GameControllerApp {
 
     private static final int MAX_TIC_TAC_TOE_ITERATIONS = 3000;
 
-
     public static void main(String[] args){
 
         setupLogging();
-       // Game ticTacGame = new TicTacToeGame(new TicTacToeBoard(), P1);
+       // Game game= new TicTacToeGame(new TicTacToeBoard(), P1);
 
 
-        Game fourInLineGame = new FourInLineGame(new FourInLineBoard(), P1);
-        runGame(fourInLineGame,2801);
+        Game game = new FourInLineGame(new FourInLineBoard(), P1);
+        runGame(game,2801);
 
 
     }
