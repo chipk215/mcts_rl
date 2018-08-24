@@ -9,6 +9,9 @@ import java.util.List;
 
 public class Node {
 
+    public void setParentToNull(){
+        mParent = null;
+    }
     private Node mParent;
     private List<Node> mChildNodes;
 
@@ -49,6 +52,8 @@ public class Node {
     }
 
     private String mName;
+
+    // used to hold moves until node is fully expanded
     private List<? extends Move> mAvailableMoves;
 
     // Constructors

@@ -15,4 +15,8 @@ public class Tree {
     public Node getRootNode(){
         return mRoot;
     }
+
+    public void setRootNode(Node node){
+        mRoot = node;
+    }
 }

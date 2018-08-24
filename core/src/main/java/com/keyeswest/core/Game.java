@@ -3,20 +3,16 @@ package com.keyeswest.core;
 
 import java.util.List;
 
-public class Game {
+public abstract class Game {
 
 
-    private GameBoard mGameBoard;
+    protected GameBoard mGameBoard;
 
-    private GameState mGameState;
+    protected GameState mGameState;
 
-    private Game(Game game){
+    protected Game(){}
 
-        mGameBoard = game.mGameBoard.getCopyOfBoard();
-        mGameState = game.mGameState.makeCopy();
-    }
-
-    public Game(GameBoard board,Player initialPlayer ){
+    protected Game(GameBoard board,Player initialPlayer ){
         mGameBoard = board;
         mGameState = new GameState(initialPlayer);
     }
@@ -38,9 +34,7 @@ public class Game {
         mGameState.setStatus(gameStatus);
     }
 
-    public Game makeCopy(){
-        return new Game(this);
-    }
+    public abstract Game makeCopy();
 
     public GameStatus getGameStatus(){
         return mGameState.getStatus();
@@ -82,4 +76,6 @@ public class Game {
 
 
     }
+
+    public abstract Move getOpponentMove();
 }

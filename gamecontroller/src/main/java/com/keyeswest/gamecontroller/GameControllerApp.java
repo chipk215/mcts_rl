@@ -2,11 +2,12 @@ package com.keyeswest.gamecontroller;
 
 import com.keyeswest.core.*;
 import com.keyeswest.fourinline.FourInLineBoard;
+import com.keyeswest.fourinline.FourInLineGame;
 import com.keyeswest.fourinline.FourInLineMove;
 import com.keyeswest.mcts.MonteCarloTreeSearch;
+import com.keyeswest.mcts.Node;
 import com.keyeswest.tictactoe.TicTacToeBoard;
-import com.keyeswest.tictactoe.TicTacToeMove;
-
+import com.keyeswest.tictactoe.TicTacToeGame;
 
 import java.io.IOException;
 import java.nio.file.FileSystems;
@@ -14,7 +15,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
-import java.util.Scanner;
+
 
 import java.util.logging.FileHandler;
 import java.util.logging.Logger;
@@ -36,9 +37,12 @@ public class GameControllerApp {
     public static void main(String[] args){
 
         setupLogging();
+       // Game ticTacGame = new TicTacToeGame(new TicTacToeBoard(), P1);
 
-        runFourInLine(2801);
-        //runTicTacToe(MAX_TIC_TAC_TOE_ITERATIONS);
+
+        Game fourInLineGame = new FourInLineGame(new FourInLineBoard(), P1);
+        runGame(fourInLineGame,2801);
+
 
     }
 
@@ -97,45 +101,6 @@ public class GameControllerApp {
     }
 
 
-    private static void runTicTacToe(int maxIterations){
-        Scanner in = new Scanner(System.in);
-
-        Game ticTacGame = new Game(new TicTacToeBoard(), P1);
-
-        MonteCarloTreeSearch searchAgent = new MonteCarloTreeSearch(maxIterations,LOGGER);
-
-        boolean done = false;
-        while(! done){
-            Move suggestedMove = searchAgent.findNextMove(ticTacGame);
-            LOGGER.info("Executing suggested move for P1= " + suggestedMove.getName());
-            ticTacGame.performMove(suggestedMove);
-            ticTacGame.getGameBoard().display(null);
-            if (ticTacGame.getGameState().getStatus() == GameStatus.IN_PROGRESS){
-                // P2 moves
-                System.out.print("Enter P2 row move: ");
-                int selectedRow = in.nextInt();
-                in.nextLine();
-                System.out.println("Enter P2 column move: ");
-                System.out.flush();
-                int selectedColumn = in.nextInt();
-                in.nextLine();
-
-                TicTacToeMove p2Move = new TicTacToeMove(selectedRow, selectedColumn);
-                ticTacGame.performMove(p2Move);
-                ticTacGame.getGameBoard().display(null);
-                if (ticTacGame.getGameState().getStatus() != GameStatus.IN_PROGRESS){
-                    displayEndOfGameMessage(ticTacGame, P2);
-                    done = true;
-                }
-
-            }else{
-                displayEndOfGameMessage(ticTacGame, P1);
-                done = true;
-            }
-        }
-    }
-
-
     private static void displayEndOfGameMessage(Game game, Player player){
         if (game.getGameState().getStatus() == GameStatus.GAME_TIED){
             LOGGER.info("Game ends in tie.");
@@ -146,41 +111,52 @@ public class GameControllerApp {
         }
     }
 
+    private static void runGame(Game game, int maxIterations){
 
-    private static void runFourInLine(int maxIterations){
-        Scanner in = new Scanner(System.in);
-        //runSimulations();
-
-        Game fourInLineGame = new Game(new FourInLineBoard(), P1);
-        //setupInitialConditions(fourInLineGame );
-
-        MonteCarloTreeSearch searchAgent = new MonteCarloTreeSearch(maxIterations,LOGGER);
-
+        MonteCarloTreeSearch searchAgent = new MonteCarloTreeSearch(game,maxIterations,LOGGER);
+        Node suggestedNode = null;
+        Move p2Move = null;
         boolean done = false;
         while(! done){
-            Move suggestedMove = searchAgent.findNextMove(fourInLineGame);
-            LOGGER.info("Executing suggested move for P1= " + suggestedMove.getName());
-            fourInLineGame.performMove(suggestedMove);
-            fourInLineGame.getGameBoard().display(null);
-            if (fourInLineGame.getGameState().getStatus() == GameStatus.IN_PROGRESS){
-                // P2 moves
-                System.out.println("Enter P2 move: ");
-                System.out.flush();
-                int selectedColumn = in.nextInt();
-                in.nextLine();
+            if (suggestedNode == null){
+                suggestedNode = searchAgent.findNextMove(null);
+            }else{
+                boolean foundChild = false;
+                // determine if child node corresponding to opponent's move exists
+                for (Node childNode : suggestedNode.getChildNodes()){
+                    if (childNode.getMove().getName().equals(p2Move.getName())){
+                        childNode.setParentToNull();
+                        childNode.setBoard(game.getGameBoard());
+                        suggestedNode = searchAgent.findNextMove(childNode);
+                        foundChild= true;
+                        break;
+                    }
+                }
+                if (! foundChild){
+                    suggestedNode = searchAgent.findNextMove(null);
+                }
 
-                FourInLineMove p2Move = new FourInLineMove(selectedColumn);
-                fourInLineGame.performMove(p2Move);
-                fourInLineGame.getGameBoard().display(null);
-                if (fourInLineGame.getGameState().getStatus() != GameStatus.IN_PROGRESS){
-                    displayEndOfGameMessage(fourInLineGame, P2);
+            }
+
+            Move suggestedMove = suggestedNode.getMove();
+            LOGGER.info("Executing suggested move for P1= " + suggestedMove.getName());
+            game.performMove(suggestedMove);
+            game.getGameBoard().display(null);
+            if (game.getGameState().getStatus() == GameStatus.IN_PROGRESS){
+                // P2 moves
+                p2Move = game.getOpponentMove();
+                game.performMove(p2Move);
+                game.getGameBoard().display(null);
+                if (game.getGameState().getStatus() != GameStatus.IN_PROGRESS){
+                    displayEndOfGameMessage(game, P2);
                     done = true;
                 }
 
             }else{
-                displayEndOfGameMessage(fourInLineGame, P1);
+                displayEndOfGameMessage(game, P1);
                 done = true;
             }
         }
     }
+
 }
