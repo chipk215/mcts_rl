@@ -55,4 +55,12 @@ public class BoardCell extends StackPane {
         return mMarked;
     }
 
+    public int getRow(){
+        return mRow;
+    }
+
+    public int getColumn(){
+        return mColumn;
+    }
+
 }

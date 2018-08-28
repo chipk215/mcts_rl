@@ -1,5 +1,8 @@
 package com.keyeswest.tictactoe.view;
 
+import com.keyeswest.core.ManualPlayerCallback;
+import com.keyeswest.core.Move;
+import com.keyeswest.tictactoe.TicTacToeMove;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.geometry.VPos;
@@ -26,13 +29,16 @@ public class Board  implements CellClickHandler{
 
     private VBox mRoot;
 
+    private ManualPlayerCallback mManualPlayerCallback;
+
 
     private boolean mManualPlayerTurn;
 
-    public Board(){
+    public Board(ManualPlayerCallback manualPlayerCallback){
         mBoard = new BoardCell[3][3];
         mUserMessage = new Text();
         mManualPlayerTurn = false;
+        mManualPlayerCallback = manualPlayerCallback;
     }
 
     public Parent createContent(){
@@ -53,7 +59,7 @@ public class Board  implements CellClickHandler{
         for (int row=0; row<3; row++){
             for(int col=0; col< 3; col++) {
 
-                BoardCell cell = new BoardCell(row, col, this);
+                BoardCell cell = new BoardCell(2-row, col, this);
                 cell.setTranslateY( row * 75);
                 cell.setTranslateX(175 +col * 75);
                 boardPane.getChildren().add(cell);
@@ -94,6 +100,8 @@ public class Board  implements CellClickHandler{
             return;
         }
 
+        Move playerMove = new TicTacToeMove(cell.getRow(), cell.getColumn());
+        mManualPlayerCallback.opponentMove(playerMove);
         // handle click event for cell
     }
 }

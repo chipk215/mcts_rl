@@ -5,6 +5,7 @@ import com.keyeswest.fourinline.FourInLineMove;
 import com.keyeswest.mcts.MonteCarloTreeSearch;
 import com.keyeswest.mcts.Node;
 import com.keyeswest.tictactoe.TicTacToeGame;
+
 import javafx.application.Application;
 import javafx.concurrent.Task;
 import javafx.scene.Scene;
@@ -26,7 +27,7 @@ import java.util.logging.SimpleFormatter;
 import static com.keyeswest.core.Player.P1;
 import static com.keyeswest.core.Player.P2;
 
-public class GameControllerApp extends Application {
+public class GameControllerApp extends Application implements ManualPlayerCallback  {
 
     private static final Logger LOGGER = Logger.getLogger(GameControllerApp.class.getName());
     private static FileHandler fh = null;
@@ -37,13 +38,24 @@ public class GameControllerApp extends Application {
 
     private Player mFirstToMove;
 
+    private  MonteCarloTreeSearch mSearchAgent;
+
     private Game mGame;
+
+
+    private Node mSuggestedNode;
+
+    public GameControllerApp(){
+        super();
+        setupLogging();
+        mFirstToMove = chooseFirstMove();
+        mGame= new TicTacToeGame( mFirstToMove, this);
+        mSearchAgent = new MonteCarloTreeSearch(mGame,MAX_TIC_TAC_TOE_ITERATIONS,LOGGER);
+        mSuggestedNode = null;
+    }
 
     @Override
     public void start(Stage primaryStage) {
-        setupLogging();
-        mFirstToMove = chooseFirstMove();
-        mGame= new TicTacToeGame( mFirstToMove);
 
         Scene scene = new Scene(mGame.getGraphicalBoardDisplay());
         primaryStage.setScene(scene);
@@ -57,9 +69,16 @@ public class GameControllerApp extends Application {
 
                 //  Game game = new FourInLineGame(new FourInLineBoard(), P1);
                 //runGame(game,2801);
+                if (mFirstToMove == P1){
+                    mGame.setUserMessage("Thinking...");
+                    mGame.setManualPlayerTurn(false);
+                }else{
+                    mGame.setUserMessage("Your turn to make a move.");
+                    mGame.setManualPlayerTurn(true);
 
+                }
 
-                runGame(MAX_TIC_TAC_TOE_ITERATIONS);
+                executeComputerMove(null);
                 return null;
             }
         };
@@ -135,67 +154,69 @@ public class GameControllerApp extends Application {
         }
     }
 
-    private void runGame(int maxIterations){
-
-        if (mFirstToMove == P1){
-            mGame.setUserMessage("Thinking...");
-            mGame.setManualPlayerTurn(false);
+    private void executeComputerMove(Move opponentMove){
+        if (mSuggestedNode == null){
+            mSuggestedNode = mSearchAgent.findNextMove(null);
         }else{
+            boolean foundChild = false;
+            // determine if child node corresponding to opponent's move exists
+            for (Node childNode : mSuggestedNode.getChildNodes()){
+                if (childNode.getMove().getName().equals(opponentMove.getName())){
+                    childNode.setParentToNull();
+                    childNode.setBoard(mGame.getGameBoard());
+                    mSuggestedNode = mSearchAgent.findNextMove(childNode);
+                    foundChild= true;
+                    break;
+                }
+            }
+            if (! foundChild){
+                mSuggestedNode = mSearchAgent.findNextMove(null);
+            }
+
+        }
+
+        Move selectedMove = mSuggestedNode.getMove();
+        LOGGER.info("Executing suggested move for P1= " + selectedMove.getName());
+        // update the game model
+        mGame.performMove(selectedMove);
+
+        mGame.getGameBoard().logBoardPositions(null);
+
+        mGame.displayMove(selectedMove, P1);
+
+        if (mGame.getGameState().getStatus() == GameStatus.IN_PROGRESS){
             mGame.setUserMessage("Your turn to make a move.");
             mGame.setManualPlayerTurn(true);
 
+
+
+        }else{
+            displayEndOfGameMessage(mGame, P1);
+            mGame.setUserMessage("Game Over");
         }
 
-        MonteCarloTreeSearch searchAgent = new MonteCarloTreeSearch(mGame,maxIterations,LOGGER);
-        Node suggestedNode = null;
-        Move p2Move = null;
-        boolean done = false;
-        while(! done){
-            if (suggestedNode == null){
-                suggestedNode = searchAgent.findNextMove(null);
-            }else{
-                boolean foundChild = false;
-                // determine if child node corresponding to opponent's move exists
-                for (Node childNode : suggestedNode.getChildNodes()){
-                    if (childNode.getMove().getName().equals(p2Move.getName())){
-                        childNode.setParentToNull();
-                        childNode.setBoard(mGame.getGameBoard());
-                        suggestedNode = searchAgent.findNextMove(childNode);
-                        foundChild= true;
-                        break;
-                    }
-                }
-                if (! foundChild){
-                    suggestedNode = searchAgent.findNextMove(null);
-                }
+    }
 
-            }
 
-            Move selectedMove = suggestedNode.getMove();
-            LOGGER.info("Executing suggested move for P1= " + selectedMove.getName());
-            // update the game model
-            mGame.performMove(selectedMove);
+    private void executeManualMove(Move manualMove){
 
-            mGame.getGameBoard().logBoardPositions(null);
+        //update the game model
+        mGame.performMove(manualMove);
+        mGame.getGameBoard().logBoardPositions(null);
 
-            mGame.displayMove(selectedMove, P1);
+        //update the graphical display
+        mGame.displayMove(manualMove, P2);
 
-            if (mGame.getGameState().getStatus() == GameStatus.IN_PROGRESS){
-                mGame.setUserMessage("Your turn to make a move.");
-                // P2 moves
-                p2Move = mGame.getOpponentMove();
-                mGame.performMove(p2Move);
-                mGame.getGameBoard().logBoardPositions(null);
-                if (mGame.getGameState().getStatus() != GameStatus.IN_PROGRESS){
-                    displayEndOfGameMessage(mGame, P2);
-                    done = true;
-                }
-
-            }else{
-                displayEndOfGameMessage(mGame, P1);
-                done = true;
-            }
+        if (mGame.getGameState().getStatus() != GameStatus.IN_PROGRESS){
+            displayEndOfGameMessage(mGame, P2);
+            mGame.setUserMessage("Game Over");
+        }else{
+            // game continues, it is ow the computer's move
+            mGame.setUserMessage("Thinking...");
+            mGame.setManualPlayerTurn(false);
+            executeComputerMove(manualMove);
         }
+
     }
 
 
@@ -204,4 +225,18 @@ public class GameControllerApp extends Application {
     }
 
 
+    @Override
+    public void opponentMove(Move move) {
+        Task<Void> manualMoveTask = new Task<Void>(){
+
+            @Override
+            protected Void call() {
+
+                executeManualMove(move);
+                return null;
+            }
+        };
+
+        new Thread( manualMoveTask).start();
+    }
 }

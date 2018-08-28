@@ -2,6 +2,7 @@ package com.keyeswest.tictactoe;
 
 import com.keyeswest.core.Game;
 
+import com.keyeswest.core.ManualPlayerCallback;
 import com.keyeswest.core.Move;
 import com.keyeswest.core.Player;
 import com.keyeswest.tictactoe.view.Board;
@@ -51,9 +52,9 @@ public class TicTacToeGame extends Game {
         return new TicTacToeMove(selectedRow, selectedColumn);
     }
 
-    public TicTacToeGame(Player initialPlayer ){
+    public TicTacToeGame(Player initialPlayer, ManualPlayerCallback manualPlayerCallback){
         super(new TicTacToeBoard(), initialPlayer);
-        mGraphicalDisplayBoard = new Board();
+        mGraphicalDisplayBoard = new Board(manualPlayerCallback);
     }
 
 
@@ -64,7 +65,7 @@ public class TicTacToeGame extends Game {
 
     @Override
     public void setManualPlayerTurn(boolean manualPlayerTurn) {
-        mGraphicalDisplayBoard.setManualPlayerTurn(manualPlayerTurn);
+        Platform.runLater(() ->mGraphicalDisplayBoard.setManualPlayerTurn(manualPlayerTurn));
     }
 
     @Override
