@@ -30,9 +30,9 @@ public class GameTestBoard extends GameBoard {
         return GameStatus.IN_PROGRESS;
     }
 
-    
+
     @Override
-    public void display(Logger logger) {
+    public void logBoardPositions(Logger logger) {
 
     }
 }

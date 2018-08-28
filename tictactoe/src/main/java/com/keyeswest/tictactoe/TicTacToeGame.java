@@ -1,18 +1,35 @@
 package com.keyeswest.tictactoe;
 
 import com.keyeswest.core.Game;
-import com.keyeswest.core.GameBoard;
 
 import com.keyeswest.core.Move;
 import com.keyeswest.core.Player;
+import com.keyeswest.tictactoe.view.Board;
+import javafx.application.Platform;
+import javafx.scene.Parent;
 
 import java.util.Scanner;
 
 public class TicTacToeGame extends Game {
 
+    private final static String NAME="Tic-Tac-Toe";
+
+    private Board mGraphicalDisplayBoard;
+
     private TicTacToeGame(TicTacToeGame game){
         mGameBoard = game.mGameBoard.getCopyOfBoard();
         mGameState = game.mGameState.makeCopy();
+
+    }
+
+    @Override
+    public String getName(){
+        return NAME;
+    }
+
+    @Override
+    public Parent getGraphicalBoardDisplay() {
+        return mGraphicalDisplayBoard.createContent();
     }
 
     @Override
@@ -34,7 +51,39 @@ public class TicTacToeGame extends Game {
         return new TicTacToeMove(selectedRow, selectedColumn);
     }
 
-    public TicTacToeGame(GameBoard board, Player initialPlayer ){
-        super(board, initialPlayer);
+    public TicTacToeGame(Player initialPlayer ){
+        super(new TicTacToeBoard(), initialPlayer);
+        mGraphicalDisplayBoard = new Board();
+    }
+
+
+    @Override
+    public void setUserMessage(String message) {
+        Platform.runLater(() -> mGraphicalDisplayBoard.setUserMessage(message));
+    }
+
+    @Override
+    public void setManualPlayerTurn(boolean manualPlayerTurn) {
+        mGraphicalDisplayBoard.setManualPlayerTurn(manualPlayerTurn);
+    }
+
+    @Override
+    public void displayMove(Move move, Player player) {
+        if (!(move instanceof TicTacToeMove)) {
+            throw new IllegalStateException("Unrecognized game move.");
+        }
+        int row = ((TicTacToeMove)move).getRow();
+        int column = ((TicTacToeMove)move).getColumn();
+        boolean manualPlayer = true;
+        // Assume P1 is always computer -- verify this logic
+        if (player == Player.P1){
+            manualPlayer = false;
+
+        }
+
+        boolean finalManualPlayer = manualPlayer;
+        Platform.runLater(() -> mGraphicalDisplayBoard.markCell(row, column, finalManualPlayer));
+
+
     }
 }

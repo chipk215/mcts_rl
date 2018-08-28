@@ -4,10 +4,13 @@ import com.keyeswest.core.Game;
 import com.keyeswest.core.GameBoard;
 import com.keyeswest.core.Move;
 import com.keyeswest.core.Player;
+import javafx.scene.Parent;
 
 import java.util.Scanner;
 
 public class FourInLineGame extends Game {
+
+    private final static String NAME="4 In A Line!";
 
     private FourInLineGame(FourInLineGame game){
         mGameBoard = game.mGameBoard.getCopyOfBoard();
@@ -15,8 +18,18 @@ public class FourInLineGame extends Game {
     }
 
     @Override
+    public Parent getGraphicalBoardDisplay() {
+        return null;
+    }
+
+    @Override
     public Game makeCopy() {
         return new FourInLineGame(this);
+    }
+
+    @Override
+    public String getName(){
+        return NAME;
     }
 
     @Override
@@ -32,5 +45,20 @@ public class FourInLineGame extends Game {
 
     public FourInLineGame(GameBoard board, Player initialPlayer ){
         super(board, initialPlayer);
+    }
+
+    @Override
+    public void setUserMessage(String string) {
+
+    }
+
+    @Override
+    public void setManualPlayerTurn(boolean manualPlayerTurn) {
+
+    }
+
+    @Override
+    public void displayMove(Move move, Player player) {
+
     }
 }

@@ -1,9 +1,11 @@
 package com.keyeswest.core;
 
 
+import javafx.scene.Parent;
+
 import java.util.List;
 
-public abstract class Game {
+public abstract class Game implements GraphicalDisplayInterface {
 
 
     protected GameBoard mGameBoard;
@@ -22,6 +24,8 @@ public abstract class Game {
 
     }
 
+    public abstract Parent getGraphicalBoardDisplay();
+
     public void setWinner(Player player){
         mGameState.setWinningPlayer(player);
     }
@@ -35,6 +39,8 @@ public abstract class Game {
     }
 
     public abstract Game makeCopy();
+
+    public abstract String getName();
 
     public GameStatus getGameStatus(){
         return mGameState.getStatus();

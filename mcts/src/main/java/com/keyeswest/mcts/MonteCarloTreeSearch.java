@@ -1,7 +1,6 @@
 package com.keyeswest.mcts;
 
 import com.keyeswest.core.*;
-import com.sun.tools.javac.util.Assert;
 
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -53,7 +52,7 @@ public class MonteCarloTreeSearch {
                 }
             }
         }
-        mGame.getGameBoard().display(LOGGER);
+        mGame.getGameBoard().logBoardPositions(LOGGER);
 
         int iterationCount = 0;
         while(iterationCount < MAX_ITERATIONS){

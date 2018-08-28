@@ -1,13 +1,15 @@
 package com.keyeswest.gamecontroller;
 
 import com.keyeswest.core.*;
-import com.keyeswest.fourinline.FourInLineBoard;
-import com.keyeswest.fourinline.FourInLineGame;
 import com.keyeswest.fourinline.FourInLineMove;
 import com.keyeswest.mcts.MonteCarloTreeSearch;
 import com.keyeswest.mcts.Node;
-import com.keyeswest.tictactoe.TicTacToeBoard;
 import com.keyeswest.tictactoe.TicTacToeGame;
+import javafx.application.Application;
+import javafx.concurrent.Task;
+import javafx.scene.Scene;
+import javafx.stage.Stage;
+
 
 import java.io.IOException;
 import java.nio.file.FileSystems;
@@ -24,7 +26,7 @@ import java.util.logging.SimpleFormatter;
 import static com.keyeswest.core.Player.P1;
 import static com.keyeswest.core.Player.P2;
 
-public class GameControllerApp {
+public class GameControllerApp extends Application {
 
     private static final Logger LOGGER = Logger.getLogger(GameControllerApp.class.getName());
     private static FileHandler fh = null;
@@ -33,30 +35,53 @@ public class GameControllerApp {
 
     private static final int MAX_TIC_TAC_TOE_ITERATIONS = 3000;
 
-    public static void main(String[] args){
+    private Player mFirstToMove;
 
+    private Game mGame;
+
+    @Override
+    public void start(Stage primaryStage) {
         setupLogging();
-       // Game game= new TicTacToeGame(new TicTacToeBoard(), P1);
+        mFirstToMove = chooseFirstMove();
+        mGame= new TicTacToeGame( mFirstToMove);
+
+        Scene scene = new Scene(mGame.getGraphicalBoardDisplay());
+        primaryStage.setScene(scene);
+        primaryStage.setTitle(mGame.getName());
+        primaryStage.show();
+
+        Task<Void> task = new Task<Void>(){
+
+            @Override
+            protected Void call() {
+
+                //  Game game = new FourInLineGame(new FourInLineBoard(), P1);
+                //runGame(game,2801);
 
 
-        Game game = new FourInLineGame(new FourInLineBoard(), P1);
-        runGame(game,2801);
+                runGame(MAX_TIC_TAC_TOE_ITERATIONS);
+                return null;
+            }
+        };
+
+        new Thread(task).start();
 
 
     }
 
 
-    private static Player chooseFirstMove(){
-        Player firstToMove;
-        int randomSelection = (int)(Math.random() * 2);
-        if ((randomSelection %2) == 0){
-            firstToMove= P1;
-        }else{
-            firstToMove = P2;
-        }
+    private  Player chooseFirstMove(){
 
-        LOGGER.info("First to move is: " + firstToMove.toString());
-        return firstToMove;
+    //    int randomSelection = (int)(Math.random() * 2);
+    //    if ((randomSelection %2) == 0){
+    //        mFirstToMove= P1;
+    //    }else{
+    //        mFirstToMove= P2;
+     //   }
+
+        mFirstToMove = P1;
+        LOGGER.info("First to move is: " + mFirstToMove.toString());
+        return mFirstToMove;
     }
 
 
@@ -96,7 +121,7 @@ public class GameControllerApp {
         fourInLineGame.performMove(p1Move);
         fourInLineGame.performMove(p2MoveInit);
 
-        fourInLineGame.getGameBoard().display(null);
+        fourInLineGame.getGameBoard().logBoardPositions(null);
     }
 
 
@@ -110,9 +135,18 @@ public class GameControllerApp {
         }
     }
 
-    private static void runGame(Game game, int maxIterations){
+    private void runGame(int maxIterations){
 
-        MonteCarloTreeSearch searchAgent = new MonteCarloTreeSearch(game,maxIterations,LOGGER);
+        if (mFirstToMove == P1){
+            mGame.setUserMessage("Thinking...");
+            mGame.setManualPlayerTurn(false);
+        }else{
+            mGame.setUserMessage("Your turn to make a move.");
+            mGame.setManualPlayerTurn(true);
+
+        }
+
+        MonteCarloTreeSearch searchAgent = new MonteCarloTreeSearch(mGame,maxIterations,LOGGER);
         Node suggestedNode = null;
         Move p2Move = null;
         boolean done = false;
@@ -125,7 +159,7 @@ public class GameControllerApp {
                 for (Node childNode : suggestedNode.getChildNodes()){
                     if (childNode.getMove().getName().equals(p2Move.getName())){
                         childNode.setParentToNull();
-                        childNode.setBoard(game.getGameBoard());
+                        childNode.setBoard(mGame.getGameBoard());
                         suggestedNode = searchAgent.findNextMove(childNode);
                         foundChild= true;
                         break;
@@ -137,25 +171,37 @@ public class GameControllerApp {
 
             }
 
-            Move suggestedMove = suggestedNode.getMove();
-            LOGGER.info("Executing suggested move for P1= " + suggestedMove.getName());
-            game.performMove(suggestedMove);
-            game.getGameBoard().display(null);
-            if (game.getGameState().getStatus() == GameStatus.IN_PROGRESS){
+            Move selectedMove = suggestedNode.getMove();
+            LOGGER.info("Executing suggested move for P1= " + selectedMove.getName());
+            // update the game model
+            mGame.performMove(selectedMove);
+
+            mGame.getGameBoard().logBoardPositions(null);
+
+            mGame.displayMove(selectedMove, P1);
+
+            if (mGame.getGameState().getStatus() == GameStatus.IN_PROGRESS){
+                mGame.setUserMessage("Your turn to make a move.");
                 // P2 moves
-                p2Move = game.getOpponentMove();
-                game.performMove(p2Move);
-                game.getGameBoard().display(null);
-                if (game.getGameState().getStatus() != GameStatus.IN_PROGRESS){
-                    displayEndOfGameMessage(game, P2);
+                p2Move = mGame.getOpponentMove();
+                mGame.performMove(p2Move);
+                mGame.getGameBoard().logBoardPositions(null);
+                if (mGame.getGameState().getStatus() != GameStatus.IN_PROGRESS){
+                    displayEndOfGameMessage(mGame, P2);
                     done = true;
                 }
 
             }else{
-                displayEndOfGameMessage(game, P1);
+                displayEndOfGameMessage(mGame, P1);
                 done = true;
             }
         }
     }
+
+
+    public static void main(String[] args){
+        launch(args);
+    }
+
 
 }

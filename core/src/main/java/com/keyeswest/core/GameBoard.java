@@ -40,7 +40,7 @@ public abstract class GameBoard {
 
     public abstract GameStatus performMove(Move move,Player player);
 
-    public void display(Logger clientLogger){
+    public void logBoardPositions(Logger clientLogger){
         Logger logger = clientLogger;
         if (logger == null){
             logger = LOGGER;
