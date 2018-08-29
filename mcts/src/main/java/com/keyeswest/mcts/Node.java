@@ -58,7 +58,7 @@ public class Node {
     private String mName;
 
     // used to hold moves until node is fully expanded
-    private List<? extends Move> mAvailableMoves;
+   // private List<? extends Move> mAvailableMoves;
 
     // Constructors
 
@@ -76,7 +76,7 @@ public class Node {
             throw new IllegalArgumentException("Game board can not be null");
         }
 
-        mAvailableMoves =  mBoard.getAvailableMoves();
+      //  mAvailableMoves =  mBoard.getAvailableMoves();
         mMoveToGetHere= null;
         mChildNodes = new ArrayList<>();
         mVisitCount = 0;
@@ -90,8 +90,16 @@ public class Node {
     }
 
     public Move getRandomAvailableMove(){
-        int randomSelection = (int)(Math.random() * mAvailableMoves.size());
-        return mAvailableMoves.remove(randomSelection);
+
+        List<? extends Move> availableMoves = mBoard.getAvailableMoves();
+        if (availableMoves.size() == 0){
+            throw new IllegalStateException("No moves available for board, precondition requires check.");
+        }
+        int randomSelection = (int)(Math.random() * availableMoves.size());
+
+        Move theMove =  availableMoves.get(randomSelection);
+
+        return theMove;
     }
 
 
@@ -135,7 +143,7 @@ public class Node {
         // a node is terminal if there are no more moves available or the state of the
         // board is won or loss when the corresponding  move is executed
         boolean hasChildren = ! mChildNodes.isEmpty();
-        boolean hasAvailableMoves = ! mAvailableMoves.isEmpty();
+        boolean hasAvailableMoves = ! mBoard.getAvailableMoves().isEmpty();
         return !mTerminalNode && (hasChildren || hasAvailableMoves) ;
     }
 
@@ -143,7 +151,7 @@ public class Node {
         // As child nodes are created, the corresponding moves from available moves are
         // removed from the available moves list. The node is fully expanded is
         // the available moves list is empty
-        return mAvailableMoves.isEmpty();
+        return mBoard.getAvailableMoves().isEmpty();
     }
 
 

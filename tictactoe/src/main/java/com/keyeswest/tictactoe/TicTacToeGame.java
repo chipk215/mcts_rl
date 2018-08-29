@@ -63,7 +63,7 @@ public class TicTacToeGame extends Game {
 
     @Override
     public void setManualPlayerTurn(boolean manualPlayerTurn) {
-        Platform.runLater(() ->mGraphicalDisplayBoard.setManualPlayerTurn(manualPlayerTurn));
+        mGraphicalDisplayBoard.setManualPlayerTurn(manualPlayerTurn);
     }
 
     @Override

@@ -72,13 +72,14 @@ public class GameControllerApp extends Application implements ManualPlayerCallba
                 if (mFirstToMove == P1){
                     mGame.setUserMessage(UserMessages.THINKING);
                     mGame.setManualPlayerTurn(false);
+                    executeComputerMove(null);
                 }else{
                     mGame.setUserMessage(UserMessages.YOUR_TURN);
                     mGame.setManualPlayerTurn(true);
 
                 }
 
-                executeComputerMove(null);
+
                 return null;
             }
         };
@@ -98,7 +99,8 @@ public class GameControllerApp extends Application implements ManualPlayerCallba
     //        mFirstToMove= P2;
      //   }
 
-        mFirstToMove = P1;
+         mFirstToMove = P1.getOpponent();
+        //mFirstToMove = P1;
         LOGGER.info("First to move is: " + mFirstToMove.toString());
         return mFirstToMove;
     }
