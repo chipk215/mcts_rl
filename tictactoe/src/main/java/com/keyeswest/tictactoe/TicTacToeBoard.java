@@ -41,6 +41,8 @@ public class TicTacToeBoard extends GameBoard {
             }
         }
         mPositions.addAll(board.mPositions);
+
+        mWinLine = board.mWinLine;
     }
 
 
@@ -65,14 +67,13 @@ public class TicTacToeBoard extends GameBoard {
     @Override
     public GameStatus performMove(Move move, Player player) {
         GameStatus gameStatus = GameStatus.IN_PROGRESS;
-        WinLine winLine;
 
         if (!(move instanceof TicTacToeMove)) {
             throw new IllegalStateException("Unrecognized game move.");
         }
 
-        winLine = markPosition(player, ((TicTacToeMove)move).getRow(), ((TicTacToeMove)move).getColumn());
-        if (winLine != null){
+        markPosition(player, ((TicTacToeMove)move).getRow(), ((TicTacToeMove)move).getColumn());
+        if ( mWinLine != null){
             gameStatus = GameStatus.GAME_WON;
         }else{
             // check for tie
@@ -84,7 +85,7 @@ public class TicTacToeBoard extends GameBoard {
     }
 
 
-    public WinLine markPosition(Player player, int row, int column ){
+    private void markPosition(Player player, int row, int column ){
 
         if (validateEmptyPosition(row, column)){
             mBoard[row][column] = player.value();
@@ -96,7 +97,9 @@ public class TicTacToeBoard extends GameBoard {
 
         }
 
-        return checkBoardForWin(player);
+        checkBoardForWin(player);
+
+        return;
     }
 
 
@@ -121,47 +124,63 @@ public class TicTacToeBoard extends GameBoard {
         return column + MAX_COLS * row;
     }
 
-    WinLine checkBoardForWin(Player player){
-        WinLine winningLine=null;
+    private void checkBoardForWin(Player player){
 
+        List<Coordinate> positions = new ArrayList<>();
         // check verticals
         for (int column = 0; column < MAX_COLS; column++){
+            positions.clear();
             int columnSum = 0;
             for (int row=0; row< MAX_ROWS; row++){
+                Coordinate coordinate = new Coordinate(row, column);
+                positions.add(coordinate);
                 columnSum+= mBoard[row][column];
             }
             if (columnSum == (3 * player.value())){
-                winningLine = new WinLine(LineType.VERTICAL, 0, column);
-                return winningLine;
+                mWinLine = new WinLine(LineType.VERTICAL, positions);
+               // winningLine = new WinLine(LineType.VERTICAL, 0, column);
+                return;
             }
         }
 
         //check horizontals
         for (int row=0; row < MAX_ROWS; row++){
+            positions.clear();
             int rowSum = 0;
             for (int column= 0; column< MAX_COLS; column++){
+                Coordinate coordinate = new Coordinate(row, column);
+                positions.add(coordinate);
                 rowSum+= mBoard[row][column];
             }
             if (rowSum == (3 * player.value())){
-                winningLine = new WinLine(LineType.HORIZONTAL, row, 0);
-                return winningLine;
+                mWinLine= new WinLine(LineType.HORIZONTAL,positions);
+                return;
             }
         }
 
         //check negative slope diagonal
+
+        positions.clear();
         int diagonalSum = mBoard[2][0] + mBoard[1][1] + mBoard[0][2];
         if (diagonalSum == (3 * player.value())){
-            winningLine = new WinLine(LineType.DIAGONAL, 2, 0);
-            return winningLine;
+            positions.add(new Coordinate(2,0));
+            positions.add(new Coordinate(1,1));
+            positions.add(new Coordinate(0,2));
+            mWinLine = new WinLine(LineType.DIAGONAL, positions);
+            return;
         }
 
         //check positive diagonal
+        positions.clear();
         diagonalSum = mBoard[0][0] + mBoard[1][1] + mBoard[2][2];
         if (diagonalSum == (3 * player.value())){
-            winningLine = new WinLine(LineType.DIAGONAL, 0, 0);
-            return winningLine;
+            positions.add(new Coordinate(0,0));
+            positions.add(new Coordinate(1,1));
+            positions.add(new Coordinate(2,2));
+            mWinLine = new WinLine(LineType.DIAGONAL, positions);
+            return;
         }
 
-        return winningLine;
+        return;
     }
 }

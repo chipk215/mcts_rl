@@ -21,6 +21,9 @@ public abstract class GameBoard {
     protected final int MAX_ROWS;
     protected final int MAX_COLS;
 
+
+    protected WinLine mWinLine = null;
+
     // index (0,0) corresponds to bottom left of board
     protected int[] [] mBoard;
 
@@ -65,6 +68,10 @@ public abstract class GameBoard {
 
     public List<CellOccupant> getBoardPositions(){
         return mPositions;
+    }
+
+    public WinLine getWinLine() {
+        return mWinLine;
     }
 
 }

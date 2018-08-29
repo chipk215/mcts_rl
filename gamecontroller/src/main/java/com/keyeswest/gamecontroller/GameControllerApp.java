@@ -70,10 +70,10 @@ public class GameControllerApp extends Application implements ManualPlayerCallba
                 //  Game game = new FourInLineGame(new FourInLineBoard(), P1);
                 //runGame(game,2801);
                 if (mFirstToMove == P1){
-                    mGame.setUserMessage("Thinking...");
+                    mGame.setUserMessage(UserMessages.THINKING);
                     mGame.setManualPlayerTurn(false);
                 }else{
-                    mGame.setUserMessage("Your turn to make a move.");
+                    mGame.setUserMessage(UserMessages.YOUR_TURN);
                     mGame.setManualPlayerTurn(true);
 
                 }
@@ -184,16 +184,35 @@ public class GameControllerApp extends Application implements ManualPlayerCallba
 
         mGame.displayMove(selectedMove, P1);
 
-        if (mGame.getGameState().getStatus() == GameStatus.IN_PROGRESS){
-            mGame.setUserMessage("Your turn to make a move.");
+        GameStatus resultStatus = mGame.getGameState().getStatus();
+        if (resultStatus == GameStatus.IN_PROGRESS){
+            mGame.setUserMessage(UserMessages.YOUR_TURN);
             mGame.setManualPlayerTurn(true);
-
-
 
         }else{
             displayEndOfGameMessage(mGame, P1);
-            mGame.setUserMessage("Game Over");
+            if (resultStatus == GameStatus.GAME_WON){
+                // handle game won scenario
+                displayWinnerInformation();
+            }else{
+                mGame.setUserMessage(UserMessages.TIED);
+            }
+
         }
+
+    }
+
+
+    private void displayWinnerInformation(){
+        Player winner = mGame.getGameState().getWinningPlayer();
+        if (winner == P1){
+            mGame.setUserMessage(UserMessages.COMPUTER_WIN);
+        }else{
+            mGame.setUserMessage(UserMessages.OPPONENT_WIN);
+        }
+
+        // show winning line
+        mGame.showWinner();
 
     }
 
@@ -207,12 +226,21 @@ public class GameControllerApp extends Application implements ManualPlayerCallba
         //update the graphical display
         mGame.displayMove(manualMove, P2);
 
-        if (mGame.getGameState().getStatus() != GameStatus.IN_PROGRESS){
+        GameStatus resultStatus = mGame.getGameState().getStatus();
+
+        if (resultStatus != GameStatus.IN_PROGRESS){
+            // log end log game message
             displayEndOfGameMessage(mGame, P2);
-            mGame.setUserMessage("Game Over");
+            if (resultStatus == GameStatus.GAME_WON){
+                // handle game won scenario
+                displayWinnerInformation();
+            }else{
+                mGame.setUserMessage(UserMessages.TIED);
+            }
+
         }else{
-            // game continues, it is ow the computer's move
-            mGame.setUserMessage("Thinking...");
+            // game continues, it is now the computer's move
+            mGame.setUserMessage(UserMessages.THINKING);
             mGame.setManualPlayerTurn(false);
             executeComputerMove(manualMove);
         }

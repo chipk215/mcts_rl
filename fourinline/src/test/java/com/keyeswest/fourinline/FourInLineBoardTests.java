@@ -106,8 +106,8 @@ public class FourInLineBoardTests {
 
 
         // this is a winning negative diagonal move
-        WinLine winLine = mFourInLineBoard.addPiece( Player.P1, 2);
-        Assert.assertNotNull(winLine);
+        mFourInLineBoard.addPiece( Player.P1, 2);
+        Assert.assertNotNull(mFourInLineBoard.getWinLine());
     }
 
 
@@ -173,13 +173,13 @@ public class FourInLineBoardTests {
                // board.configureBoardForRowTests(testRow,Player.P1);
                 board.constructHorizontalLine(testRow,col, Player.P1);
 
-                WinLine result = board.checkBoardForWin(Player.P1, testRow, col);
-                if (col <= mFourInLineBoard.getMAX_COLS() - FourInLineBoard.getWinConnection()) {
+                board.checkBoardForWin(Player.P1, testRow, col);
+                if (col <= board.getMAX_COLS() - FourInLineBoard.getWinConnection()) {
                     // horizontal line is within board bounds
-                    Assert.assertNotNull(result);
-                    Assert.assertEquals(LineType.HORIZONTAL,result.getLineType());
+                    Assert.assertNotNull(board.getWinLine());
+                    Assert.assertEquals(LineType.HORIZONTAL,board.getWinLine().getLineType());
                 } else {
-                    Assert.assertNull(result);
+                    Assert.assertNull(board.getWinLine());
                 }
             }
         }
@@ -192,13 +192,13 @@ public class FourInLineBoardTests {
                 TestBoard board = new TestBoard();
                 board.constructVerticalLine(testRow, col, Player.P1);
 
-                WinLine result = board.checkBoardForWin(Player.P1, testRow, col);
-                if (testRow <= mFourInLineBoard.getMAX_ROWS() - FourInLineBoard.getWinConnection()) {
+                board.checkBoardForWin(Player.P1, testRow, col);
+                if (testRow <= board.getMAX_ROWS() - TestBoard.getWinConnection()) {
                     // vertical line is within the board bounds
-                    Assert.assertNotNull(result);
-                    Assert.assertEquals(LineType.VERTICAL,result.getLineType());
+                    Assert.assertNotNull(board.getWinLine());
+                    Assert.assertEquals(LineType.VERTICAL,board.getWinLine().getLineType());
                 } else {
-                    Assert.assertNull(result);
+                    Assert.assertNull(board.getWinLine());
                 }
             }
         }
@@ -214,18 +214,18 @@ public class FourInLineBoardTests {
         int column = 1;
         TestBoard board = new TestBoard();
         board.constructPositiveDiagonal(row,column,Player.P1);
-        WinLine result = board.checkBoardForWin(Player.P1, row, column);
-        Assert.assertNotNull(result);
-        Assert.assertEquals(LineType.DIAGONAL,result.getLineType());
+        board.checkBoardForWin(Player.P1, row, column);
+        Assert.assertNotNull(board.getWinLine());
+        Assert.assertEquals(LineType.DIAGONAL,board.getWinLine().getLineType());
 
         // Test Case 2: Diagonal extending from row0,col3 to row3,col6
         row = 0;
         column = 3;
         board = new TestBoard();
         board.configureBoardForPositiveDiagonalTest(row,column,Player.P1);
-        result = board.checkBoardForWin(Player.P1, row, column);
-        Assert.assertNotNull(result);
-        Assert.assertEquals(LineType.DIAGONAL,result.getLineType());
+        board.checkBoardForWin(Player.P1, row, column);
+        Assert.assertNotNull(board.getWinLine());
+        Assert.assertEquals(LineType.DIAGONAL,board.getWinLine().getLineType());
 
     }
 
@@ -236,18 +236,18 @@ public class FourInLineBoardTests {
         int column = 0;
         TestBoard board = new TestBoard();
         board.constructNegativeDiagonal(row,column,Player.P1);
-        WinLine result = board.checkBoardForWin(Player.P1, row, column);
-        Assert.assertNotNull(result);
-        Assert.assertEquals(LineType.DIAGONAL,result.getLineType());
+        board.checkBoardForWin(Player.P1, row, column);
+        Assert.assertNotNull(board.getWinLine());
+        Assert.assertEquals(LineType.DIAGONAL,board.getWinLine().getLineType());
 
         // Test Case 3:
         row = 3;
         column = 0;
         board = new TestBoard();
         board.constructNegativeDiagonal(row,column,Player.P1);
-        result = board.checkBoardForWin(Player.P1, row, column);
-        Assert.assertNotNull(result);
-        Assert.assertEquals(LineType.DIAGONAL,result.getLineType());
+        board.checkBoardForWin(Player.P1, row, column);
+        Assert.assertNotNull(board.getWinLine());
+        Assert.assertEquals(LineType.DIAGONAL,board.getWinLine().getLineType());
 
     }
 
@@ -383,12 +383,12 @@ public class FourInLineBoardTests {
                 int randomSelection = (int) (Math.random() * range);
 
                 FourInLineMove randomMove = moves.get(randomSelection);
-                WinLine winner = mFourInLineBoard.addPiece(player, randomMove.getColumn());
+                mFourInLineBoard.addPiece(player, randomMove.getColumn());
 
                 moveCount++;
                 Assert.assertTrue(moveCount<= (mFourInLineBoard.getMAX_ROWS() * mFourInLineBoard.getMAX_COLS()));
 
-                if (winner != null) {
+                if (mFourInLineBoard.getWinLine() != null) {
                     gameOver = true;
                 }else{
                     player = player.getOpponent();

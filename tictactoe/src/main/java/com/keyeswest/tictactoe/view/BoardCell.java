@@ -63,4 +63,8 @@ public class BoardCell extends StackPane {
         return mColumn;
     }
 
+    public void highlightBackground(){
+        setStyle("-fx-background-color: lightgrey;");
+    }
+
 }

@@ -1,11 +1,9 @@
 package com.keyeswest.fourinline;
 
-import com.keyeswest.core.Game;
-import com.keyeswest.core.GameBoard;
-import com.keyeswest.core.Move;
-import com.keyeswest.core.Player;
+import com.keyeswest.core.*;
 import javafx.scene.Parent;
 
+import java.util.List;
 import java.util.Scanner;
 
 public class FourInLineGame extends Game {
@@ -48,7 +46,7 @@ public class FourInLineGame extends Game {
     }
 
     @Override
-    public void setUserMessage(String string) {
+    public void setUserMessage(UserMessages message) {
 
     }
 
@@ -59,6 +57,11 @@ public class FourInLineGame extends Game {
 
     @Override
     public void displayMove(Move move, Player player) {
+
+    }
+
+    @Override
+    public void showWinner() {
 
     }
 }

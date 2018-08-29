@@ -83,13 +83,11 @@ public class FourInLineBoard extends GameBoard {
     @Override
     public GameStatus performMove(Move move, Player player) {
 
-        WinLine winLine;
-
         if (move instanceof FourInLineMove){
             int column = ((FourInLineMove)move).getColumn();
-            winLine = addPiece(player,column);
+            addPiece(player,column);
             GameStatus gameStatus = GameStatus.IN_PROGRESS;
-            if (winLine != null){
+            if (mWinLine != null){
                 gameStatus = GameStatus.GAME_WON;
             }else{
                 // check for tie
@@ -114,7 +112,7 @@ public class FourInLineBoard extends GameBoard {
 
 
 
-    public WinLine addPiece(Player player, int column){
+     void addPiece(Player player, int column){
 
         if ( (column < 0) || (column >= MAX_COLS)){
             throw new IllegalStateException("Illegal and unexpected game move executed.");
@@ -126,7 +124,9 @@ public class FourInLineBoard extends GameBoard {
         mBoard[row][column] = player.value();
         mPositions.add(new CellOccupant(player,computeCellNumber(row,column)));
 
-        return checkBoardForWin(player, row, column);
+        checkBoardForWin(player, row, column);
+
+        return;
     }
 
     /**
@@ -136,20 +136,22 @@ public class FourInLineBoard extends GameBoard {
      * @param player - player making move
      * @param row  - row containing the last move
      * @param column - column containing last move
-     * @return - the winning segment or null if no win.
      */
-    WinLine checkBoardForWin(Player player, int row, int column){
-        WinLine winningLine;
-        winningLine =checkHorizontalsForWin(player, row, column);
-        if (winningLine != null){
-            return winningLine;
-        }
-        winningLine = checkVerticalsForWin(player, row, column);
-        if (winningLine != null){
-            return winningLine;
+    void checkBoardForWin(Player player, int row, int column){
+
+        checkHorizontalsForWin(player, row, column);
+        if (mWinLine != null){
+            return;
         }
 
-        return checkDiagonalsForWin(player, row, column);
+        checkVerticalsForWin(player, row, column);
+        if (mWinLine != null){
+            return;
+        }
+
+        checkDiagonalsForWin(player, row, column);
+
+        return;
     }
 
 
@@ -173,7 +175,7 @@ public class FourInLineBoard extends GameBoard {
     * in the parameter list for consecutive positions corresponding to the
     * specified player.
     */
-    private WinLine checkVerticalsForWin(Player player, int row, int column){
+    private void checkVerticalsForWin(Player player, int row, int column){
         // check segments beginning 3 rows beneath the specified row
         int startRow = row - (WIN_CONNECTION-1);
         if (startRow < 0){
@@ -191,12 +193,12 @@ public class FourInLineBoard extends GameBoard {
             }
             if (sum == matchSum){
                 // we have a winner
-                return new WinLine(LineType.VERTICAL, startRow, column);
+                mWinLine = new WinLine(LineType.VERTICAL, startRow, column);
+                return;
             }
             startRow++;
         }
 
-        return null;  // no winner found
     }
 
 
@@ -205,7 +207,7 @@ public class FourInLineBoard extends GameBoard {
      * in the parameter list for consecutive positions corresponding to the
      * specified player.
      */
-    private WinLine checkHorizontalsForWin(Player player, int row, int column){
+    private void checkHorizontalsForWin(Player player, int row, int column){
 
         // need to check at most 4 segments beginning 3 cols to the left of the
         // provided coordinate
@@ -225,19 +227,20 @@ public class FourInLineBoard extends GameBoard {
             }
             if (sum == matchSum){
                 // we have a winner
-                return new WinLine(LineType.HORIZONTAL, row, startCol);
+                mWinLine = new WinLine(LineType.HORIZONTAL, row, startCol);
+                return;
             }
 
             startCol++;
         }
-        return null;  // no horizontal win line found
+
     }
 
 
     /*
      * Helper function for checking diagonals that looks for adjacent positions.
      */
-    private WinLine checkAdjacentPositions(int rowIndex, int colIndex, Player player, boolean negativeSlope){
+    private void checkAdjacentPositions(int rowIndex, int colIndex, Player player, boolean negativeSlope){
         int sum =0;
         int matchSum = 4 * player.value();
         for(int index=0; index< WIN_CONNECTION; index++ ){
@@ -251,10 +254,10 @@ public class FourInLineBoard extends GameBoard {
             }
         }
         if (sum == matchSum){
-            return new WinLine(LineType.DIAGONAL, rowIndex, colIndex);
+            mWinLine = new WinLine(LineType.DIAGONAL, rowIndex, colIndex);
+            return;
         }
 
-        return null;
     }
 
     /*
@@ -262,7 +265,7 @@ public class FourInLineBoard extends GameBoard {
      * parameters.  Check the diagonal for 4 adjacent positions corresponding
      * to the specified player.
      */
-    private WinLine checkDiagonalsForWin(Player player, int row, int column){
+    private void checkDiagonalsForWin(Player player, int row, int column){
 
         LineSegment positiveDiagonal = computePositiveDiagonalSegment(row,column);
         if (positiveDiagonal.getLength() >= WIN_CONNECTION ){
@@ -271,9 +274,9 @@ public class FourInLineBoard extends GameBoard {
             int colIndex = positiveDiagonal.getStartColumn();
             while(  (rowIndex <=positiveDiagonal.getEndRow()- WIN_CONNECTION +1) &&
                     (colIndex <= positiveDiagonal.getEndColumn()-WIN_CONNECTION +1) ){
-                WinLine winner = checkAdjacentPositions(rowIndex, colIndex, player, false);
-                if (winner != null){
-                    return winner;
+                checkAdjacentPositions(rowIndex, colIndex, player, false);
+                if (mWinLine != null){
+                    return;
                 }
                 rowIndex++;
                 colIndex++;
@@ -288,16 +291,15 @@ public class FourInLineBoard extends GameBoard {
             while(  (rowIndex >=negativeDiagonal.getEndRow()+ WIN_CONNECTION -1) &&
                     (colIndex <= negativeDiagonal.getEndColumn()-WIN_CONNECTION +1) ){
 
-                WinLine winner = checkAdjacentPositions(rowIndex, colIndex, player,true);
-                if (winner != null){
-                    return winner;
+                checkAdjacentPositions(rowIndex, colIndex, player,true);
+                if (mWinLine != null){
+                    return;
                 }
                 rowIndex--;
                 colIndex++;
             }
         }
 
-        return null;
     }
 
 

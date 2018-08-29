@@ -1,14 +1,12 @@
 package com.keyeswest.tictactoe;
 
-import com.keyeswest.core.Game;
+import com.keyeswest.core.*;
 
-import com.keyeswest.core.ManualPlayerCallback;
-import com.keyeswest.core.Move;
-import com.keyeswest.core.Player;
 import com.keyeswest.tictactoe.view.Board;
 import javafx.application.Platform;
 import javafx.scene.Parent;
 
+import java.util.List;
 import java.util.Scanner;
 
 public class TicTacToeGame extends Game {
@@ -59,8 +57,8 @@ public class TicTacToeGame extends Game {
 
 
     @Override
-    public void setUserMessage(String message) {
-        Platform.runLater(() -> mGraphicalDisplayBoard.setUserMessage(message));
+    public void setUserMessage(UserMessages message) {
+        Platform.runLater(() -> mGraphicalDisplayBoard.setUserMessage(USER_MESSAGES.get(message)));
     }
 
     @Override
@@ -86,5 +84,10 @@ public class TicTacToeGame extends Game {
         Platform.runLater(() -> mGraphicalDisplayBoard.markCell(row, column, finalManualPlayer));
 
 
+    }
+
+    @Override
+    public void showWinner() {
+       Platform.runLater(() -> mGraphicalDisplayBoard.showWinLine(mGameBoard.getWinLine().getWinningPositions()));
     }
 }
