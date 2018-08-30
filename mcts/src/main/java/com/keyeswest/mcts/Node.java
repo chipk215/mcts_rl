@@ -1,5 +1,6 @@
 package com.keyeswest.mcts;
 
+import com.keyeswest.core.CellOccupant;
 import com.keyeswest.core.GameBoard;
 import com.keyeswest.core.Move;
 import com.keyeswest.core.Player;
@@ -58,7 +59,7 @@ public class Node {
     private String mName;
 
     // used to hold moves until node is fully expanded
-   // private List<? extends Move> mAvailableMoves;
+    private List<? extends Move> mAvailableChildMoves;
 
     // Constructors
 
@@ -76,7 +77,7 @@ public class Node {
             throw new IllegalArgumentException("Game board can not be null");
         }
 
-      //  mAvailableMoves =  mBoard.getAvailableMoves();
+        mAvailableChildMoves =  mBoard.getAvailableMoves();
         mMoveToGetHere= null;
         mChildNodes = new ArrayList<>();
         mVisitCount = 0;
@@ -84,20 +85,26 @@ public class Node {
         mName="ROOT";
     }
 
+    public Node(GameBoard gameBoard, Player firstToMove, Move firstMove){
+        this(gameBoard, firstToMove);
+        mMoveToGetHere = firstMove;
+        mName = mName + " + " + firstMove.getName();
+    }
+
 
     public void setBoard(GameBoard board){
         mBoard = board.getCopyOfBoard();
     }
 
-    public Move getRandomAvailableMove(){
+    public Move getRandomAvailableChildMove(){
 
-        List<? extends Move> availableMoves = mBoard.getAvailableMoves();
-        if (availableMoves.size() == 0){
+
+        if (mAvailableChildMoves.size() == 0){
             throw new IllegalStateException("No moves available for board, precondition requires check.");
         }
-        int randomSelection = (int)(Math.random() * availableMoves.size());
+        int randomSelection = (int)(Math.random() * mAvailableChildMoves.size());
 
-        Move theMove =  availableMoves.get(randomSelection);
+        Move theMove =  mAvailableChildMoves.remove(randomSelection);
 
         return theMove;
     }
@@ -151,7 +158,7 @@ public class Node {
         // As child nodes are created, the corresponding moves from available moves are
         // removed from the available moves list. The node is fully expanded is
         // the available moves list is empty
-        return mBoard.getAvailableMoves().isEmpty();
+        return mAvailableChildMoves.isEmpty();
     }
 
 
@@ -187,5 +194,13 @@ public class Node {
 
     public boolean getDefensiveTerminalNode(){
         return mDefensiveTerminalNode;
+    }
+
+    public  List<CellOccupant> getBoardHistory(){
+        return mBoard.getBoardPositions();
+    }
+
+    public GameBoard getBoard(){
+        return mBoard;
     }
 }

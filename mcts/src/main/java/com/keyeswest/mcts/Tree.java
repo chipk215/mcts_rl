@@ -12,6 +12,10 @@ public class Tree {
         mRoot = new Node(board,firstToMove );
     }
 
+    public Tree( Node rootNode){
+        mRoot = rootNode;
+    }
+
     public Node getRootNode(){
         return mRoot;
     }

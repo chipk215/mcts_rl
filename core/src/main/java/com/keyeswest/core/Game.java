@@ -99,5 +99,19 @@ public abstract class Game implements GraphicalDisplayInterface {
 
     }
 
+    public void clearGameState(){
+        mGameBoard = null;
+        mGameState = null;
+    }
+
+    public void executeHistory(GameBoard board, List<CellOccupant> history){
+        mGameBoard = board;
+        Player initialPlayer = history.get(0).getPlayer();
+        mGameState = new GameState(initialPlayer);
+        for (CellOccupant occupant : history){
+           performMove(occupant.getMove());
+        }
+    }
+
     public abstract Move getOpponentMove();
 }

@@ -40,7 +40,7 @@ public class FourInLineBoardTests {
             Assert.assertNotNull(moves);
             Assert.assertEquals(moves.size(),expectedMoveCount );
             for(int row = 0; row< mFourInLineBoard.getMAX_ROWS(); row++){
-                mFourInLineBoard.addPiece(Player.P1,column);
+                mFourInLineBoard.addPiece(Player.P1,new FourInLineMove(column));
             }
             expectedMoveCount--;
 
@@ -65,48 +65,48 @@ public class FourInLineBoardTests {
     @Test
     public void diagonalTestCaseTest(){
         // setup board with test case moves
-        mFourInLineBoard.addPiece( Player.P1, 3);
-        mFourInLineBoard.addPiece( Player.P2, 0);
+        mFourInLineBoard.addPiece( Player.P1, new FourInLineMove(3));
+        mFourInLineBoard.addPiece( Player.P2, new FourInLineMove(0));
 
-        mFourInLineBoard.addPiece( Player.P1, 3);
-        mFourInLineBoard.addPiece( Player.P2, 0);
+        mFourInLineBoard.addPiece( Player.P1, new FourInLineMove(3));
+        mFourInLineBoard.addPiece( Player.P2, new FourInLineMove(0));
 
-        mFourInLineBoard.addPiece( Player.P1, 4);
-        mFourInLineBoard.addPiece( Player.P2, 0);
+        mFourInLineBoard.addPiece( Player.P1,  new FourInLineMove(4));
+        mFourInLineBoard.addPiece( Player.P2, new FourInLineMove(0));
 
-        mFourInLineBoard.addPiece( Player.P1, 0);
-        mFourInLineBoard.addPiece( Player.P2, 1);
+        mFourInLineBoard.addPiece( Player.P1, new FourInLineMove(0));
+        mFourInLineBoard.addPiece( Player.P2, new FourInLineMove(1));
 
-        mFourInLineBoard.addPiece( Player.P1, 3);
-        mFourInLineBoard.addPiece( Player.P2, 3);
+        mFourInLineBoard.addPiece( Player.P1,  new FourInLineMove(3));
+        mFourInLineBoard.addPiece( Player.P2,  new FourInLineMove(3));
 
-        mFourInLineBoard.addPiece( Player.P1, 1);
-        mFourInLineBoard.addPiece( Player.P2, 2);
+        mFourInLineBoard.addPiece( Player.P1, new FourInLineMove(1));
+        mFourInLineBoard.addPiece( Player.P2, new FourInLineMove(2));
 
-        mFourInLineBoard.addPiece( Player.P1, 1);
-        mFourInLineBoard.addPiece( Player.P2, 0);
+        mFourInLineBoard.addPiece( Player.P1, new FourInLineMove(1));
+        mFourInLineBoard.addPiece( Player.P2, new FourInLineMove(0));
 
-        mFourInLineBoard.addPiece( Player.P1, 4);
-        mFourInLineBoard.addPiece( Player.P2, 1);
+        mFourInLineBoard.addPiece( Player.P1, new FourInLineMove(4));
+        mFourInLineBoard.addPiece( Player.P2, new FourInLineMove(1));
 
-        mFourInLineBoard.addPiece( Player.P1, 4);
-        mFourInLineBoard.addPiece( Player.P2, 4);
+        mFourInLineBoard.addPiece( Player.P1, new FourInLineMove(4));
+        mFourInLineBoard.addPiece( Player.P2, new FourInLineMove(4));
 
-        mFourInLineBoard.addPiece( Player.P1, 5);
-        mFourInLineBoard.addPiece( Player.P2, 2);
+        mFourInLineBoard.addPiece( Player.P1,  new FourInLineMove(5));
+        mFourInLineBoard.addPiece( Player.P2, new FourInLineMove(2));
 
-        mFourInLineBoard.addPiece( Player.P1, 5);
-        mFourInLineBoard.addPiece( Player.P2, 5);
+        mFourInLineBoard.addPiece( Player.P1,  new FourInLineMove(5));
+        mFourInLineBoard.addPiece( Player.P2,  new FourInLineMove(5));
 
-        mFourInLineBoard.addPiece( Player.P1, 4);
-        mFourInLineBoard.addPiece( Player.P2, 6);
+        mFourInLineBoard.addPiece( Player.P1, new FourInLineMove(4));
+        mFourInLineBoard.addPiece( Player.P2,  new FourInLineMove(6));
 
-        mFourInLineBoard.addPiece( Player.P1, 5);
-        mFourInLineBoard.addPiece( Player.P2, 2);
+        mFourInLineBoard.addPiece( Player.P1, new FourInLineMove(5));
+        mFourInLineBoard.addPiece( Player.P2, new FourInLineMove(2));
 
 
         // this is a winning negative diagonal move
-        mFourInLineBoard.addPiece( Player.P1, 2);
+        mFourInLineBoard.addPiece( Player.P1, new FourInLineMove(2));
         Assert.assertNotNull(mFourInLineBoard.getWinLine());
     }
 
@@ -116,12 +116,12 @@ public class FourInLineBoardTests {
     public void validMoveTest(){
         Player player = Player.P1;
         int expectedPosition = 0;
-        mFourInLineBoard.addPiece( player, 0);
+        mFourInLineBoard.addPiece( player, new FourInLineMove(0));
         List<CellOccupant> occupants = mFourInLineBoard.getBoardPositions();
         Assert.assertTrue(occupants.size() == 1);
         CellOccupant occupant = occupants.get(0);
         Assert.assertEquals(player, occupant.getPlayer());
-        Assert.assertEquals(expectedPosition, occupant.getCellNumber());
+        Assert.assertEquals(expectedPosition, ((FourInLineMove)occupant.getMove()).getColumn());
 
     }
 
@@ -129,13 +129,13 @@ public class FourInLineBoardTests {
     @Test(expected = IllegalStateException.class)
     public void invalidSmallColumnTest(){
         Player player = Player.P1;
-        mFourInLineBoard.addPiece( player, -1);
+        mFourInLineBoard.addPiece( player, new FourInLineMove(-1));
     }
 
     @Test(expected = IllegalStateException.class)
     public void invalidLargeColumnTest(){
         Player player = Player.P1;
-        mFourInLineBoard.addPiece( player, mFourInLineBoard.getMAX_COLS());
+        mFourInLineBoard.addPiece( player, new FourInLineMove(mFourInLineBoard.getMAX_COLS()));
 
     }
 
@@ -147,8 +147,8 @@ public class FourInLineBoardTests {
         int expectedPlayerTwoPosition = mFourInLineBoard.getMAX_COLS();
         Player playerOne = Player.P1;
         Player playerTwo = Player.P2;
-         mFourInLineBoard.addPiece( playerOne, 0);
-         mFourInLineBoard.addPiece( playerTwo, 0);
+         mFourInLineBoard.addPiece( playerOne, new FourInLineMove(0));
+         mFourInLineBoard.addPiece( playerTwo, new FourInLineMove(0));
 
         List<CellOccupant> occupants = mFourInLineBoard.getBoardPositions();
         Assert.assertTrue(occupants.size() == 2);
@@ -156,9 +156,9 @@ public class FourInLineBoardTests {
         for (int i=0; i< 2; i++) {
             CellOccupant occupant = occupants.get(i);
             if (occupant.getPlayer() == playerOne) {
-               Assert.assertEquals(expectedPlayerOnePosition,occupant.getCellNumber() );
+               Assert.assertEquals(expectedPlayerOnePosition,((FourInLineMove)occupant.getMove()).getColumn() );
             }else{
-                Assert.assertEquals(expectedPlayerTwoPosition,occupant.getCellNumber() );
+                Assert.assertEquals(expectedPlayerTwoPosition,((FourInLineMove)occupant.getMove()).getColumn() );
             }
         }
 
@@ -383,7 +383,7 @@ public class FourInLineBoardTests {
                 int randomSelection = (int) (Math.random() * range);
 
                 FourInLineMove randomMove = moves.get(randomSelection);
-                mFourInLineBoard.addPiece(player, randomMove.getColumn());
+                mFourInLineBoard.addPiece(player, new FourInLineMove(randomMove.getColumn()));
 
                 moveCount++;
                 Assert.assertTrue(moveCount<= (mFourInLineBoard.getMAX_ROWS() * mFourInLineBoard.getMAX_COLS()));

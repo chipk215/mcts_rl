@@ -33,8 +33,8 @@ public class GameControllerApp extends Application implements ManualPlayerCallba
     private static FileHandler fh = null;
 
     private static final int MAX_FOUR_IN_LINE_ITERATIONS = 3000;
-
     private static final int MAX_TIC_TAC_TOE_ITERATIONS = 3000;
+
 
     private Player mFirstToMove;
 
@@ -48,58 +48,70 @@ public class GameControllerApp extends Application implements ManualPlayerCallba
     public GameControllerApp(){
         super();
         setupLogging();
-        mFirstToMove = chooseFirstMove();
-        mGame= new TicTacToeGame( mFirstToMove, this);
-        mSearchAgent = new MonteCarloTreeSearch(mGame,MAX_TIC_TAC_TOE_ITERATIONS,LOGGER);
-        mSuggestedNode = null;
+
+    }
+
+
+    // this should execute on the UI thread
+    private void startNewGame(Stage primaryStage){
+
+        try {
+            mFirstToMove = chooseFirstMove();
+            mGame = new TicTacToeGame(mFirstToMove, this);
+            //mSearchAgent = new MonteCarloTreeSearch(mGame, MAX_TIC_TAC_TOE_ITERATIONS, LOGGER);
+            mSearchAgent = null;
+            mSuggestedNode = null;
+
+            Scene scene = new Scene(mGame.getGraphicalBoardDisplay());
+            primaryStage.setScene(scene);
+            primaryStage.setTitle(mGame.getName());
+            primaryStage.show();
+
+            Task<Void> task = new Task<Void>() {
+
+                @Override
+                protected Void call() {
+
+                    //  Game game = new FourInLineGame(new FourInLineBoard(), P1);
+                    //runGame(game,2801);
+                    if (mFirstToMove == P1) {
+                        mGame.setUserMessage(UserMessages.THINKING);
+                        mGame.setManualPlayerTurn(false);
+                        executeComputerMove(null);
+                    } else {
+                        mGame.setUserMessage(UserMessages.YOUR_TURN);
+                        mGame.setManualPlayerTurn(true);
+
+                    }
+
+
+                    return null;
+                }
+            };
+
+            new Thread(task).start();
+        }catch(Exception ex){
+            ex.printStackTrace();
+            System.exit(-1);
+        }
     }
 
     @Override
     public void start(Stage primaryStage) {
-
-        Scene scene = new Scene(mGame.getGraphicalBoardDisplay());
-        primaryStage.setScene(scene);
-        primaryStage.setTitle(mGame.getName());
-        primaryStage.show();
-
-        Task<Void> task = new Task<Void>(){
-
-            @Override
-            protected Void call() {
-
-                //  Game game = new FourInLineGame(new FourInLineBoard(), P1);
-                //runGame(game,2801);
-                if (mFirstToMove == P1){
-                    mGame.setUserMessage(UserMessages.THINKING);
-                    mGame.setManualPlayerTurn(false);
-                    executeComputerMove(null);
-                }else{
-                    mGame.setUserMessage(UserMessages.YOUR_TURN);
-                    mGame.setManualPlayerTurn(true);
-
-                }
-
-
-                return null;
-            }
-        };
-
-        new Thread(task).start();
-
-
+        startNewGame(primaryStage);
     }
 
 
     private  Player chooseFirstMove(){
 
-    //    int randomSelection = (int)(Math.random() * 2);
-    //    if ((randomSelection %2) == 0){
-    //        mFirstToMove= P1;
-    //    }else{
-    //        mFirstToMove= P2;
-     //   }
+        int randomSelection = (int)(Math.random() * 2);
+        if ((randomSelection %2) == 0){
+            mFirstToMove= P1;
+        }else{
+            mFirstToMove= P2;
+        }
 
-         mFirstToMove = P1.getOpponent();
+        mFirstToMove = P1.getOpponent();
         //mFirstToMove = P1;
         LOGGER.info("First to move is: " + mFirstToMove.toString());
         return mFirstToMove;
@@ -157,25 +169,49 @@ public class GameControllerApp extends Application implements ManualPlayerCallba
     }
 
     private void executeComputerMove(Move opponentMove){
-        if (mSuggestedNode == null){
-            mSuggestedNode = mSearchAgent.findNextMove(null);
+
+        //TODO All this startup logic needs to be moved into MCTS
+
+        if (mSearchAgent == null){
+            // this is the computer's first move
+
+            // has the opponent moved?
+            if (opponentMove != null){
+                // yes, the opponent moved first so create a root node representing the user's move
+                Node opNode = new Node(mGame.getGameBoard(), P1,  opponentMove );
+                mSearchAgent = new MonteCarloTreeSearch(mGame, MAX_TIC_TAC_TOE_ITERATIONS, LOGGER, opNode);
+                mSuggestedNode = mSearchAgent.findNextMove(null);
+            }else{
+                // computer moved first
+                mSearchAgent = new MonteCarloTreeSearch(mGame, MAX_TIC_TAC_TOE_ITERATIONS, LOGGER);
+                mSuggestedNode = mSearchAgent.findNextMove(null);
+            }
         }else{
+            // continuation of the game after the computer has moved at least once
+
+            // if the opponent has just moved look in the search tree for the opponent move to
+            // use the previously generated simulation history to help determine the next move
             boolean foundChild = false;
             // determine if child node corresponding to opponent's move exists
-            for (Node childNode : mSuggestedNode.getChildNodes()){
-                if (childNode.getMove().getName().equals(opponentMove.getName())){
+            for (Node childNode : mSuggestedNode.getChildNodes()) {
+                if (childNode.getMove().getName().equals(opponentMove.getName())) {
                     childNode.setParentToNull();
                     childNode.setBoard(mGame.getGameBoard());
                     mSuggestedNode = mSearchAgent.findNextMove(childNode);
-                    foundChild= true;
+                    foundChild = true;
                     break;
                 }
             }
-            if (! foundChild){
+            if (!foundChild) {
+                // if the opponent move is not present then create a new root node representing the user move
+                Node opNode = new Node(mGame.getGameBoard(), P2,  opponentMove );
+                mSearchAgent = new MonteCarloTreeSearch(mGame, MAX_TIC_TAC_TOE_ITERATIONS, LOGGER, opNode);
                 mSuggestedNode = mSearchAgent.findNextMove(null);
             }
 
+
         }
+
 
         Move selectedMove = mSuggestedNode.getMove();
         LOGGER.info("Executing suggested move for P1= " + selectedMove.getName());

@@ -29,47 +29,65 @@ public class MonteCarloTreeSearch {
         mTree = new Tree(game.getGameBoard(), game.getNextPlayerToMove());
     }
 
+    public MonteCarloTreeSearch(Game game, int iterations, Logger clientLogger, Node rootNode){
+        if (clientLogger != null){
+            LOGGER = clientLogger;
+        }
+
+        MAX_ITERATIONS = iterations;
+        mGame = game;
+        mTree = new Tree(rootNode);
+    }
+
     public void updateGame(Game game){
         mGame = game;
         mTree = new Tree(game.getGameBoard(), game.getNextPlayerToMove());
     }
     public Node findNextMove(Node node){
 
-        if (node != null){
+        if (node != null) {
             mTree.setRootNode(node);
-            // check for defensive nodes
-            for (Node child : mTree.getRootNode().getChildNodes()){
-                GameBoard defenseBoard = node.getCopyOfBoard();
+        }
+        // check for defensive nodes
+        for (Node child : mTree.getRootNode().getChildNodes()) {
+            GameBoard defenseBoard = node.getCopyOfBoard();
 
-                Player opponent =  mTree.getRootNode().getPlayer().getOpponent();
-                Move opMove = child.getMove();
-                GameStatus defenseStatus = defenseBoard.performMove(opMove, opponent);
+            Player opponent = mTree.getRootNode().getPlayer().getOpponent();
+            Move opMove = child.getMove();
+            GameStatus defenseStatus = defenseBoard.performMove(opMove, opponent);
 
-                if (defenseStatus == GameStatus.GAME_WON){
-                    child.setDefensiveTerminalNode();
-                }else{
-                    child.clearDefensiveTerminalNode();
-                }
+            if (defenseStatus == GameStatus.GAME_WON) {
+                child.setDefensiveTerminalNode();
+                // all we need is one defensive move, if there are more than 1 we are going to lose
+                break;
+            } else {
+                child.clearDefensiveTerminalNode();
             }
         }
+
         mGame.getGameBoard().logBoardPositions(LOGGER);
 
         int iterationCount = 0;
         while(iterationCount < MAX_ITERATIONS){
             StringBuilder sBuilder = new StringBuilder(System.lineSeparator());
             sBuilder.append("***Iteration:"+ iterationCount + System.lineSeparator());
-            GameState gameState;
+
 
             Node searchNode = treePolicy(mTree.getRootNode());
             sBuilder.append("Candidate Selection: " + searchNode.getName() + System.lineSeparator());
-            Game gameCopy = mGame.makeCopy();
+            GameState gameState;
             if (searchNode.isNonTerminal()) {
-                gameState = gameCopy.playRandomGame();
-                sBuilder.append("Simulation results: " + System.lineSeparator());
-                sBuilder.append("   " + gameState.describe());
-                sBuilder.append(System.lineSeparator());
-            }else {
+                 Game simGame = mGame.makeCopy();
+                 simGame.clearGameState();
+                 simGame.executeHistory(searchNode.getBoard(),searchNode.getBoardHistory());
 
+                 gameState = simGame.playRandomGame();
+
+                 sBuilder.append("Simulation results: " + System.lineSeparator());
+                 sBuilder.append("   " + gameState.describe());
+                 sBuilder.append(System.lineSeparator());
+            }else {
+                Game  gameCopy =  mGame.makeCopy();
                 gameCopy.getGameState().update(GameStatus.GAME_WON,searchNode.getPlayer().getOpponent());
                 gameState = gameCopy.getGameState();
                 gameState.setStatus(GameStatus.GAME_WON);
@@ -80,13 +98,20 @@ public class MonteCarloTreeSearch {
                         (searchNode.getParent().getPlayer() == mTree.getRootNode().getPlayer())){
                     LOGGER.log(Level.INFO,"Selected Move: " + searchNode.getMove().getName() + System.lineSeparator() );
                     //return candidateNode.getMove();
+                    sBuilder.append("Winning move found: " + "Selected Move: " + searchNode.getMove().getName());
+                    LOGGER.log(Level.INFO,sBuilder.toString());
                     return searchNode;
+                } else{
+                    sBuilder.append("Expanding tree. "  + searchNode.getMove().getName() + System.lineSeparator());
+
                 }
 
             }
             backPropagation(searchNode, gameState);
 
             Node nodeInfo = searchNode;
+
+ /*
             int level=0;
             while(nodeInfo != null){
                 sBuilder.append("level= "+ level + System.lineSeparator());
@@ -98,6 +123,7 @@ public class MonteCarloTreeSearch {
                 level++;
 
             }
+ */
 
             LOGGER.log(Level.INFO,sBuilder.toString());
             iterationCount++;
@@ -112,7 +138,17 @@ public class MonteCarloTreeSearch {
             }
         }
 
+        StringBuilder sb = new StringBuilder(System.lineSeparator());
+        sb.append("Candidate Node Values :" + System.lineSeparator() );
+        for (Node cNode : mTree.getRootNode().getChildNodes() ) {
+            sb.append("Node: " + cNode.getName());
+            sb.append("  Value: " + Double.toString(cNode.getValue()/cNode.getVisitCount()) + System.lineSeparator())  ;
+        }
+        LOGGER.log(Level.INFO,sb.toString());
+
         Node bestChild = UCB1.findChildNodeWithBestUCBValue(mTree.getRootNode(),0,LOGGER);
+
+        // log candidate node values
 
 
 
@@ -145,8 +181,8 @@ public class MonteCarloTreeSearch {
     private Node expand(Node parentNode){
         // A copy of the parent node's board is used to add the move associated with the
         // the new child
-        GameBoard board = parentNode.getCopyOfBoard();
-        Move availableMoveFromParent = parentNode.getRandomAvailableMove();
+
+        Move availableMoveFromParent = parentNode.getRandomAvailableChildMove();
         boolean defenseTerminalState = false;
         // check for defensive terminal node if parentNode is root
         if (parentNode.getParent() == null){
@@ -158,9 +194,10 @@ public class MonteCarloTreeSearch {
             }
         }
 
-        GameStatus moveStatus = board.performMove(availableMoveFromParent,parentNode.getPlayer());
+        GameBoard childBoard = parentNode.getCopyOfBoard();
+        GameStatus moveStatus = childBoard.performMove(availableMoveFromParent,parentNode.getPlayer());
         boolean terminalStatus = moveStatus != GameStatus.IN_PROGRESS;
-        Node childNode = parentNode.addChild(board,terminalStatus,availableMoveFromParent);
+        Node childNode = parentNode.addChild(childBoard,terminalStatus,availableMoveFromParent);
         if (defenseTerminalState){
             childNode.setDefensiveTerminalNode();
         }else{
@@ -195,5 +232,7 @@ public class MonteCarloTreeSearch {
 
         return node;
     }
+
+
 
 }

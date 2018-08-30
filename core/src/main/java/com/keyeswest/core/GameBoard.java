@@ -74,4 +74,9 @@ public abstract class GameBoard {
         return mWinLine;
     }
 
+    public void clear(){
+        mBoard = new int[MAX_ROWS][MAX_COLS];
+    }
+
+
 }

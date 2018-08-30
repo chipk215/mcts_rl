@@ -68,11 +68,12 @@ public class TicTacToeBoard extends GameBoard {
     public GameStatus performMove(Move move, Player player) {
         GameStatus gameStatus = GameStatus.IN_PROGRESS;
 
-        if (!(move instanceof TicTacToeMove)) {
-            throw new IllegalStateException("Unrecognized game move.");
-        }
+        try {
 
-        markPosition(player, ((TicTacToeMove)move).getRow(), ((TicTacToeMove)move).getColumn());
+            markPosition(player,move);
+        }catch(Exception ex){
+            System.exit(-1);
+        }
         if ( mWinLine != null){
             gameStatus = GameStatus.GAME_WON;
         }else{
@@ -85,11 +86,16 @@ public class TicTacToeBoard extends GameBoard {
     }
 
 
-    private void markPosition(Player player, int row, int column ){
+    private void markPosition(Player player, Move move ){
 
+        if (!(move instanceof TicTacToeMove)) {
+            throw new IllegalStateException("Unrecognized game move.");
+        }
+        int row = ((TicTacToeMove) move).getRow();
+        int column = ((TicTacToeMove) move).getColumn();
         if (validateEmptyPosition(row, column)){
             mBoard[row][column] = player.value();
-            mPositions.add(new CellOccupant(player,computeCellNumber(row,column)));
+            mPositions.add(new CellOccupant(player,move));
 
         }else{
             throw new IllegalArgumentException("Trying to mark occupied board position. Row= " +
@@ -120,9 +126,6 @@ public class TicTacToeBoard extends GameBoard {
     }
 
 
-    private int computeCellNumber(int row, int column){
-        return column + MAX_COLS * row;
-    }
 
     private void checkBoardForWin(Player player){
 

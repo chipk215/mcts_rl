@@ -3,18 +3,18 @@ package com.keyeswest.core;
 public class CellOccupant {
 
     private Player mPlayer;
-    private int mCellNumber;
+    private Move mMove;
 
-    public CellOccupant(Player player, int cellNumber){
+    public CellOccupant(Player player, Move move){
         mPlayer = player;
-        mCellNumber = cellNumber;
+        mMove = move;
     }
 
     public Player getPlayer() {
         return mPlayer;
     }
 
-    public int getCellNumber() {
-        return mCellNumber;
+    public Move getMove() {
+        return mMove;
     }
 }

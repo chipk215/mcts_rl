@@ -6,7 +6,7 @@ import com.keyeswest.tictactoe.view.Board;
 import javafx.application.Platform;
 import javafx.scene.Parent;
 
-import java.util.List;
+
 import java.util.Scanner;
 
 public class TicTacToeGame extends Game {
