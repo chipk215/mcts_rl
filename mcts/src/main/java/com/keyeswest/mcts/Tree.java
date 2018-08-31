@@ -7,18 +7,12 @@ class Tree {
 
     private Node mRoot;
 
-
     Tree(GameState gameState){
        mRoot = new Node(gameState, null);
     }
-
-
 
     Node getRootNode(){
         return mRoot;
     }
 
-    void setRootNode(Node node){
-        mRoot = node;
-    }
 }

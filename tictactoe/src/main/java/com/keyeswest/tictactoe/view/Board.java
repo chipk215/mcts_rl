@@ -1,9 +1,8 @@
 package com.keyeswest.tictactoe.view;
 
 import com.keyeswest.core.Coordinate;
-import com.keyeswest.core.ManualPlayerCallback;
+import com.keyeswest.core.GameCallback;
 import com.keyeswest.core.Move;
-
 import com.keyeswest.tictactoe.TicTacToeMove;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -18,13 +17,12 @@ import javafx.scene.text.Text;
 import java.util.List;
 
 
-public class Board  implements CellClickHandler{
+public class Board implements CellClickHandler {
 
     private static double PANE_WIDTH = 600.0d;
     private static double PANE_HEIGHT = 400.0d;
 
-
-    private final static String NEW_GAME_LABEL= "New Game";
+    private final static String NEW_GAME_LABEL = "New Game";
     private final static String INITIALIZING_MESSAGE = "Initializing...";
 
     private Text mUserMessage;
@@ -35,19 +33,19 @@ public class Board  implements CellClickHandler{
 
     private VBox mRoot;
 
-    private ManualPlayerCallback mManualPlayerCallback;
+    private GameCallback mGameCallback;
 
 
     private boolean mManualPlayerTurn;
 
-    public Board(ManualPlayerCallback manualPlayerCallback){
+    public Board(GameCallback gameCallback) {
         mBoard = new BoardCell[3][3];
         mUserMessage = new Text();
         mManualPlayerTurn = false;
-        mManualPlayerCallback = manualPlayerCallback;
+        mGameCallback = gameCallback;
     }
 
-    public Parent createContent(){
+    public Parent createContent() {
         mRoot = new VBox();
         mRoot.setPrefSize(PANE_WIDTH, PANE_HEIGHT);
 
@@ -60,45 +58,46 @@ public class Board  implements CellClickHandler{
 
         Pane boardPane = new Pane();
 
-        boardPane.setPrefSize(275,275);
+        boardPane.setPrefSize(275, 275);
         boardPane.setPadding(new Insets(25));
-        for (int row=0; row<3; row++){
-            for(int col=0; col< 3; col++) {
+        for (int row = 0; row < 3; row++) {
+            for (int col = 0; col < 3; col++) {
 
-                BoardCell cell = new BoardCell(2-row, col, this);
-                cell.setTranslateY( row * 75);
-                cell.setTranslateX(175 +col * 75);
+                BoardCell cell = new BoardCell(2 - row, col, this);
+                cell.setTranslateY(row * 75);
+                cell.setTranslateX(175 + col * 75);
                 boardPane.getChildren().add(cell);
 
-                mBoard[2-row][col] = cell;
+                mBoard[2 - row][col] = cell;
             }
         }
 
         mResetButton = new Button(NEW_GAME_LABEL);
-        mRoot.getChildren().addAll( mUserMessage,boardPane,mResetButton);
+        mResetButton.setOnAction(event -> mGameCallback.resetGame());
+        mRoot.getChildren().addAll(mUserMessage, boardPane, mResetButton);
         mRoot.setAlignment(Pos.TOP_CENTER);
 
         return mRoot;
     }
 
-    public void setUserMessage(String message){
+    public void setUserMessage(String message) {
         mUserMessage.setText(message);
     }
 
-    public void setManualPlayerTurn(boolean manualPlayerTurn){
+    public void setManualPlayerTurn(boolean manualPlayerTurn) {
         mManualPlayerTurn = manualPlayerTurn;
     }
 
-    public void markCell(int row, int column, boolean manualPlayer){
-        if (manualPlayer){
+    public void markCell(int row, int column, boolean manualPlayer) {
+        if (manualPlayer) {
             mBoard[row][column].drawO();
-        }else{
+        } else {
             mBoard[row][column].drawX();
         }
     }
 
-    public void showWinLine(List<Coordinate> positions){
-        for (Coordinate position : positions){
+    public void showWinLine(List<Coordinate> positions) {
+        for (Coordinate position : positions) {
             mBoard[position.getRow()][position.getColumn()].highlightBackground();
         }
 
@@ -114,7 +113,7 @@ public class Board  implements CellClickHandler{
         }
 
         Move playerMove = new TicTacToeMove(cell.getRow(), cell.getColumn());
-        mManualPlayerCallback.opponentMove(playerMove);
-        // handle click event for cell
+        mGameCallback.opponentMove(playerMove);
+
     }
 }

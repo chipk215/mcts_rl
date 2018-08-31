@@ -3,7 +3,6 @@ package com.keyeswest.gamecontroller;
 import com.keyeswest.core.*;
 import com.keyeswest.fourinline.FourInLineMove;
 import com.keyeswest.mcts.MonteCarloTreeSearch;
-import com.keyeswest.mcts.Node;
 import com.keyeswest.tictactoe.TicTacToeGame;
 
 import javafx.application.Application;
@@ -27,13 +26,15 @@ import java.util.logging.SimpleFormatter;
 import static com.keyeswest.core.Player.P1;
 import static com.keyeswest.core.Player.P2;
 
-public class GameControllerApp extends Application implements ManualPlayerCallback  {
+public class GameControllerApp extends Application implements GameCallback {
 
     private static final Logger LOGGER = Logger.getLogger(GameControllerApp.class.getName());
     private static FileHandler fh = null;
 
     private static final int MAX_FOUR_IN_LINE_ITERATIONS = 3000;
     private static final int MAX_TIC_TAC_TOE_ITERATIONS = 3000;
+
+    private static Stage pStage;
 
     private Player mFirstToMove;
 
@@ -49,7 +50,7 @@ public class GameControllerApp extends Application implements ManualPlayerCallba
 
 
     // this should execute on the UI thread
-    private void startNewGame(Stage primaryStage){
+    private void startNewGame(){
 
         try {
             mFirstToMove = chooseFirstMove();
@@ -57,9 +58,9 @@ public class GameControllerApp extends Application implements ManualPlayerCallba
             mSearchAgent = new MonteCarloTreeSearch(MAX_TIC_TAC_TOE_ITERATIONS, LOGGER);
 
             Scene scene = new Scene(mGame.getGraphicalBoardDisplay());
-            primaryStage.setScene(scene);
-            primaryStage.setTitle(mGame.getName());
-            primaryStage.show();
+            pStage.setScene(scene);
+            pStage.setTitle(mGame.getName());
+            pStage.show();
 
             Task<Void> task = new Task<Void>() {
 
@@ -88,7 +89,8 @@ public class GameControllerApp extends Application implements ManualPlayerCallba
 
     @Override
     public void start(Stage primaryStage) {
-        startNewGame(primaryStage);
+        setPrimaryStage(primaryStage);
+        startNewGame();
     }
 
 
@@ -168,8 +170,6 @@ public class GameControllerApp extends Application implements ManualPlayerCallba
     }
 
 
-
-
     private void executeComputerMove(GameState gameState){
 
         Move selectedMove = mSearchAgent.findNextMove(gameState);
@@ -178,7 +178,6 @@ public class GameControllerApp extends Application implements ManualPlayerCallba
         // update the game model
         GameState newState = mGame.performMove(selectedMove);
         newState.logBoardPositions(null);
-
 
         mGame.displayMove(selectedMove, P1);
 
@@ -192,9 +191,6 @@ public class GameControllerApp extends Application implements ManualPlayerCallba
 
         }
     }
-
-
-
 
 
     private void executeManualMove(Move manualMove){
@@ -211,14 +207,6 @@ public class GameControllerApp extends Application implements ManualPlayerCallba
         if (resultStatus != GameStatus.IN_PROGRESS){
             // log end log game message
             displayEndOfGameMessage(gameState);
-
-            /*
-            if (resultStatus == GameStatus.GAME_WON){
-                // handle game won scenario
-                displayWinnerInformation();
-            }else{
-                mGame.setUserMessage(UserMessages.TIED);
-            } */
 
         }else{
             // game continues, it is now the computer's move
@@ -248,5 +236,18 @@ public class GameControllerApp extends Application implements ManualPlayerCallba
         };
 
         new Thread(manualMoveTask).start();
+    }
+
+    @Override
+    public void resetGame() {
+        startNewGame();
+    }
+
+    public static Stage getPrimaryStage() {
+        return pStage;
+    }
+
+    private void setPrimaryStage(Stage pStage) {
+        GameControllerApp.pStage = pStage;
     }
 }

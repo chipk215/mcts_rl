@@ -150,11 +150,9 @@ public class MonteCarloTreeSearch {
         if (status == GameStatus.GAME_TIED) {
             return TIE_VALUE;
         }
-
         if (player == Player.P1) {
             return WIN_VALUE;
         }
-
         return LOSS_VALUE;
     }
 

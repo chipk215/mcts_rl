@@ -21,7 +21,7 @@ public class Node {
     private double mValue;
 
 
-    public String getName() {
+    String getName() {
         return mName;
     }
 
@@ -32,13 +32,13 @@ public class Node {
 
     // Constructors
 
-    public Node(GameState gameState, Node parent){
+    Node(GameState gameState, Node parent) {
         mGameState = gameState;
         mAvailableMoves = gameState.getAvailableMoves();
         mParent = parent;
-        if (parent == null){
+        if (parent == null) {
             mName = "ROOT";
-        }else{
+        } else {
             mName = parent.mName + " + " + gameState.getStateMove().getName();
         }
 
@@ -49,63 +49,62 @@ public class Node {
     }
 
 
+    private Move getRandomAvailableChildMove() {
 
-    private Move getRandomAvailableChildMove(){
 
-
-        if (mAvailableMoves.size() == 0){
+        if (mAvailableMoves.size() == 0) {
             throw new IllegalStateException("No moves available for board, precondition requires check.");
         }
-        int randomSelection = (int)(Math.random() * mAvailableMoves.size());
+        int randomSelection = (int) (Math.random() * mAvailableMoves.size());
 
         return mAvailableMoves.remove(randomSelection);
 
     }
 
 
-    public int getVisitCount() {
+    int getVisitCount() {
         return mVisitCount;
     }
 
-    public double getValue() {
+    double getValue() {
         return mValue;
     }
 
-    public List<Node> getChildNodes(){
+    List<Node> getChildNodes() {
         return mChildNodes;
     }
 
-    public Move getMove(){
-        return  mGameState.getStateMove();
+    Move getMove() {
+        return mGameState.getStateMove();
     }
 
 
-    public Player getPlayer(){
+    Player getPlayer() {
         return mGameState.getNextToMove();
     }
 
-    public void incrementVisit(){
+    void incrementVisit() {
         mVisitCount++;
     }
 
-    public void addValue(double value){
-        mValue+= value;
+    void addValue(double value) {
+        mValue += value;
     }
 
-    public Node getParent(){
+    Node getParent() {
         return mParent;
     }
 
-    public boolean isNonTerminal(){
+    boolean isNonTerminal() {
         // a node is terminal if there are no more moves available or the state of the
         // board is won or loss when the corresponding  move is executed
-        boolean hasChildren = ! mChildNodes.isEmpty();
-        boolean hasAvailableMoves = ! mGameState.getAvailableMoves().isEmpty();
+        boolean hasChildren = !mChildNodes.isEmpty();
+        boolean hasAvailableMoves = !mGameState.getAvailableMoves().isEmpty();
         boolean terminalState = mGameState.getStatus() != GameStatus.IN_PROGRESS;
-        return !terminalState && (hasChildren || hasAvailableMoves) ;
+        return !terminalState && (hasChildren || hasAvailableMoves);
     }
 
-    public boolean fullyExpanded(){
+    boolean fullyExpanded() {
         // As child nodes are created, the corresponding moves from available moves are
         // removed from the available moves list. The node is fully expanded is
         // the available moves list is empty
@@ -113,8 +112,7 @@ public class Node {
     }
 
 
-
-    public Node addChild(GameState newState){
+    Node addChild(GameState newState) {
 
         Node childNode = new Node(newState, this);
         this.mChildNodes.add(childNode);
@@ -122,36 +120,35 @@ public class Node {
     }
 
 
-
-    boolean getDefensiveTerminalNode(){
+    boolean getDefensiveTerminalNode() {
         return mGameState.isDefensiveState();
     }
 
 
-    GameState executeRandomMove(){
+    GameState executeRandomMove() {
         Move randomMove = getRandomAvailableChildMove();
 
         // before making the move for the player, make the move as the opponent to determine
         // if this is a required move to block an opponent's win
         GameBoard copyBoard = mGameState.copyBoard();
 
-        GameState tempState = new GameState(copyBoard,mGameState.getNextToMove().getOpponent(),
-                GameStatus.IN_PROGRESS, mGameState.getStateMove() );
+        GameState tempState = new GameState(copyBoard, mGameState.getNextToMove().getOpponent(),
+                GameStatus.IN_PROGRESS, mGameState.getStateMove());
         GameState defenseState = tempState.moveToNextState(randomMove);
         boolean defensiveMove = false;
-        if (defenseState.getStatus() == GameStatus.GAME_WON){
+        if (defenseState.getStatus() == GameStatus.GAME_WON) {
             defensiveMove = true;
         }
 
         GameState newState = mGameState.moveToNextState(randomMove);
-        if (((newState.getStatus() == GameStatus.IN_PROGRESS)) && defensiveMove){
+        if (((newState.getStatus() == GameStatus.IN_PROGRESS)) && defensiveMove) {
             newState.setDefensiveState();
         }
 
         return newState;
     }
 
-    public GameStatus getNodeStatus(){
+    GameStatus getNodeStatus() {
         return mGameState.getStatus();
     }
 }

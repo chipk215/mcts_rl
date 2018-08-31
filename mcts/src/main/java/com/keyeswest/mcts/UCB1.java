@@ -8,11 +8,11 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 
-public class UCB1 {
+class UCB1 {
 
     private static double EPSILON = 1.0E-06;
 
-    public static double ucb1Value(int totalVisit, double nodeValue, int nodeVisit, double cValue){
+    private static double ucb1Value(int totalVisit, double nodeValue, int nodeVisit, double cValue){
         if (nodeVisit == 0){
             return Integer.MAX_VALUE;
         }
@@ -20,7 +20,7 @@ public class UCB1 {
         return (nodeValue / (double)nodeVisit) + cValue * Math.sqrt(2 * Math.log(totalVisit)/ (double) nodeVisit);
     }
 
-    public static Node findChildNodeWithBestUCBValue(Node node, double cValue, Logger logger){
+    static Node findChildNodeWithBestUCBValue(Node node, double cValue, Logger logger){
         List<Node> candidates = new ArrayList<>();
         int parentVisit = node.getVisitCount();
         int childCount = node.getChildNodes().size();
@@ -53,7 +53,7 @@ public class UCB1 {
             if (logger != null){
                 StringBuilder sb = new StringBuilder("Multiple Max UCB1 scores." +  System.lineSeparator());
                 for (Node highNode : candidates){
-                    sb.append(highNode.getName() + " ");
+                    sb.append(highNode.getName()).append(" ");
                 }
                 sb.append(System.lineSeparator());
                 logger.log(Level.INFO,sb.toString());

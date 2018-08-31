@@ -1,6 +1,5 @@
 package com.keyeswest.core;
 
-import java.util.List;
 
 public interface GraphicalDisplayInterface {
     void setUserMessage(UserMessages message);

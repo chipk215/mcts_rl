@@ -24,10 +24,10 @@ public class TicTacToeGame extends Game {
         return mGraphicalDisplayBoard.createContent();
     }
 
-    public TicTacToeGame(Player initialPlayer, ManualPlayerCallback manualPlayerCallback){
+    public TicTacToeGame(Player initialPlayer, GameCallback gameCallback){
         super(new GameState(new TicTacToeBoard(),initialPlayer, GameStatus.IN_PROGRESS, null));
 
-        mGraphicalDisplayBoard = new Board(manualPlayerCallback);
+        mGraphicalDisplayBoard = new Board(gameCallback);
     }
 
     @Override
