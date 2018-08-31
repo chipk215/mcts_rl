@@ -56,8 +56,6 @@ public class GameControllerApp extends Application implements ManualPlayerCallba
             mGame = new TicTacToeGame(mFirstToMove, this);
             mSearchAgent = new MonteCarloTreeSearch(MAX_TIC_TAC_TOE_ITERATIONS, LOGGER);
 
-
-
             Scene scene = new Scene(mGame.getGraphicalBoardDisplay());
             primaryStage.setScene(scene);
             primaryStage.setTitle(mGame.getName());
@@ -71,7 +69,7 @@ public class GameControllerApp extends Application implements ManualPlayerCallba
                     if (mFirstToMove == P1) {
                         mGame.setUserMessage(UserMessages.THINKING);
                         mGame.setManualPlayerTurn(false);
-                       // executeComputerMove(null);
+                        executeComputerMove(mGame.getGameState());
                     } else {
                         mGame.setUserMessage(UserMessages.YOUR_TURN);
                         mGame.setManualPlayerTurn(true);
@@ -103,8 +101,7 @@ public class GameControllerApp extends Application implements ManualPlayerCallba
             mFirstToMove= P2;
         }
 
-        mFirstToMove = P1.getOpponent();
-        //mFirstToMove = P1;
+
         LOGGER.info("First to move is: " + mFirstToMove.toString());
         return mFirstToMove;
     }

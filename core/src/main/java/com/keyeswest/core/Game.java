@@ -24,8 +24,7 @@ public abstract class Game implements GraphicalDisplayInterface {
         put(UserMessages.COMPUTER_WIN,COMPUTER_WIN_MESSAGE);
     }};
 
-    // Winning player if game was won, null otherwise.
-    protected Player mWinningPlayer;
+
 
     protected GameState mGameState;
 
@@ -44,7 +43,9 @@ public abstract class Game implements GraphicalDisplayInterface {
         return mGameState;
     }
 
-
+    public GameState getGameState(){
+        return mGameState;
+    }
 
 
 
