@@ -34,15 +34,8 @@ public class TicTacToeBoard extends GameBoard {
     }
 
     private TicTacToeBoard(TicTacToeBoard board){
-        this();
-        for(int row = 0; row< MAX_ROWS; row++){
-            for(int col = 0; col< MAX_COLS; col++){
-                mBoard[row][col] =board.mBoard[row][col];
-            }
-        }
-        mPositions.addAll(board.mPositions);
+        super(board);
 
-        mWinLine = board.mWinLine;
     }
 
 
@@ -59,19 +52,17 @@ public class TicTacToeBoard extends GameBoard {
         return moves;
     }
 
-    @Override
-    public GameBoard getCopyOfBoard() {
-        return new TicTacToeBoard(this);
-    }
+
 
     @Override
     public GameStatus performMove(Move move, Player player) {
+
         GameStatus gameStatus = GameStatus.IN_PROGRESS;
 
         try {
-
             markPosition(player,move);
         }catch(Exception ex){
+            ex.printStackTrace();
             System.exit(-1);
         }
         if ( mWinLine != null){
@@ -85,6 +76,11 @@ public class TicTacToeBoard extends GameBoard {
         return gameStatus;
     }
 
+    @Override
+    public GameBoard makeCopy() {
+        return new TicTacToeBoard(this);
+    }
+
 
     private void markPosition(Player player, Move move ){
 
@@ -95,7 +91,6 @@ public class TicTacToeBoard extends GameBoard {
         int column = ((TicTacToeMove) move).getColumn();
         if (validateEmptyPosition(row, column)){
             mBoard[row][column] = player.value();
-            mPositions.add(new CellOccupant(player,move));
 
         }else{
             throw new IllegalArgumentException("Trying to mark occupied board position. Row= " +
@@ -105,7 +100,6 @@ public class TicTacToeBoard extends GameBoard {
 
         checkBoardForWin(player);
 
-        return;
     }
 
 

@@ -19,7 +19,7 @@ public class GameTestBoard extends GameBoard {
         return null;
     }
 
-    @Override
+
     public GameBoard getCopyOfBoard() {
         return null;
     }
@@ -34,5 +34,10 @@ public class GameTestBoard extends GameBoard {
     @Override
     public void logBoardPositions(Logger logger) {
 
+    }
+
+    @Override
+    public GameBoard makeCopy() {
+        return null;
     }
 }

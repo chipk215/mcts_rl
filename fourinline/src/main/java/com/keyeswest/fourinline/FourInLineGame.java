@@ -10,27 +10,24 @@ public class FourInLineGame extends Game {
 
     private final static String NAME="4 In A Line!";
 
-    private FourInLineGame(FourInLineGame game){
-        mGameBoard = game.mGameBoard.getCopyOfBoard();
-        mGameState = game.mGameState.makeCopy();
-    }
+   // private FourInLineGame(FourInLineGame game){
+        //mGameBoard = game.mGameBoard.getCopyOfBoard();
+       // mGameState = game.mGameState.makeCopy();
+  //  }
 
     @Override
     public Parent getGraphicalBoardDisplay() {
         return null;
     }
 
-    @Override
-    public Game makeCopy() {
-        return new FourInLineGame(this);
-    }
+
 
     @Override
     public String getName(){
         return NAME;
     }
 
-    @Override
+
     public Move getOpponentMove() {
         Scanner in = new Scanner(System.in);
         System.out.println("Enter P2 move: ");
@@ -41,8 +38,8 @@ public class FourInLineGame extends Game {
         return new FourInLineMove(selectedColumn);
     }
 
-    public FourInLineGame(GameBoard board, Player initialPlayer ){
-        super(board, initialPlayer);
+    public FourInLineGame(Player initialPlayer ){
+        super(new GameState(new FourInLineBoard(),initialPlayer, GameStatus.IN_PROGRESS, null));
     }
 
     @Override

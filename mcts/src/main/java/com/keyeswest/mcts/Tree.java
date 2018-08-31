@@ -1,26 +1,24 @@
 package com.keyeswest.mcts;
 
-import com.keyeswest.core.GameBoard;
-import com.keyeswest.core.Player;
+import com.keyeswest.core.GameState;
 
-public class Tree {
+
+class Tree {
 
     private Node mRoot;
 
-    public Tree(GameBoard board, Player firstToMove){
 
-        mRoot = new Node(board,firstToMove );
+    Tree(GameState gameState){
+       mRoot = new Node(gameState, null);
     }
 
-    public Tree( Node rootNode){
-        mRoot = rootNode;
-    }
 
-    public Node getRootNode(){
+
+    Node getRootNode(){
         return mRoot;
     }
 
-    public void setRootNode(Node node){
+    void setRootNode(Node node){
         mRoot = node;
     }
 }

@@ -7,19 +7,12 @@ import javafx.application.Platform;
 import javafx.scene.Parent;
 
 
-import java.util.Scanner;
-
 public class TicTacToeGame extends Game {
 
     private final static String NAME="Tic-Tac-Toe";
 
     private Board mGraphicalDisplayBoard;
 
-    private TicTacToeGame(TicTacToeGame game){
-        mGameBoard = game.mGameBoard.getCopyOfBoard();
-        mGameState = game.mGameState.makeCopy();
-
-    }
 
     @Override
     public String getName(){
@@ -31,30 +24,11 @@ public class TicTacToeGame extends Game {
         return mGraphicalDisplayBoard.createContent();
     }
 
-    @Override
-    public Game makeCopy() {
-        return new TicTacToeGame(this);
-    }
-
-    @Override
-    public Move getOpponentMove() {
-        Scanner in = new Scanner(System.in);
-        System.out.print("Enter P2 row move: ");
-        int selectedRow = in.nextInt();
-        in.nextLine();
-        System.out.println("Enter P2 column move: ");
-        System.out.flush();
-        int selectedColumn = in.nextInt();
-        in.nextLine();
-
-        return new TicTacToeMove(selectedRow, selectedColumn);
-    }
-
     public TicTacToeGame(Player initialPlayer, ManualPlayerCallback manualPlayerCallback){
-        super(new TicTacToeBoard(), initialPlayer);
+        super(new GameState(new TicTacToeBoard(),initialPlayer, GameStatus.IN_PROGRESS, null));
+
         mGraphicalDisplayBoard = new Board(manualPlayerCallback);
     }
-
 
     @Override
     public void setUserMessage(UserMessages message) {
@@ -82,12 +56,10 @@ public class TicTacToeGame extends Game {
 
         boolean finalManualPlayer = manualPlayer;
         Platform.runLater(() -> mGraphicalDisplayBoard.markCell(row, column, finalManualPlayer));
-
-
     }
 
     @Override
     public void showWinner() {
-       Platform.runLater(() -> mGraphicalDisplayBoard.showWinLine(mGameBoard.getWinLine().getWinningPositions()));
+       Platform.runLater(() -> mGraphicalDisplayBoard.showWinLine(mGameState.getWinLine().getWinningPositions()));
     }
 }

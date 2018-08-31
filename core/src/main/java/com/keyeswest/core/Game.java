@@ -4,7 +4,7 @@ package com.keyeswest.core;
 import javafx.scene.Parent;
 
 import java.util.HashMap;
-import java.util.List;
+
 import java.util.Map;
 
 public abstract class Game implements GraphicalDisplayInterface {
@@ -24,94 +24,29 @@ public abstract class Game implements GraphicalDisplayInterface {
         put(UserMessages.COMPUTER_WIN,COMPUTER_WIN_MESSAGE);
     }};
 
-    protected GameBoard mGameBoard;
+    // Winning player if game was won, null otherwise.
+    protected Player mWinningPlayer;
 
     protected GameState mGameState;
 
-    protected Game(){}
-
-    protected Game(GameBoard board,Player initialPlayer ){
-        mGameBoard = board;
-        mGameState = new GameState(initialPlayer);
+    protected  Game(GameState initialState){
+        mGameState = initialState;
     }
 
-    public GameBoard getGameBoard() {
-        return mGameBoard;
-
-    }
 
     public abstract Parent getGraphicalBoardDisplay();
 
-    public void setWinner(Player player){
-        mGameState.setWinningPlayer(player);
-    }
-
-    public Player getWinner(){
-        return mGameState.getWinningPlayer();
-    }
-
-    public void setGameStatus(GameStatus gameStatus){
-        mGameState.setStatus(gameStatus);
-    }
-
-    public abstract Game makeCopy();
-
     public abstract String getName();
 
-    public GameStatus getGameStatus(){
-        return mGameState.getStatus();
-    }
+    public GameState performMove(Move move) {
 
-    public GameState playRandomGame(){
-        while(mGameState.getStatus() == GameStatus.IN_PROGRESS){
-            List<? extends Move> availableMoves =  mGameBoard.getAvailableMoves();
-            int numberMovesAvailable = availableMoves.size();
-            if (numberMovesAvailable ==0){
-                mGameState.setStatus(GameStatus.GAME_TIED);
-            }else{
-                int randomSelection = (int)(Math.random() * numberMovesAvailable);
-                Move selectedMove = availableMoves.get(randomSelection);
-                performMove(selectedMove);
-            }
-        }
-
+        mGameState= mGameState.moveToNextState(move);
         return mGameState;
     }
 
-    public Player getNextPlayerToMove(){
-        return mGameState.getNextToMove();
-    }
-
-    public GameState getGameState(){
-        return mGameState;
-    }
-
-    public void performMove(Move move) {
-
-        Player player = mGameState.getNextToMove();
-        GameStatus gameStatus =mGameBoard.performMove(move,player);
-        Player gameWinner = null;
-        if (gameStatus == GameStatus.GAME_WON){
-           gameWinner =  player;
-        }
-        mGameState.update(gameStatus, gameWinner);
 
 
-    }
 
-    public void clearGameState(){
-        mGameBoard = null;
-        mGameState = null;
-    }
 
-    public void executeHistory(GameBoard board, List<CellOccupant> history){
-        mGameBoard = board;
-        Player initialPlayer = history.get(0).getPlayer();
-        mGameState = new GameState(initialPlayer);
-        for (CellOccupant occupant : history){
-           performMove(occupant.getMove());
-        }
-    }
 
-    public abstract Move getOpponentMove();
 }

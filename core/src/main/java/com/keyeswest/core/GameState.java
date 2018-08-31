@@ -1,6 +1,9 @@
 package com.keyeswest.core;
 
 
+import java.util.List;
+import java.util.logging.Logger;
+
 /**
  * GameState represents the state of both a game in progress and the final state of a completed game.
  *
@@ -9,35 +12,41 @@ package com.keyeswest.core;
  * When complete, the progress is either 'GAME_WON' or 'GAME_TIED'. The winning player
  * is identified if the game has a winner.
  */
-public class GameState {
+public final class GameState {
+
+    private final GameBoard mGameBoard;
 
     //The enumerated status value for the game.
-    private GameStatus mStatus;
+    private final GameStatus mStatus;
 
-    // Winning player if game was won, null otherwise.
-    private Player mWinningPlayer;
+    private final Player mNextToMove;
 
-    private Player mNextToMove;
+    // indicates that the move that created this state blocks the opponent from winning the game
+    private boolean mDefensiveState;
 
-    private int mNumberMoves;
+    private Move mMoveToGetHere;
 
-    //Copy constructor for used when making copies of games.
-    private GameState(GameState status){
-        mStatus = status.mStatus;
-        mWinningPlayer = status.mWinningPlayer;
-        mNextToMove = status.mNextToMove;
-        mNumberMoves = status.mNumberMoves;
+
+    public GameState(GameBoard initialBoard, Player playerNextToMove,
+                     GameStatus gameStatus, Move moveToGetHere){
+
+        mGameBoard = initialBoard;
+
+        mNextToMove = playerNextToMove;
+        // Verify the next two initializations are always correct when creating a game state
+        mStatus = gameStatus;
+        mDefensiveState = false;
+        mMoveToGetHere = moveToGetHere;
+
+
     }
 
-    GameState(Player initialPlayer){
-        mStatus = GameStatus.IN_PROGRESS;
-        mWinningPlayer = null;
-        mNextToMove = initialPlayer;
-        mNumberMoves = 0;
-    }
-
-    public void setWinningPlayer(Player winningPlayer) {
-        mWinningPlayer = winningPlayer;
+    public GameState(GameState gameState){
+        mGameBoard = gameState.copyBoard();
+        mStatus = gameState.mStatus;
+        mNextToMove = gameState.mNextToMove;
+        mDefensiveState = gameState.mDefensiveState;
+        mMoveToGetHere = gameState.mMoveToGetHere;
     }
 
 
@@ -45,43 +54,82 @@ public class GameState {
         return mStatus;
     }
 
-    public Player getWinningPlayer() {
-        return mWinningPlayer;
-    }
-
-    public void setStatus(GameStatus status) {
-        mStatus = status;
-    }
-
-    public GameState makeCopy(){
-        return new GameState(this);
-    }
-
 
     public Player getNextToMove(){
         return mNextToMove;
     }
 
-    public int getNumberOfMoves(){
-        return mNumberMoves;
-    }
-
     public String describe(){
         StringBuilder sBuilder = new StringBuilder("Game State" + System.lineSeparator());
         sBuilder.append("Status= " + mStatus.toString() + System.lineSeparator());
-        if (mWinningPlayer != null){
-            sBuilder.append("Winner= " +  mWinningPlayer.toString()+ System.lineSeparator());
-        }
-        sBuilder.append("Number of Moves= " +Integer.toString(mNumberMoves) + System.lineSeparator());
 
         return sBuilder.toString();
     }
 
-    public void update(GameStatus gameStatus, Player winningPlayer){
-        mStatus = gameStatus;
-        mWinningPlayer = winningPlayer;
-        mNextToMove = mNextToMove.getOpponent();
-        mNumberMoves++;
 
+    /**
+     * Create a new game state by executing the specified move.
+     * Evaluate the new game state and set state variables.
+     * @param move - the move to execute from this state to the new state
+     * @return
+     */
+    public GameState moveToNextState(Move move){
+
+        GameBoard newBoard = mGameBoard.makeCopy();
+
+        // execute the move on a copy of the game board associated with this state
+        GameStatus gameStatus = newBoard.performMove(move,mNextToMove);
+
+        return new GameState(newBoard,mNextToMove.getOpponent(),gameStatus, move);
     }
+
+
+    public WinLine getWinLine(){
+        return mGameBoard.getWinLine();
+    }
+
+    public void logBoardPositions(Logger logger){
+        mGameBoard.logBoardPositions(logger);
+    }
+
+    public List<? extends Move> getAvailableMoves(){
+        return mGameBoard.getAvailableMoves();
+    }
+
+    public GameBoard copyBoard(){
+        return mGameBoard.makeCopy();
+    }
+
+    public void setDefensiveState(){
+        mDefensiveState = true;
+    }
+
+    public boolean isDefensiveState(){
+        return mDefensiveState;
+    }
+
+    public Move getStateMove(){
+        return mMoveToGetHere;
+    }
+
+    public static GameState playRandomGame(GameState gameState){
+
+
+        while(gameState.mStatus == GameStatus.IN_PROGRESS){
+            List<? extends Move> availableMoves =  gameState.getAvailableMoves();
+            int numberMovesAvailable = availableMoves.size();
+            if (numberMovesAvailable ==0){
+                 return new GameState(gameState.copyBoard(),gameState.getNextToMove(),
+                        GameStatus.GAME_TIED,gameState.getStateMove());
+
+            }else{
+                int randomSelection = (int)(Math.random() * numberMovesAvailable);
+                Move selectedMove = availableMoves.get(randomSelection);
+                gameState = gameState.moveToNextState(selectedMove);
+            }
+        }
+
+        return gameState;
+    }
+
 }

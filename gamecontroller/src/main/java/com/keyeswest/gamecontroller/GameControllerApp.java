@@ -35,15 +35,11 @@ public class GameControllerApp extends Application implements ManualPlayerCallba
     private static final int MAX_FOUR_IN_LINE_ITERATIONS = 3000;
     private static final int MAX_TIC_TAC_TOE_ITERATIONS = 3000;
 
-
     private Player mFirstToMove;
 
     private  MonteCarloTreeSearch mSearchAgent;
 
     private Game mGame;
-
-
-    private Node mSuggestedNode;
 
     public GameControllerApp(){
         super();
@@ -58,9 +54,9 @@ public class GameControllerApp extends Application implements ManualPlayerCallba
         try {
             mFirstToMove = chooseFirstMove();
             mGame = new TicTacToeGame(mFirstToMove, this);
-            //mSearchAgent = new MonteCarloTreeSearch(mGame, MAX_TIC_TAC_TOE_ITERATIONS, LOGGER);
-            mSearchAgent = null;
-            mSuggestedNode = null;
+            mSearchAgent = new MonteCarloTreeSearch(MAX_TIC_TAC_TOE_ITERATIONS, LOGGER);
+
+
 
             Scene scene = new Scene(mGame.getGraphicalBoardDisplay());
             primaryStage.setScene(scene);
@@ -72,19 +68,15 @@ public class GameControllerApp extends Application implements ManualPlayerCallba
                 @Override
                 protected Void call() {
 
-                    //  Game game = new FourInLineGame(new FourInLineBoard(), P1);
-                    //runGame(game,2801);
                     if (mFirstToMove == P1) {
                         mGame.setUserMessage(UserMessages.THINKING);
                         mGame.setManualPlayerTurn(false);
-                        executeComputerMove(null);
+                       // executeComputerMove(null);
                     } else {
                         mGame.setUserMessage(UserMessages.YOUR_TURN);
                         mGame.setManualPlayerTurn(true);
 
                     }
-
-
                     return null;
                 }
             };
@@ -154,133 +146,89 @@ public class GameControllerApp extends Application implements ManualPlayerCallba
         fourInLineGame.performMove(p1Move);
         fourInLineGame.performMove(p2MoveInit);
 
-        fourInLineGame.getGameBoard().logBoardPositions(null);
+      //  fourInLineGame.getGameBoard().logBoardPositions(null);
     }
 
 
-    private static void displayEndOfGameMessage(Game game, Player player){
-        if (game.getGameState().getStatus() == GameStatus.GAME_TIED){
+    private void displayEndOfGameMessage(GameState gameState){
+        if (gameState.getStatus() == GameStatus.GAME_TIED){
             LOGGER.info("Game ends in tie.");
             System.out.println("Game ends in tie.");
+            mGame.setUserMessage(UserMessages.TIED);
         }else{
-            LOGGER.info(player.toString()+ " wins game.");
-            System.out.println(player.toString()+ " wins game.");
+            Player winner = gameState.getNextToMove().getOpponent();
+            LOGGER.info(winner.toString()+ " wins game.");
+            System.out.println(winner.toString()+ " wins game.");
+
+            if (winner == P1){
+                mGame.setUserMessage(UserMessages.COMPUTER_WIN);
+            }else{
+                mGame.setUserMessage(UserMessages.OPPONENT_WIN);
+            }
+
+            // show winning line
+            mGame.showWinner();
         }
     }
 
-    private void executeComputerMove(Move opponentMove){
-
-        //TODO All this startup logic needs to be moved into MCTS
-
-        if (mSearchAgent == null){
-            // this is the computer's first move
-
-            // has the opponent moved?
-            if (opponentMove != null){
-                // yes, the opponent moved first so create a root node representing the user's move
-                Node opNode = new Node(mGame.getGameBoard(), P1,  opponentMove );
-                mSearchAgent = new MonteCarloTreeSearch(mGame, MAX_TIC_TAC_TOE_ITERATIONS, LOGGER, opNode);
-                mSuggestedNode = mSearchAgent.findNextMove(null);
-            }else{
-                // computer moved first
-                mSearchAgent = new MonteCarloTreeSearch(mGame, MAX_TIC_TAC_TOE_ITERATIONS, LOGGER);
-                mSuggestedNode = mSearchAgent.findNextMove(null);
-            }
-        }else{
-            // continuation of the game after the computer has moved at least once
-
-            // if the opponent has just moved look in the search tree for the opponent move to
-            // use the previously generated simulation history to help determine the next move
-            boolean foundChild = false;
-            // determine if child node corresponding to opponent's move exists
-            for (Node childNode : mSuggestedNode.getChildNodes()) {
-                if (childNode.getMove().getName().equals(opponentMove.getName())) {
-                    childNode.setParentToNull();
-                    childNode.setBoard(mGame.getGameBoard());
-                    mSuggestedNode = mSearchAgent.findNextMove(childNode);
-                    foundChild = true;
-                    break;
-                }
-            }
-            if (!foundChild) {
-                // if the opponent move is not present then create a new root node representing the user move
-                Node opNode = new Node(mGame.getGameBoard(), P2,  opponentMove );
-                mSearchAgent = new MonteCarloTreeSearch(mGame, MAX_TIC_TAC_TOE_ITERATIONS, LOGGER, opNode);
-                mSuggestedNode = mSearchAgent.findNextMove(null);
-            }
 
 
-        }
 
+    private void executeComputerMove(GameState gameState){
 
-        Move selectedMove = mSuggestedNode.getMove();
+        Move selectedMove = mSearchAgent.findNextMove(gameState);
+
         LOGGER.info("Executing suggested move for P1= " + selectedMove.getName());
         // update the game model
-        mGame.performMove(selectedMove);
+        GameState newState = mGame.performMove(selectedMove);
+        newState.logBoardPositions(null);
 
-        mGame.getGameBoard().logBoardPositions(null);
 
         mGame.displayMove(selectedMove, P1);
 
-        GameStatus resultStatus = mGame.getGameState().getStatus();
+        GameStatus resultStatus = newState.getStatus();
         if (resultStatus == GameStatus.IN_PROGRESS){
             mGame.setUserMessage(UserMessages.YOUR_TURN);
             mGame.setManualPlayerTurn(true);
 
         }else{
-            displayEndOfGameMessage(mGame, P1);
-            if (resultStatus == GameStatus.GAME_WON){
-                // handle game won scenario
-                displayWinnerInformation();
-            }else{
-                mGame.setUserMessage(UserMessages.TIED);
-            }
+            displayEndOfGameMessage(newState);
 
         }
-
     }
 
 
-    private void displayWinnerInformation(){
-        Player winner = mGame.getGameState().getWinningPlayer();
-        if (winner == P1){
-            mGame.setUserMessage(UserMessages.COMPUTER_WIN);
-        }else{
-            mGame.setUserMessage(UserMessages.OPPONENT_WIN);
-        }
 
-        // show winning line
-        mGame.showWinner();
-
-    }
 
 
     private void executeManualMove(Move manualMove){
 
         //update the game model
-        mGame.performMove(manualMove);
-        mGame.getGameBoard().logBoardPositions(null);
+        GameState gameState = mGame.performMove(manualMove);
+        gameState.logBoardPositions(null);
 
         //update the graphical display
         mGame.displayMove(manualMove, P2);
 
-        GameStatus resultStatus = mGame.getGameState().getStatus();
+        GameStatus resultStatus = gameState.getStatus();
 
         if (resultStatus != GameStatus.IN_PROGRESS){
             // log end log game message
-            displayEndOfGameMessage(mGame, P2);
+            displayEndOfGameMessage(gameState);
+
+            /*
             if (resultStatus == GameStatus.GAME_WON){
                 // handle game won scenario
                 displayWinnerInformation();
             }else{
                 mGame.setUserMessage(UserMessages.TIED);
-            }
+            } */
 
         }else{
             // game continues, it is now the computer's move
             mGame.setUserMessage(UserMessages.THINKING);
             mGame.setManualPlayerTurn(false);
-            executeComputerMove(manualMove);
+            executeComputerMove(gameState);
         }
 
     }
@@ -303,6 +251,6 @@ public class GameControllerApp extends Application implements ManualPlayerCallba
             }
         };
 
-        new Thread( manualMoveTask).start();
+        new Thread(manualMoveTask).start();
     }
 }

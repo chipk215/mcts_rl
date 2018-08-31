@@ -1,6 +1,6 @@
 package com.keyeswest.core;
 
-import java.util.ArrayList;
+
 import java.util.List;
 import java.util.logging.Logger;
 
@@ -10,24 +10,14 @@ public abstract class GameBoard {
 
     protected static int EMPTY = 0;
 
-    public int getMAX_ROWS() {
-        return MAX_ROWS;
-    }
-
-    public int getMAX_COLS() {
-        return MAX_COLS;
-    }
-
     protected final int MAX_ROWS;
     protected final int MAX_COLS;
-
 
     protected WinLine mWinLine = null;
 
     // index (0,0) corresponds to bottom left of board
     protected int[] [] mBoard;
 
-    protected List<CellOccupant> mPositions = new ArrayList<>();
 
     protected GameBoard(int rows,int columns){
         MAX_ROWS = rows;
@@ -36,10 +26,24 @@ public abstract class GameBoard {
         mBoard = new int[MAX_ROWS][MAX_COLS];
     }
 
+    protected GameBoard(GameBoard board){
+        MAX_ROWS = board.MAX_ROWS;
+        MAX_COLS = board.MAX_COLS;
+        mBoard = new int[MAX_ROWS][MAX_COLS];
+        for (int row=0; row< MAX_ROWS; row++){
+            for (int col=0; col< MAX_COLS; col++){
+                mBoard[row][col] = board.mBoard[row][col];
+            }
+        }
+
+        if (board.mWinLine != null){
+            mWinLine = new WinLine(board.mWinLine);
+        }
+
+    }
+
     // Note: This method may require a player for some games.
     public abstract List<? extends Move> getAvailableMoves();
-
-    public abstract GameBoard getCopyOfBoard();
 
     public abstract GameStatus performMove(Move move,Player player);
 
@@ -66,17 +70,20 @@ public abstract class GameBoard {
         logger.info(sBuilder.toString());
     }
 
-    public List<CellOccupant> getBoardPositions(){
-        return mPositions;
-    }
 
     public WinLine getWinLine() {
-        return mWinLine;
+        return new WinLine(mWinLine);
     }
 
-    public void clear(){
-        mBoard = new int[MAX_ROWS][MAX_COLS];
+    public int getMAX_ROWS() {
+        return MAX_ROWS;
     }
+
+    public int getMAX_COLS() {
+        return MAX_COLS;
+    }
+
+    public abstract GameBoard makeCopy();
 
 
 }

@@ -58,7 +58,7 @@ public class FourInLineBoard extends GameBoard {
                 mBoard[row][col] = fourInLineBoard.mBoard[row][col];
             }
         }
-        mPositions.addAll(fourInLineBoard.mPositions);
+
     }
 
     @Override
@@ -75,10 +75,7 @@ public class FourInLineBoard extends GameBoard {
         return moves;
     }
 
-    @Override
-    public GameBoard getCopyOfBoard() {
-        return new FourInLineBoard(this);
-    }
+
 
     @Override
     public GameStatus performMove(Move move, Player player) {
@@ -95,6 +92,11 @@ public class FourInLineBoard extends GameBoard {
         }
         return gameStatus;
 
+    }
+
+    @Override
+    public GameBoard makeCopy() {
+        return null;
     }
 
     private void logWinMessage(WinLine winner, Player player) {
@@ -122,7 +124,7 @@ public class FourInLineBoard extends GameBoard {
             throw new IllegalStateException("Illegal and unexpected game move executed.");
         }
         mBoard[row][column] = player.value();
-        mPositions.add(new CellOccupant(player, move));
+
 
         checkBoardForWin(player, row, column);
 

@@ -1,5 +1,6 @@
 package com.keyeswest.core;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class WinLine {
@@ -35,6 +36,14 @@ public class WinLine {
 
     public List<Coordinate> getWinningPositions(){
         return mWinningPositions;
+    }
+
+    public WinLine(WinLine winLine){
+        mLineType = winLine.mLineType;
+        mWinningPositions = new ArrayList<>();
+        for (Coordinate position : winLine.mWinningPositions){
+            mWinningPositions.add(position);
+        }
     }
 
 }

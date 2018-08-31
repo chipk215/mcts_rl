@@ -3,7 +3,7 @@ package com.keyeswest.tictactoe.view;
 import com.keyeswest.core.Coordinate;
 import com.keyeswest.core.ManualPlayerCallback;
 import com.keyeswest.core.Move;
-import com.keyeswest.core.UserMessages;
+
 import com.keyeswest.tictactoe.TicTacToeMove;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -15,9 +15,8 @@ import javafx.scene.layout.VBox;
 import javafx.scene.text.Font;
 import javafx.scene.text.Text;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
+
 
 public class Board  implements CellClickHandler{
 
