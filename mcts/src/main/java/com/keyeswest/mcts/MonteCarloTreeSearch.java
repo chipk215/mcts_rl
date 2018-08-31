@@ -23,7 +23,6 @@ public class MonteCarloTreeSearch {
         }
 
         MAX_ITERATIONS = iterations;
-
     }
 
     public Move findNextMove(@NotNull GameState gameState) {
@@ -41,74 +40,42 @@ public class MonteCarloTreeSearch {
             sBuilder.append("***Iteration:").append(iterationCount).append(System.lineSeparator());
 
             Node searchNode = treePolicy(tree.getRootNode());
-
             sBuilder.append("Candidate Selection: ").append(searchNode.getName()).append(System.lineSeparator());
 
-
             if (searchNode.isNonTerminal()) {
-
                 GameState copyState = new GameState(gameState);
-                GameState simState = GameState.playRandomGame(copyState );
+                GameState simState = GameState.playRandomGame(copyState);
 
-                sBuilder.append("Simulation results: " + System.lineSeparator());
-                sBuilder.append("   " + simState.describe());
+                sBuilder.append("Simulation results: ").append(System.lineSeparator());
+                sBuilder.append("   ").append(simState.describe());
                 sBuilder.append(System.lineSeparator());
 
-                if (simState.getStatus() == GameStatus.GAME_TIED){
-                    rewardValue = TIE_VALUE;
-                }else{
-                    if (simState.getNextToMove().getOpponent() == Player.P1){
-                        rewardValue = WIN_VALUE;
-                    }else{
-                        rewardValue = LOSS_VALUE;
-                    }
-                }
-
-
+                // As a reminder the player who made the winning move is the opposite of the player
+                // whose next in turn to move which is saved in the game state
+                rewardValue = computeRewardValue(simState.getStatus(), simState.getNextToMove().getOpponent());
             } else {
 
                 // if the search node is a winning terminal node, and an immediate child of root,
                 // then return the move as the selected move.
                 if ((searchNode.getParent().equals(tree.getRootNode())) &&
                         (searchNode.getParent().getPlayer() == tree.getRootNode().getPlayer())) {
-                    LOGGER.log(Level.INFO, "Selected Move: " + searchNode.getMove().getName() + System.lineSeparator());
-                    sBuilder.append("Winning move found: " + "Selected Move: " + searchNode.getMove().getName());
+
+                    LOGGER.log(Level.INFO, "Selected Move: " + searchNode.getMove().getName()
+                            + System.lineSeparator());
+
+                    sBuilder.append("Winning move found: " + "Selected Move: ").append(searchNode.getMove().getName());
                     LOGGER.log(Level.INFO, sBuilder.toString());
                     return searchNode.getMove();
                 } else {
-                    sBuilder.append("Expanding tree with terminal node. " +
-                            searchNode.getMove().getName() + System.lineSeparator());
-                    GameStatus searchStatus = searchNode.getNodeStatus();
-                    if (searchStatus == GameStatus.GAME_TIED){
-                        rewardValue = TIE_VALUE;
-                    }else{
-                        if (searchNode.getPlayer().getOpponent() == Player.P1){
-                            rewardValue = WIN_VALUE;
-                        }else{
-                            rewardValue = LOSS_VALUE;
-                        }
-                    }
+                    sBuilder.append("Expanding tree with terminal node. ")
+                            .append(searchNode.getMove().getName()).append(System.lineSeparator());
 
+                    GameStatus searchStatus = searchNode.getNodeStatus();
+                    rewardValue = computeRewardValue(searchStatus, searchNode.getPlayer().getOpponent());
                 }
             }
 
             backPropagation(searchNode, rewardValue);
-
-            /*
-            Node nodeInfo = searchNode;
-
-            int level=0;
-            while(nodeInfo != null){
-                sBuilder.append("level= "+ level + System.lineSeparator());
-                sBuilder.append("Name= ").append(nodeInfo.getName() + System.lineSeparator());
-                sBuilder.append("Value= " + nodeInfo.getValue() + System.lineSeparator());
-                sBuilder.append("Visits= ").append(nodeInfo.getVisitCount()).append(System.lineSeparator());
-                sBuilder.append("---"+System.lineSeparator());
-                nodeInfo = nodeInfo.getParent();
-                level++;
-
-            }
- */
 
             LOGGER.log(Level.INFO, sBuilder.toString());
             iterationCount++;
@@ -124,30 +91,26 @@ public class MonteCarloTreeSearch {
         }
 
         StringBuilder sb = new StringBuilder(System.lineSeparator());
-        sb.append("Candidate Node Values :" + System.lineSeparator());
+        sb.append("Candidate Node Values :").append(System.lineSeparator());
         for (Node cNode : tree.getRootNode().getChildNodes()) {
-            sb.append("Node: " + cNode.getName());
-            sb.append("  Value: " + Double.toString(cNode.getValue() / cNode.getVisitCount()) + System.lineSeparator());
+            sb.append("Node: ").append(cNode.getName());
+            sb.append("  Value: ").append(Double.toString(cNode.getValue() / cNode.getVisitCount()))
+                    .append(System.lineSeparator());
         }
         LOGGER.log(Level.INFO, sb.toString());
 
         Node bestChild = UCB1.findChildNodeWithBestUCBValue(tree.getRootNode(), 0, LOGGER);
-
-
         LOGGER.log(Level.INFO, "Selected Move: " + bestChild.getMove().getName() + System.lineSeparator());
 
         return bestChild.getMove();
     }
 
     private void backPropagation(Node node, double simReward) {
-
-
         Node backPropNode = node;
         while (backPropNode != null) {
             backPropNode.incrementVisit();
             backPropNode.addValue(simReward);
             backPropNode = backPropNode.getParent();
-
         }
     }
 
@@ -180,6 +143,19 @@ public class MonteCarloTreeSearch {
             }
         }
         return node;
+    }
+
+
+    private static double computeRewardValue(GameStatus status, Player player) {
+        if (status == GameStatus.GAME_TIED) {
+            return TIE_VALUE;
+        }
+
+        if (player == Player.P1) {
+            return WIN_VALUE;
+        }
+
+        return LOSS_VALUE;
     }
 
 }

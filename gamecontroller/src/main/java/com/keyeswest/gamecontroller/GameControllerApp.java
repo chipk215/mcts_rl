@@ -101,7 +101,6 @@ public class GameControllerApp extends Application implements ManualPlayerCallba
             mFirstToMove= P2;
         }
 
-
         LOGGER.info("First to move is: " + mFirstToMove.toString());
         return mFirstToMove;
     }
