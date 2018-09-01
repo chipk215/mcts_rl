@@ -1,6 +1,7 @@
 package com.keyeswest.fourinline;
 
 import com.keyeswest.core.*;
+import com.keyeswest.fourinline.view.Board;
 import javafx.scene.Parent;
 
 import java.util.List;
@@ -10,14 +11,19 @@ public class FourInLineGame extends Game {
 
     private final static String NAME="4 In A Line!";
 
-   // private FourInLineGame(FourInLineGame game){
-        //mGameBoard = game.mGameBoard.getCopyOfBoard();
-       // mGameState = game.mGameState.makeCopy();
-  //  }
+    private Board mGraphicalDisplayBoard;
+
+
+    public FourInLineGame(Player initialPlayer, GameCallback gameCallback){
+        super(new GameState(new FourInLineBoard(),initialPlayer, GameStatus.IN_PROGRESS, null));
+
+        mGraphicalDisplayBoard = new Board();
+    }
 
     @Override
     public Parent getGraphicalBoardDisplay() {
-        return null;
+
+        return mGraphicalDisplayBoard.createContent();
     }
 
 
@@ -38,9 +44,7 @@ public class FourInLineGame extends Game {
         return new FourInLineMove(selectedColumn);
     }
 
-    public FourInLineGame(Player initialPlayer ){
-        super(new GameState(new FourInLineBoard(),initialPlayer, GameStatus.IN_PROGRESS, null));
-    }
+
 
     @Override
     public void setUserMessage(UserMessages message) {

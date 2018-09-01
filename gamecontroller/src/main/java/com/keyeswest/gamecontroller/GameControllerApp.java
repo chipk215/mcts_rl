@@ -1,6 +1,7 @@
 package com.keyeswest.gamecontroller;
 
 import com.keyeswest.core.*;
+import com.keyeswest.fourinline.FourInLineGame;
 import com.keyeswest.fourinline.FourInLineMove;
 import com.keyeswest.mcts.MonteCarloTreeSearch;
 import com.keyeswest.tictactoe.TicTacToeGame;
@@ -48,9 +49,24 @@ public class GameControllerApp extends Application implements GameCallback {
 
     }
 
+    private void startNewFourInLineGame(){
+        try{
+            mFirstToMove = chooseFirstMove();
+            mGame = new FourInLineGame(mFirstToMove, this);
+
+            Scene scene = new Scene(mGame.getGraphicalBoardDisplay());
+            pStage.setScene(scene);
+            pStage.setTitle(mGame.getName());
+            pStage.show();
+
+        }catch(Exception ex) {
+            ex.printStackTrace();
+            System.exit(-1);
+        }
+    }
 
     // this should execute on the UI thread
-    private void startNewGame(){
+    private void startNewTicTacGame(){
 
         try {
             mFirstToMove = chooseFirstMove();
@@ -90,7 +106,8 @@ public class GameControllerApp extends Application implements GameCallback {
     @Override
     public void start(Stage primaryStage) {
         setPrimaryStage(primaryStage);
-        startNewGame();
+        startNewFourInLineGame();
+        //startNewTicTacGame();
     }
 
 
@@ -240,7 +257,7 @@ public class GameControllerApp extends Application implements GameCallback {
 
     @Override
     public void resetGame() {
-        startNewGame();
+        startNewTicTacGame();
     }
 
     public static Stage getPrimaryStage() {
