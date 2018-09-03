@@ -3,6 +3,7 @@ package com.keyeswest.tictactoe.view;
 import com.keyeswest.core.Coordinate;
 import com.keyeswest.core.GameCallback;
 import com.keyeswest.core.Move;
+import com.keyeswest.core.MoveValue;
 import com.keyeswest.tictactoe.TicTacToeMove;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -88,12 +89,24 @@ public class Board implements CellClickHandler {
         mManualPlayerTurn = manualPlayerTurn;
     }
 
-    public void markCell(int row, int column, boolean manualPlayer) {
+    public void markCell(int row, int column, boolean manualPlayer, List<MoveValue> candidates ) {
         if (manualPlayer) {
             mBoard[row][column].drawO();
         } else {
             mBoard[row][column].drawX();
             mGameCallback.computerMoveComplete();
+            if (candidates != null){
+                for (MoveValue mv : candidates){
+                    TicTacToeMove move = (TicTacToeMove)mv.getMove();
+                    mBoard[move.getRow()][move.getColumn()].setValue(Double.toString(mv.getValue()));
+                }
+            }else{
+                for (row=0; row<3; row++){
+                    for(int col=0; col<3; col++){
+                        mBoard[row][col].setValue("");
+                    }
+                }
+            }
         }
     }
 

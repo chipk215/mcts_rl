@@ -1,7 +1,9 @@
 package com.keyeswest.tictactoe.view;
 
 import javafx.geometry.Pos;
+import javafx.scene.control.Label;
 import javafx.scene.layout.StackPane;
+import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Font;
@@ -13,11 +15,20 @@ public class BoardCell extends StackPane {
 
     private Text mMarker;
 
+    private VBox mVbox;
+
+    private Label mLabel;
+
     private boolean mMarked;
 
     private CellClickHandler mCellClickHandler;
 
     public BoardCell(int row, int column, CellClickHandler clickHandler){
+
+        mVbox = new VBox();
+        mVbox.setSpacing(2);
+        mVbox.setAlignment(Pos.CENTER);
+
         mRow = row;
         mColumn = column;
         mCellClickHandler = clickHandler;
@@ -29,10 +40,15 @@ public class BoardCell extends StackPane {
         border.setStroke(Color.BLACK);
         setAlignment(Pos.CENTER);
 
-        mMarker.setFont(Font.font(72));
+        mMarker.setFont(Font.font(48));
         mMarker.setText(" ");
 
-        getChildren().addAll(border,mMarker);
+        mLabel = new Label("");
+        mLabel.setFont(Font.font(10));
+
+        mVbox.getChildren().addAll(mMarker,mLabel);
+
+        getChildren().addAll(border,mVbox);
 
         setOnMouseClicked(event -> {
             mCellClickHandler.onCellClicked(this);
@@ -65,6 +81,10 @@ public class BoardCell extends StackPane {
 
     public void highlightBackground(){
         setStyle("-fx-background-color: lightgrey;");
+    }
+
+    public void setValue(String value){
+        mLabel.setText(value);
     }
 
 }

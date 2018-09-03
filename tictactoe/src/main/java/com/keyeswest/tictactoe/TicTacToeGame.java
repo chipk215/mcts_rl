@@ -72,7 +72,7 @@ public class TicTacToeGame extends Game {
         }
 
         boolean finalManualPlayer = manualPlayer;
-        Platform.runLater(() -> mGraphicalDisplayBoard.markCell(row, column, finalManualPlayer));
+        Platform.runLater(() -> mGraphicalDisplayBoard.markCell(row, column, finalManualPlayer, candidates));
     }
 
     @Override
