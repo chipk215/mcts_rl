@@ -113,7 +113,7 @@ public class GameControllerApp extends Application implements GameCallback {
     public void start(Stage primaryStage) {
         setPrimaryStage(primaryStage);
         startNewFourInLineGame(P1);
-       // startNewTicTacGame(P1);
+        //startNewTicTacGame(P1);
     }
 
 

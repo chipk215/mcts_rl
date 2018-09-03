@@ -87,6 +87,6 @@ public class FourInLineGame extends Game {
 
     @Override
     public void showWinner() {
-
+        Platform.runLater(() -> mGraphicalDisplayBoard.showWinLine(mGameState.getWinLine().getWinningPositions()));
     }
 }

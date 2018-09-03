@@ -22,6 +22,7 @@ import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
+import javafx.scene.shape.StrokeType;
 import javafx.scene.text.Font;
 import javafx.scene.text.Text;
 import javafx.util.Duration;
@@ -48,7 +49,7 @@ public class Board {
 
     private GameCallback mGameCallback;
     private StackPane[][] mGrid;
-
+    private Circle[][] mCircles;
     private Boolean[][] mGridFill;
 
     private Label[] mMoveValues;
@@ -63,7 +64,7 @@ public class Board {
         mGrid = new StackPane[NUM_ROWS][NUM_COLS];
         mGridFill = new Boolean[NUM_ROWS][NUM_COLS];
         mMoveValues = new Label[NUM_COLS];
-
+        mCircles = new Circle[NUM_ROWS][NUM_COLS];
     }
 
 
@@ -106,11 +107,6 @@ public class Board {
             mMoveValues[col] = label;
         }
 
-       // Label colOne = new Label("0.500");
-       // colOne.setTranslateX(35);
-       // colOne.setTranslateY(380);
-       // colOne.setFont(Font.font(10));
-       // mBoard.getChildren().add(colOne);
 
         mBoard.setOnMouseMoved(event -> {
             int lastBallX=0;
@@ -127,6 +123,7 @@ public class Board {
                                 LOGGER.info("ball col= " + Integer.toString(ballColumn));
 
                                 mSelectionBall.relocate(25 + ballColumn*50,25+ (row+1)*50);
+                                mCircles[row][ballColumn] = mSelectionBall;
                                 break;
                             }
                         }
@@ -135,7 +132,7 @@ public class Board {
                     }
                 });
 
-
+                // Move ball across the columns
                 double mouseX =event.getX();
                 double ballX = mSelectionBall.getLayoutX();
                 //LOGGER.info("ballX= " + Double.toString(ballX));
@@ -185,6 +182,7 @@ public class Board {
         rBall.setTranslateY(4);
         rBall.relocate(25 + 3*50,25 );
         mBoard.getChildren().add(rBall);
+        mCircles[row][column] = rBall;
 
         EventHandler<javafx.event.ActionEvent> onT2Finished = eventTwo -> {
             addCandidateValueLabels(candidates);
@@ -239,6 +237,15 @@ public class Board {
 
         int pos = (int)(position - 25);
         return pos/50;
+
+    }
+
+    public void showWinLine(List<Coordinate> positions) {
+        for (Coordinate position : positions) {
+            mCircles[position.getRow()][position.getColumn()].setStrokeType(StrokeType.INSIDE);
+            mCircles[position.getRow()][position.getColumn()].setStrokeWidth(4.0);
+            mCircles[position.getRow()][position.getColumn()].setStroke(Color.BLACK);
+        }
 
     }
 }
