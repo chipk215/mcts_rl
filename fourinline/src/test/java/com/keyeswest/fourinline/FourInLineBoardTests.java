@@ -123,29 +123,7 @@ public class FourInLineBoardTests {
     }
 
 
-    // Verify that cell can be occupied above an occupied cell
-    @Test
-    public void validStackTest(){
-        int expectedPlayerOnePosition = 0;
-        int expectedPlayerTwoPosition = mFourInLineBoard.getMAX_COLS();
-        Player playerOne = Player.P1;
-        Player playerTwo = Player.P2;
-         mFourInLineBoard.addPiece( playerOne, new FourInLineMove(0));
-         mFourInLineBoard.addPiece( playerTwo, new FourInLineMove(0));
 
-      //  List<CellOccupant> occupants = mFourInLineBoard.getBoardPositions();
-      //  Assert.assertTrue(occupants.size() == 2);
-
-      //  for (int i=0; i< 2; i++) {
-         //   CellOccupant occupant = occupants.get(i);
-         //   if (occupant.getPlayer() == playerOne) {
-           //    Assert.assertEquals(expectedPlayerOnePosition,((FourInLineMove)occupant.getMove()).getColumn() );
-           // }else{
-             //   Assert.assertEquals(expectedPlayerTwoPosition,((FourInLineMove)occupant.getMove()).getColumn() );
-           // }
-        //}
-
-    }
 
     @Test
     public void horizontalWinTest(){

@@ -175,9 +175,8 @@ public class TicTacToeBoard extends GameBoard {
             positions.add(new Coordinate(1,1));
             positions.add(new Coordinate(2,2));
             mWinLine = new WinLine(LineType.DIAGONAL, positions);
-            return;
+
         }
 
-        return;
     }
 }

@@ -1,22 +1,39 @@
 package com.keyeswest.fourinline.view;
 
+import com.keyeswest.core.GameCallback;
+import com.keyeswest.fourinline.FourInLineMove;
+import javafx.animation.KeyFrame;
+import javafx.animation.KeyValue;
+import javafx.animation.Timeline;
+import javafx.animation.TranslateTransition;
+import javafx.event.Event;
+import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.geometry.VPos;
 import javafx.scene.Parent;
-import javafx.scene.canvas.Canvas;
-import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.Button;
+import javafx.scene.control.Label;
 import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.layout.Pane;
+import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
+import javafx.scene.paint.Color;
+import javafx.scene.shape.Circle;
 import javafx.scene.text.Font;
 import javafx.scene.text.Text;
+import javafx.util.Duration;
+
+import java.util.logging.Logger;
 
 public class Board {
 
+    private static final Logger LOGGER = Logger.getLogger(Board.class.getName());
     private static double PANE_WIDTH = 440;
     private static double PANE_HEIGHT = 600;
+    private static int NUM_ROWS = 6;
+    private static int NUM_COLS = 7;
 
     private final static String NEW_GAME_LABEL = "New Game";
     private final static String INITIALIZING_MESSAGE = "Initializing...";
@@ -25,10 +42,23 @@ public class Board {
     private Text mUserMessage;
     private Button mResetButton;
 
-    private double ballPos;
+    private Pane mBoard;
 
-    public Board(){
+    private GameCallback mGameCallback;
+    private StackPane[][] mGrid;
+
+    private Boolean[][] mGridFill;
+
+    private boolean mManualPlayerTurn;
+
+    private Circle mSelectionBall;
+
+    public Board(GameCallback gameCallback){
         mUserMessage = new Text();
+        mGameCallback = gameCallback;
+        mGrid = new StackPane[NUM_ROWS][NUM_COLS];
+        mGridFill = new Boolean[NUM_ROWS][NUM_COLS];
+
     }
 
 
@@ -43,55 +73,143 @@ public class Board {
         mUserMessage.setTextOrigin(VPos.TOP);
         mUserMessage.setText(INITIALIZING_MESSAGE);
 
-        Canvas canvas = new Canvas(400, 400);
-
-        GraphicsContext gc = canvas.getGraphicsContext2D();
         Image cell = new Image("file:fourinline/images/container.png");
-        Image redBall = new Image("file:fourinline/images/redBall.png");
-        Image blank = new Image("file:fourinline/images/white.png");
+       // Image blank = new Image("file:fourinline/images/white.png");
 
-        for (int row = 0; row < 6; row++) {
-            for (int col = 0; col < 7; col++) {
-                gc.drawImage(cell, 25 + (col * 50), 75 + (row * 50));
+        mBoard = new Pane();
+        mBoard.setPrefSize(400,400);
+        mBoard.setPadding(new Insets(25));
+
+
+        for (int row = 0; row < NUM_ROWS; row++) {
+            for (int col = 0; col < NUM_COLS; col++) {
+                ImageView cellView = new ImageView(cell);
+                mGrid[row][col] = new StackPane();
+                mGrid[row][col].getChildren().add(cellView);
+                mGrid[row][col].relocate(25 + (col * 50), 75 + (row * 50));
+                mBoard.getChildren().add(mGrid[row][col]);
+                mGridFill[row][col] = false;
             }
         }
-        gc.drawImage(redBall, 25, 25);
 
-        ballPos = 25;
-        canvas.setOnMouseMoved(event -> {
+        Label colOne = new Label("0.500");
+        colOne.setTranslateX(35);
+        colOne.setTranslateY(380);
+        colOne.setFont(Font.font(10));
+        mBoard.getChildren().add(colOne);
 
-            double mouseX =event.getX();
-            int ballColumn = computeColumn(ballPos);
-            int mouseColumn = computeColumn(mouseX);
-            if (mouseColumn != ballColumn){
-                gc.drawImage(blank, ballPos, 25);
-                ballPos = 25 + (mouseColumn-1)*50;
+        mBoard.setOnMouseMoved(event -> {
+            int lastBallX=0;
 
-                gc.drawImage(redBall, ballPos, 25);
+            if (mManualPlayerTurn){
+                mBoard.setOnMouseClicked(clickEvent ->{
+
+                    int ballColumn = computeColumn(mSelectionBall.getLayoutX());
+                    if ( ! mGridFill[0][ballColumn]){
+                        for(int row=NUM_ROWS-1; row>=0; row--){
+                            if(! mGridFill[row][ballColumn]){
+                                mGridFill[row][ballColumn] = true;
+                                LOGGER.info("ball row" + Integer.toString(row));
+                                LOGGER.info("ball col= " + Integer.toString(ballColumn));
+
+                                mSelectionBall.relocate(25 + ballColumn*50,25+ (row+1)*50);
+                                break;
+                            }
+                        }
+                        mManualPlayerTurn = false;
+                        mGameCallback.opponentMove(new FourInLineMove(ballColumn));
+                    }
+                });
+
+
+                double mouseX =event.getX();
+                double ballX = mSelectionBall.getLayoutX();
+                //LOGGER.info("ballX= " + Double.toString(ballX));
+                int ballColumn = computeColumn(ballX) +1;
+
+                int mouseColumn = computeColumn(mouseX)+1;
+                if (mouseColumn != ballColumn) {
+                    lastBallX = 25+(mouseColumn-1)*50;
+                    mSelectionBall.relocate(lastBallX,25);
+                }
             }
-
         });
 
-
         mResetButton = new Button(NEW_GAME_LABEL);
-        //mResetButton.setOnAction(event -> mGameCallback.resetGame());
-        mRoot.getChildren().addAll(mUserMessage, canvas, mResetButton);
+        mResetButton.setOnAction(event -> mGameCallback.resetGame());
+        mRoot.getChildren().addAll(mUserMessage, mBoard, mResetButton);
         mRoot.setAlignment(Pos.TOP_CENTER);
 
         return mRoot;
     }
 
+
+    public void setUserMessage(String message) {
+        mUserMessage.setText(message);
+    }
+
+    public void showComputerMove(int row, int column){
+
+        mGridFill[NUM_ROWS-row-1][column] = true;
+
+        Circle rBall = new Circle(21, Color.RED);
+        rBall.setTranslateX(4);
+        rBall.setTranslateY(4);
+        rBall.relocate(25 + 3*50,25 );
+        mBoard.getChildren().add(rBall);
+
+        EventHandler<javafx.event.ActionEvent> onT2Finished = eventTwo -> {
+            mGameCallback.computerMoveComplete();
+        };
+
+        if (column!= 3){
+            KeyValue kv1 =  new KeyValue(rBall.centerXProperty(), (column-3)*50);
+            EventHandler<javafx.event.ActionEvent> onT1Finished = event -> {
+                KeyValue kv2 = new  KeyValue(rBall.layoutYProperty(), 46+ (NUM_ROWS- row)*50);
+                KeyFrame f2 = new KeyFrame(Duration.millis(250),onT2Finished,kv2);
+                Timeline t2 = new Timeline(f2);
+                t2.play();
+
+            };
+            KeyFrame frame = new KeyFrame(Duration.millis(250), onT1Finished, kv1);
+            Timeline t1 = new Timeline(frame);
+
+            t1.play();
+        }
+        else{
+
+            KeyValue kv2 = new  KeyValue(rBall.layoutYProperty(), 46+((NUM_ROWS- row)*50));
+            KeyFrame f2 = new KeyFrame(Duration.millis(400),onT2Finished,kv2);
+            Timeline t2 = new Timeline(f2);
+            t2.play();
+        }
+
+
+    }
+
+    public void setManualPlayerTurn(boolean manualPlayerTurn) {
+        mManualPlayerTurn = manualPlayerTurn;
+        if(mManualPlayerTurn){
+            mSelectionBall = new Circle(21, Color.BLUE);
+            mSelectionBall.setTranslateX(4);
+            mSelectionBall.setTranslateY(4);
+            mSelectionBall.relocate(25 ,25 );
+            mBoard.getChildren().add(mSelectionBall);
+
+        }
+    }
+
     private int computeColumn(double position){
         if(position < 25){
-            return 1;
+            return 0;
         }
 
         if (position > 374){
-            return 7;
+            return 6;
         }
 
         int pos = (int)(position - 25);
-        return pos/50 +1;
+        return pos/50;
 
     }
 }

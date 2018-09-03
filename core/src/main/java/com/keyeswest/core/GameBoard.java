@@ -72,6 +72,9 @@ public abstract class GameBoard {
 
 
     public WinLine getWinLine() {
+        if (mWinLine == null){
+            return null;
+        }
         return new WinLine(mWinLine);
     }
 

@@ -93,6 +93,7 @@ public class Board implements CellClickHandler {
             mBoard[row][column].drawO();
         } else {
             mBoard[row][column].drawX();
+            mGameCallback.computerMoveComplete();
         }
     }
 

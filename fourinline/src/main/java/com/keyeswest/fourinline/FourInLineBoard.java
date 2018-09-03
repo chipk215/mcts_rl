@@ -51,13 +51,8 @@ public class FourInLineBoard extends GameBoard {
         }
     }
 
-    private FourInLineBoard(FourInLineBoard fourInLineBoard) {
-        this();
-        for (int row = 0; row < MAX_ROWS; row++) {
-            for (int col = 0; col < MAX_COLS; col++) {
-                mBoard[row][col] = fourInLineBoard.mBoard[row][col];
-            }
-        }
+    private FourInLineBoard(FourInLineBoard board) {
+        super(board);
 
     }
 
@@ -96,15 +91,12 @@ public class FourInLineBoard extends GameBoard {
 
     @Override
     public GameBoard makeCopy() {
-        return null;
+        return new FourInLineBoard(this);
     }
 
     private void logWinMessage(WinLine winner, Player player) {
         LOGGER.info("***** Game won by player: " + player.toString());
         LOGGER.info("Win line type: " + winner.getLineType().toString());
-        String startRow = "Row = " + Integer.toString(winner.getStartRow());
-        String startColumn = " Column= " + Integer.toString(winner.getStartColumn());
-        LOGGER.info("Win Line starting coordinates: " + startRow + startColumn);
     }
 
 
@@ -123,6 +115,7 @@ public class FourInLineBoard extends GameBoard {
         if (row == -1) {
             throw new IllegalStateException("Illegal and unexpected game move executed.");
         }
+        ((FourInLineMove) move).setRow(row);
         mBoard[row][column] = player.value();
 
 
@@ -168,9 +161,6 @@ public class FourInLineBoard extends GameBoard {
     }
 
 
-    private int computeCellNumber(int row, int column) {
-        return column + MAX_COLS * row;
-    }
 
     /*
      * Check across the vertical column containing the coordinate provided
@@ -178,6 +168,7 @@ public class FourInLineBoard extends GameBoard {
      * specified player.
      */
     private void checkVerticalsForWin(Player player, int row, int column) {
+        List<Coordinate> positions = new ArrayList<>();
         // check segments beginning 3 rows beneath the specified row
         int startRow = row - (WIN_CONNECTION - 1);
         if (startRow < 0) {
@@ -186,16 +177,18 @@ public class FourInLineBoard extends GameBoard {
         int matchSum = getMatchSum(player);
 
         while ((startRow <= row) && (startRow + WIN_CONNECTION <= MAX_ROWS)) {
+            positions.clear();
             int sum = 0;
             for (int i = startRow; i < startRow + WIN_CONNECTION; i++) {
                 sum += mBoard[i][column];
+                positions.add(new Coordinate(i,column));
                 if ((sum == 0) || (sum == player.getOpponent().value())) {
                     break;
                 }
             }
             if (sum == matchSum) {
                 // we have a winner
-                mWinLine = new WinLine(LineType.VERTICAL, startRow, column);
+                mWinLine = new WinLine(LineType.VERTICAL, positions);
                 return;
             }
             startRow++;
@@ -210,7 +203,7 @@ public class FourInLineBoard extends GameBoard {
      * specified player.
      */
     private void checkHorizontalsForWin(Player player, int row, int column) {
-
+        List<Coordinate> positions = new ArrayList<>();
         // need to check at most 4 segments beginning 3 cols to the left of the
         // provided coordinate
         int startCol = column - (WIN_CONNECTION - 1);
@@ -220,16 +213,18 @@ public class FourInLineBoard extends GameBoard {
         int matchSum = getMatchSum(player);
 
         while ((startCol <= column) && (startCol + WIN_CONNECTION <= MAX_COLS)) {
+            positions.clear();
             int sum = 0;
             for (int i = startCol; i < startCol + WIN_CONNECTION; i++) {
                 sum += mBoard[row][i];
+                positions.add(new Coordinate(row,i));
                 if ((sum == 0) || (sum == player.getOpponent().value())) {
                     break;
                 }
             }
             if (sum == matchSum) {
                 // we have a winner
-                mWinLine = new WinLine(LineType.HORIZONTAL, row, startCol);
+                mWinLine = new WinLine(LineType.HORIZONTAL, positions);
                 return;
             }
 
@@ -243,20 +238,23 @@ public class FourInLineBoard extends GameBoard {
      * Helper function for checking diagonals that looks for adjacent positions.
      */
     private void checkAdjacentPositions(int rowIndex, int colIndex, Player player, boolean negativeSlope) {
+        List<Coordinate> positions = new ArrayList<>();
         int sum = 0;
         int matchSum = 4 * player.value();
         for (int index = 0; index < WIN_CONNECTION; index++) {
             if (negativeSlope) {
                 sum += mBoard[rowIndex - index][colIndex + index];
+                positions.add(new Coordinate(rowIndex-index,colIndex+index));
             } else {
                 sum += mBoard[rowIndex + index][colIndex + index];
+                positions.add(new Coordinate(rowIndex+index,colIndex+index));
             }
             if ((sum == 0) || (sum == player.getOpponent().value())) {
                 break;
             }
         }
         if (sum == matchSum) {
-            mWinLine = new WinLine(LineType.DIAGONAL, rowIndex, colIndex);
+            mWinLine = new WinLine(LineType.DIAGONAL, positions);
             return;
         }
 

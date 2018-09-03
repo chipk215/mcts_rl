@@ -2,7 +2,7 @@ package com.keyeswest.gamecontroller;
 
 import com.keyeswest.core.*;
 import com.keyeswest.fourinline.FourInLineGame;
-import com.keyeswest.fourinline.FourInLineMove;
+
 import com.keyeswest.mcts.MonteCarloTreeSearch;
 import com.keyeswest.tictactoe.TicTacToeGame;
 
@@ -32,16 +32,17 @@ public class GameControllerApp extends Application implements GameCallback {
     private static final Logger LOGGER = Logger.getLogger(GameControllerApp.class.getName());
     private static FileHandler fh = null;
 
-    private static final int MAX_FOUR_IN_LINE_ITERATIONS = 3000;
-    private static final int MAX_TIC_TAC_TOE_ITERATIONS = 3000;
+
+    private static final int MAX_ITERATIONS = 3000;
 
     private static Stage pStage;
 
-    private Player mFirstToMove;
 
     private  MonteCarloTreeSearch mSearchAgent;
 
     private Game mGame;
+
+    private GameState mNewState;
 
     public GameControllerApp(){
         super();
@@ -49,29 +50,10 @@ public class GameControllerApp extends Application implements GameCallback {
 
     }
 
-    private void startNewFourInLineGame(){
-        try{
-            mFirstToMove = chooseFirstMove();
-            mGame = new FourInLineGame(mFirstToMove, this);
-
-            Scene scene = new Scene(mGame.getGraphicalBoardDisplay());
-            pStage.setScene(scene);
-            pStage.setTitle(mGame.getName());
-            pStage.show();
-
-        }catch(Exception ex) {
-            ex.printStackTrace();
-            System.exit(-1);
-        }
-    }
-
-    // this should execute on the UI thread
-    private void startNewTicTacGame(){
-
+    private void startNewGame(Player firstToMove){
         try {
-            mFirstToMove = chooseFirstMove();
-            mGame = new TicTacToeGame(mFirstToMove, this);
-            mSearchAgent = new MonteCarloTreeSearch(MAX_TIC_TAC_TOE_ITERATIONS, LOGGER);
+
+            mSearchAgent = new MonteCarloTreeSearch(MAX_ITERATIONS, LOGGER);
 
             Scene scene = new Scene(mGame.getGraphicalBoardDisplay());
             pStage.setScene(scene);
@@ -83,7 +65,7 @@ public class GameControllerApp extends Application implements GameCallback {
                 @Override
                 protected Void call() {
 
-                    if (mFirstToMove == P1) {
+                    if (firstToMove == P1) {
                         mGame.setUserMessage(UserMessages.THINKING);
                         mGame.setManualPlayerTurn(false);
                         executeComputerMove(mGame.getGameState());
@@ -101,27 +83,42 @@ public class GameControllerApp extends Application implements GameCallback {
             ex.printStackTrace();
             System.exit(-1);
         }
+
+    }
+
+    private void startNewFourInLineGame(Player firstToMove){
+
+        mGame = new FourInLineGame(firstToMove, this);
+        startNewGame(firstToMove);
+
+    }
+
+    // this should execute on the UI thread
+    private void startNewTicTacGame(Player firstToMove){
+        mGame = new TicTacToeGame(firstToMove, this);
+        startNewGame(firstToMove);
+
     }
 
     @Override
     public void start(Stage primaryStage) {
         setPrimaryStage(primaryStage);
-        startNewFourInLineGame();
-        //startNewTicTacGame();
+       // startNewFourInLineGame(P1);
+        startNewTicTacGame(P1);
     }
 
 
     private  Player chooseFirstMove(){
-
+        Player firstToMove;
         int randomSelection = (int)(Math.random() * 2);
         if ((randomSelection %2) == 0){
-            mFirstToMove= P1;
+            firstToMove= P1;
         }else{
-            mFirstToMove= P2;
+            firstToMove= P2;
         }
 
-        LOGGER.info("First to move is: " + mFirstToMove.toString());
-        return mFirstToMove;
+        LOGGER.info("First to move is: " + firstToMove.toString());
+        return firstToMove;
     }
 
 
@@ -142,26 +139,6 @@ public class GameControllerApp extends Application implements GameCallback {
 
         LOGGER.setUseParentHandlers(false);
 
-    }
-
-
-    private static void setupInitialConditions(Game fourInLineGame){
-        FourInLineMove p1Move = new FourInLineMove(1);
-        FourInLineMove p2MoveInit = new FourInLineMove(6);
-
-
-        // set up initial condition
-        fourInLineGame.performMove(p1Move);
-        fourInLineGame.performMove(p2MoveInit);
-
-        p1Move = new FourInLineMove(3);
-        fourInLineGame.performMove(p1Move);
-        fourInLineGame.performMove(p2MoveInit);
-
-        fourInLineGame.performMove(p1Move);
-        fourInLineGame.performMove(p2MoveInit);
-
-      //  fourInLineGame.getGameBoard().logBoardPositions(null);
     }
 
 
@@ -193,20 +170,12 @@ public class GameControllerApp extends Application implements GameCallback {
 
         LOGGER.info("Executing suggested move for P1= " + selectedMove.getName());
         // update the game model
-        GameState newState = mGame.performMove(selectedMove);
-        newState.logBoardPositions(null);
+        mNewState = mGame.performMove(selectedMove);
+        mNewState.logBoardPositions(null);
 
         mGame.displayMove(selectedMove, P1);
 
-        GameStatus resultStatus = newState.getStatus();
-        if (resultStatus == GameStatus.IN_PROGRESS){
-            mGame.setUserMessage(UserMessages.YOUR_TURN);
-            mGame.setManualPlayerTurn(true);
 
-        }else{
-            displayEndOfGameMessage(newState);
-
-        }
     }
 
 
@@ -257,12 +226,23 @@ public class GameControllerApp extends Application implements GameCallback {
 
     @Override
     public void resetGame() {
-        startNewTicTacGame();
+        //startNewFourInLineGame(chooseFirstMove());
+        startNewTicTacGame(chooseFirstMove());
     }
 
-    public static Stage getPrimaryStage() {
-        return pStage;
+    @Override
+    public void computerMoveComplete() {
+        GameStatus resultStatus = mNewState.getStatus();
+        if (resultStatus == GameStatus.IN_PROGRESS){
+            mGame.setUserMessage(UserMessages.YOUR_TURN);
+            mGame.setManualPlayerTurn(true);
+
+        }else{
+            displayEndOfGameMessage(mNewState);
+
+        }
     }
+
 
     private void setPrimaryStage(Stage pStage) {
         GameControllerApp.pStage = pStage;
