@@ -3,6 +3,8 @@ package com.keyeswest.mcts;
 import com.keyeswest.core.*;
 import com.sun.istack.internal.NotNull;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -25,7 +27,7 @@ public class MonteCarloTreeSearch {
         MAX_ITERATIONS = iterations;
     }
 
-    public Move findNextMove(@NotNull GameState gameState) {
+    public SearchResult findNextMove(@NotNull GameState gameState) {
 
         Tree tree = new Tree(gameState);
 
@@ -65,7 +67,7 @@ public class MonteCarloTreeSearch {
 
                     sBuilder.append("Winning move found: " + "Selected Move: ").append(searchNode.getMove().getName());
                     LOGGER.log(Level.INFO, sBuilder.toString());
-                    return searchNode.getMove();
+                    return prepareSearchResult(tree,searchNode.getMove() );
                 } else {
                     sBuilder.append("Expanding tree with terminal node. ")
                             .append(searchNode.getMove().getName()).append(System.lineSeparator());
@@ -86,7 +88,7 @@ public class MonteCarloTreeSearch {
             if (child.getDefensiveTerminalNode()) {
                 LOGGER.log(Level.INFO, "Selected (defensive) Move: " +
                         child.getMove().getName() + System.lineSeparator());
-                return child.getMove();
+                return prepareSearchResult(tree,child.getMove() );
             }
         }
 
@@ -102,7 +104,18 @@ public class MonteCarloTreeSearch {
         Node bestChild = UCB1.findChildNodeWithBestUCBValue(tree.getRootNode(), 0, LOGGER);
         LOGGER.log(Level.INFO, "Selected Move: " + bestChild.getMove().getName() + System.lineSeparator());
 
-        return bestChild.getMove();
+        return prepareSearchResult(tree,bestChild.getMove() );
+    }
+
+
+    private SearchResult prepareSearchResult(Tree tree, Move selectedMove){
+        List<MoveValue> candidates = new ArrayList<>();
+        for (Node node : tree.getRootNode().getChildNodes()){
+
+            candidates.add(new MoveValue(node.getMove(), node.getValue()));
+        }
+
+        return new SearchResult(candidates, selectedMove);
     }
 
     private void backPropagation(Node node, double simReward) {

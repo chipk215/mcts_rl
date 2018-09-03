@@ -5,10 +5,7 @@ import com.keyeswest.fourinline.view.Board;
 import javafx.application.Platform;
 import javafx.scene.Parent;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Scanner;
+import java.util.*;
 
 public class FourInLineGame extends Game {
 
@@ -73,20 +70,18 @@ public class FourInLineGame extends Game {
     }
 
     @Override
-    public void displayMove(Move move, Player player) {
+    public void displayMove(Move move, Player player, List<MoveValue> candidates) {
         if (!(move instanceof FourInLineMove)) {
             throw new IllegalStateException("Unrecognized game move.");
         }
         int row = ((FourInLineMove)move).getRow();
         int column = ((FourInLineMove)move).getColumn();
 
+
         // Assume P1 is always computer
         if (player == Player.P1){
-            Platform.runLater(() -> mGraphicalDisplayBoard.showComputerMove(row, column));
+            Platform.runLater(() -> mGraphicalDisplayBoard.showComputerMove(row, column, candidates));
         }
-
-
-
 
     }
 

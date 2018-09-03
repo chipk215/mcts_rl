@@ -1,12 +1,13 @@
 package com.keyeswest.fourinline.view;
 
+import com.keyeswest.core.Coordinate;
 import com.keyeswest.core.GameCallback;
+import com.keyeswest.core.MoveValue;
 import com.keyeswest.fourinline.FourInLineMove;
 import javafx.animation.KeyFrame;
 import javafx.animation.KeyValue;
 import javafx.animation.Timeline;
-import javafx.animation.TranslateTransition;
-import javafx.event.Event;
+
 import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -25,6 +26,7 @@ import javafx.scene.text.Font;
 import javafx.scene.text.Text;
 import javafx.util.Duration;
 
+import java.util.List;
 import java.util.logging.Logger;
 
 public class Board {
@@ -49,6 +51,8 @@ public class Board {
 
     private Boolean[][] mGridFill;
 
+    private Label[] mMoveValues;
+
     private boolean mManualPlayerTurn;
 
     private Circle mSelectionBall;
@@ -58,6 +62,7 @@ public class Board {
         mGameCallback = gameCallback;
         mGrid = new StackPane[NUM_ROWS][NUM_COLS];
         mGridFill = new Boolean[NUM_ROWS][NUM_COLS];
+        mMoveValues = new Label[NUM_COLS];
 
     }
 
@@ -74,7 +79,7 @@ public class Board {
         mUserMessage.setText(INITIALIZING_MESSAGE);
 
         Image cell = new Image("file:fourinline/images/container.png");
-       // Image blank = new Image("file:fourinline/images/white.png");
+
 
         mBoard = new Pane();
         mBoard.setPrefSize(400,400);
@@ -92,11 +97,20 @@ public class Board {
             }
         }
 
-        Label colOne = new Label("0.500");
-        colOne.setTranslateX(35);
-        colOne.setTranslateY(380);
-        colOne.setFont(Font.font(10));
-        mBoard.getChildren().add(colOne);
+        for (int col=0; col< NUM_COLS; col++){
+            Label label = new Label("");
+            label.setTranslateX(35 + col*50);
+            label.setFont(Font.font(10));
+            label.setTranslateY(380);
+            mBoard.getChildren().add(label);
+            mMoveValues[col] = label;
+        }
+
+       // Label colOne = new Label("0.500");
+       // colOne.setTranslateX(35);
+       // colOne.setTranslateY(380);
+       // colOne.setFont(Font.font(10));
+       // mBoard.getChildren().add(colOne);
 
         mBoard.setOnMouseMoved(event -> {
             int lastBallX=0;
@@ -148,7 +162,21 @@ public class Board {
         mUserMessage.setText(message);
     }
 
-    public void showComputerMove(int row, int column){
+    private void addCandidateValueLabels(List<MoveValue> candidates){
+        if (candidates != null){
+            for (MoveValue mv : candidates){
+                FourInLineMove move = (FourInLineMove)mv.getMove();
+                double moveValue = mv.getValue();
+                mMoveValues[move.getColumn()].setText(Double.toString(moveValue));
+            }
+        }else{
+            for (int col =0; col < NUM_COLS; col++){
+                mMoveValues[col].setText("");
+            }
+        }
+    }
+
+    public void showComputerMove(int row, int column, List<MoveValue> candidates){
 
         mGridFill[NUM_ROWS-row-1][column] = true;
 
@@ -159,6 +187,7 @@ public class Board {
         mBoard.getChildren().add(rBall);
 
         EventHandler<javafx.event.ActionEvent> onT2Finished = eventTwo -> {
+            addCandidateValueLabels(candidates);
             mGameCallback.computerMoveComplete();
         };
 

@@ -7,6 +7,7 @@ import javafx.application.Platform;
 import javafx.scene.Parent;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 
@@ -57,7 +58,7 @@ public class TicTacToeGame extends Game {
     }
 
     @Override
-    public void displayMove(Move move, Player player) {
+    public void displayMove(Move move, Player player, List<MoveValue> candidates ) {
         if (!(move instanceof TicTacToeMove)) {
             throw new IllegalStateException("Unrecognized game move.");
         }

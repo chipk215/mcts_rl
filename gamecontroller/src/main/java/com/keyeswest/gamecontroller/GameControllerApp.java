@@ -4,6 +4,7 @@ import com.keyeswest.core.*;
 import com.keyeswest.fourinline.FourInLineGame;
 
 import com.keyeswest.mcts.MonteCarloTreeSearch;
+import com.keyeswest.mcts.SearchResult;
 import com.keyeswest.tictactoe.TicTacToeGame;
 
 import javafx.application.Application;
@@ -111,8 +112,8 @@ public class GameControllerApp extends Application implements GameCallback {
     @Override
     public void start(Stage primaryStage) {
         setPrimaryStage(primaryStage);
-       // startNewFourInLineGame(P1);
-        startNewTicTacGame(P1);
+        startNewFourInLineGame(P1);
+       // startNewTicTacGame(P1);
     }
 
 
@@ -174,14 +175,15 @@ public class GameControllerApp extends Application implements GameCallback {
 
     private void executeComputerMove(GameState gameState){
 
-        Move selectedMove = mSearchAgent.findNextMove(gameState);
+        SearchResult searchResult = mSearchAgent.findNextMove(gameState);
+        Move selectedMove = searchResult.getSelected();
 
         LOGGER.info("Executing suggested move for P1= " + selectedMove.getName());
         // update the game model
         mNewState = mGame.performMove(selectedMove);
         mNewState.logBoardPositions(null);
 
-        mGame.displayMove(selectedMove, P1);
+        mGame.displayMove(selectedMove, P1, searchResult.getCandidates());
 
     }
 
@@ -193,7 +195,7 @@ public class GameControllerApp extends Application implements GameCallback {
         gameState.logBoardPositions(null);
 
         //update the graphical display
-        mGame.displayMove(manualMove, P2);
+        mGame.displayMove(manualMove, P2, null);
 
         GameStatus resultStatus = gameState.getStatus();
 
