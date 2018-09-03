@@ -32,11 +32,9 @@ public class GameControllerApp extends Application implements GameCallback {
     private static final Logger LOGGER = Logger.getLogger(GameControllerApp.class.getName());
     private static FileHandler fh = null;
 
-
     private static final int MAX_ITERATIONS = 3000;
 
     private static Stage pStage;
-
 
     private  MonteCarloTreeSearch mSearchAgent;
 
@@ -49,6 +47,15 @@ public class GameControllerApp extends Application implements GameCallback {
         setupLogging();
 
     }
+
+    private GameType mGameType;
+
+
+    private enum GameType {
+        TicTacToe, FourInLine;
+
+    }
+
 
     private void startNewGame(Player firstToMove){
         try {
@@ -87,7 +94,7 @@ public class GameControllerApp extends Application implements GameCallback {
     }
 
     private void startNewFourInLineGame(Player firstToMove){
-
+        mGameType = GameType.FourInLine;
         mGame = new FourInLineGame(firstToMove, this);
         startNewGame(firstToMove);
 
@@ -95,6 +102,7 @@ public class GameControllerApp extends Application implements GameCallback {
 
     // this should execute on the UI thread
     private void startNewTicTacGame(Player firstToMove){
+        mGameType = GameType.TicTacToe;
         mGame = new TicTacToeGame(firstToMove, this);
         startNewGame(firstToMove);
 
@@ -175,7 +183,6 @@ public class GameControllerApp extends Application implements GameCallback {
 
         mGame.displayMove(selectedMove, P1);
 
-
     }
 
 
@@ -226,8 +233,16 @@ public class GameControllerApp extends Application implements GameCallback {
 
     @Override
     public void resetGame() {
-        //startNewFourInLineGame(chooseFirstMove());
-        startNewTicTacGame(chooseFirstMove());
+
+        switch (mGameType){
+            case TicTacToe:
+                startNewTicTacGame(chooseFirstMove());
+                break;
+            case FourInLine:
+                startNewFourInLineGame(chooseFirstMove());
+                break;
+        }
+
     }
 
     @Override

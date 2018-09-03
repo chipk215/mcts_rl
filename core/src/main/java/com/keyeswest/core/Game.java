@@ -3,13 +3,13 @@ package com.keyeswest.core;
 
 import javafx.scene.Parent;
 
-import java.util.HashMap;
-
-import java.util.Map;
 
 public abstract class Game implements GraphicalDisplayInterface {
 
-
+    protected static final String THINK_MESSAGE = "Thinking...";
+    protected static final String TIED_MESSAGE = "Game over. Tied game.";
+    protected static final String OPPONENT_WIN_MESSAGE = "Winner! You win, play again?";
+    protected static final String COMPUTER_WIN_MESSAGE = "Computer Wins! Play again?";
 
     protected GameState mGameState;
 
@@ -30,8 +30,5 @@ public abstract class Game implements GraphicalDisplayInterface {
     public GameState getGameState(){
         return mGameState;
     }
-
-
-
 
 }
