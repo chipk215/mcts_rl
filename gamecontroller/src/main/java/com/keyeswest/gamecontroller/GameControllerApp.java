@@ -200,9 +200,6 @@ public class GameControllerApp extends Application implements GameCallback {
         GameState gameState = mGame.performMove(manualMove);
         gameState.logBoardPositions(null);
 
-        //update the graphical display
-        mGame.displayMove(manualMove, P2, null);
-
         GameStatus resultStatus = gameState.getStatus();
 
         if (resultStatus != GameStatus.IN_PROGRESS){

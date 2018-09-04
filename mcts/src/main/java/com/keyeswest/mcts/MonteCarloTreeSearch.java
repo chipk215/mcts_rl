@@ -15,7 +15,7 @@ public class MonteCarloTreeSearch {
 
     private static final double Cp = 1 / Math.sqrt(2);
     private static final double WIN_VALUE = 1.0d;
-    private static final double LOSS_VALUE = 0.0d;
+    private static final double LOSS_VALUE =0.0d;
     private static final double TIE_VALUE = 0.5d;
     private final int MAX_ITERATIONS;
 

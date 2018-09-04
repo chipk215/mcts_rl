@@ -134,6 +134,7 @@ public class Board implements CellClickHandler {
         }
 
         Move playerMove = new TicTacToeMove(cell.getRow(), cell.getColumn());
+        markCell(cell.getRow(), cell.getColumn(),true,null);
         mGameCallback.opponentMove(playerMove);
 
     }
