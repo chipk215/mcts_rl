@@ -13,6 +13,7 @@ import javafx.scene.Scene;
 import javafx.stage.Stage;
 
 
+import java.io.File;
 import java.io.IOException;
 import java.nio.file.FileSystems;
 import java.nio.file.Path;
@@ -133,6 +134,11 @@ public class GameControllerApp extends Application implements GameCallback {
 
     private static void setupLogging(){
         Path currentPath = FileSystems.getDefault().getPath(".");
+
+        File directory = new File("logs");
+        if (! directory.exists()){
+            directory.mkdir();
+        }
 
         SimpleDateFormat format = new SimpleDateFormat("M-d_HHmmss");
         String fileName = "/logs/SearchLog_" + format.format(Calendar.getInstance().getTime()) + ".log";
