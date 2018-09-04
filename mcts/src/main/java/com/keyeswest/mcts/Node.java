@@ -148,6 +148,14 @@ public class Node {
         return newState;
     }
 
+    double getAverageValue(){
+        if (mVisitCount != 0) {
+            return mValue / mVisitCount;
+        }
+
+        return Integer.MAX_VALUE;
+    }
+
     GameStatus getNodeStatus() {
         return mGameState.getStatus();
     }

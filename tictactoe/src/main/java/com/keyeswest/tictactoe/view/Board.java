@@ -15,6 +15,7 @@ import javafx.scene.layout.VBox;
 import javafx.scene.text.Font;
 import javafx.scene.text.Text;
 
+import java.text.DecimalFormat;
 import java.util.List;
 
 
@@ -99,7 +100,8 @@ public class Board implements CellClickHandler {
         if (candidates != null){
             for (MoveValue mv : candidates){
                 TicTacToeMove move = (TicTacToeMove)mv.getMove();
-                mBoard[move.getRow()][move.getColumn()].setValue(Double.toString(mv.getValue()));
+                DecimalFormat df = new DecimalFormat("#.####");
+                mBoard[move.getRow()][move.getColumn()].setValue(df.format(mv.getValue()));
             }
         }
     }

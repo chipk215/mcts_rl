@@ -112,7 +112,7 @@ public class MonteCarloTreeSearch {
         List<MoveValue> candidates = new ArrayList<>();
         for (Node node : tree.getRootNode().getChildNodes()){
 
-            candidates.add(new MoveValue(node.getMove(), node.getValue()));
+            candidates.add(new MoveValue(node.getMove(), node.getAverageValue()));
         }
 
         return new SearchResult(candidates, selectedMove);

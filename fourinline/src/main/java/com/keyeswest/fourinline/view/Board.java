@@ -27,6 +27,7 @@ import javafx.scene.text.Font;
 import javafx.scene.text.Text;
 import javafx.util.Duration;
 
+import java.text.DecimalFormat;
 import java.util.List;
 import java.util.logging.Logger;
 
@@ -223,7 +224,8 @@ public class Board {
             for (MoveValue mv : candidates){
                 FourInLineMove move = (FourInLineMove)mv.getMove();
                 double moveValue = mv.getValue();
-                mMoveValues[move.getColumn()].setText(Double.toString(moveValue));
+                DecimalFormat df = new DecimalFormat("#.####");
+                mMoveValues[move.getColumn()].setText(df.format(moveValue));
             }
         }
     }

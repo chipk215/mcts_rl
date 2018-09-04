@@ -112,8 +112,8 @@ public class GameControllerApp extends Application implements GameCallback {
     @Override
     public void start(Stage primaryStage) {
         setPrimaryStage(primaryStage);
-        startNewFourInLineGame(P1);
-        //startNewTicTacGame(P1);
+       // startNewFourInLineGame(P1);
+        startNewTicTacGame(P1);
     }
 
 

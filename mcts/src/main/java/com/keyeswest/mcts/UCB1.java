@@ -12,12 +12,12 @@ class UCB1 {
 
     private static double EPSILON = 1.0E-06;
 
-    private static double ucb1Value(int totalVisit, double nodeValue, int nodeVisit, double cValue){
+    private static double ucb1Value(int totalVisit, double averageNodeValue, int nodeVisit, double cValue){
         if (nodeVisit == 0){
             return Integer.MAX_VALUE;
         }
 
-        return (nodeValue / (double)nodeVisit) + cValue * Math.sqrt(2 * Math.log(totalVisit)/ (double) nodeVisit);
+        return averageNodeValue + cValue * Math.sqrt(2 * Math.log(totalVisit)/ (double) nodeVisit);
     }
 
     static Node findChildNodeWithBestUCBValue(Node node, double cValue, Logger logger){
@@ -27,16 +27,16 @@ class UCB1 {
         Assert.that(childCount > 0,"Must have child nodes");
         Node candidateNode = node.getChildNodes().get(0);
         candidates.add(candidateNode);
-        double nodeValue = candidateNode.getValue();
+        double averageNodeValue = candidateNode.getAverageValue();
 
         int visits = candidateNode.getVisitCount();
-        double maxValue = UCB1.ucb1Value(parentVisit, nodeValue, visits, cValue);
+        double maxValue = UCB1.ucb1Value(parentVisit,averageNodeValue, visits, cValue);
 
         for (int i=1;i< childCount;i++){
             Node childNode = node.getChildNodes().get(i);
-            nodeValue = childNode.getValue();
+            averageNodeValue = childNode.getAverageValue();
             visits = childNode.getVisitCount();
-            double ucbValue = UCB1.ucb1Value(parentVisit, nodeValue, visits, cValue);
+            double ucbValue = UCB1.ucb1Value(parentVisit, averageNodeValue, visits, cValue);
             if (Math.abs(ucbValue-maxValue) < EPSILON){
                 // approximately equivalent nodes
                 candidates.add(childNode);
