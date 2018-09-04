@@ -170,7 +170,7 @@ public class Board {
 
                                 mSelectionBall.relocate(25 + ballColumn*CELL_WIDTH_HEIGHT,
                                         25+ (row+1)*CELL_WIDTH_HEIGHT);
-                                mCircles[row][ballColumn] = mSelectionBall;
+                                mCircles[NUM_ROWS-row-1][ballColumn] = mSelectionBall;
                                 break;
                             }
                         }

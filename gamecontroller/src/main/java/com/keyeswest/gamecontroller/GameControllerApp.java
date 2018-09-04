@@ -34,7 +34,7 @@ public class GameControllerApp extends Application implements GameCallback {
     private static final Logger LOGGER = Logger.getLogger(GameControllerApp.class.getName());
     private static FileHandler fh = null;
 
-    private static final int MAX_ITERATIONS = 6000;
+    private static final int MAX_ITERATIONS = 3000;
 
     private static Stage pStage;
 
