@@ -15,6 +15,11 @@ The GameControllerApp class is used to specify which game to run, either Tic-Tac
         //startNewTicTacGame(P1);
     }
 ```
+P1 is the computer. P2 is the user.
+To let the player to move first be randomly selected invoke the start of the game using:
+```
+startNewFourInLineGame(chooseFirstMove());
+```
 
 The program is then executed by running GameControllerApp (I'm running inside IntelliJ during development).
 
