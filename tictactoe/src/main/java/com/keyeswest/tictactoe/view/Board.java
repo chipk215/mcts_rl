@@ -89,24 +89,29 @@ public class Board implements CellClickHandler {
         mManualPlayerTurn = manualPlayerTurn;
     }
 
+
+    private void updateCellValues(List<MoveValue> candidates){
+        for (int row=0; row<3; row++){
+            for(int col=0; col<3; col++){
+                mBoard[row][col].setValue("");
+            }
+        }
+        if (candidates != null){
+            for (MoveValue mv : candidates){
+                TicTacToeMove move = (TicTacToeMove)mv.getMove();
+                mBoard[move.getRow()][move.getColumn()].setValue(Double.toString(mv.getValue()));
+            }
+        }
+    }
+
     public void markCell(int row, int column, boolean manualPlayer, List<MoveValue> candidates ) {
         if (manualPlayer) {
             mBoard[row][column].drawO();
         } else {
             mBoard[row][column].drawX();
+            updateCellValues(candidates);
             mGameCallback.computerMoveComplete();
-            if (candidates != null){
-                for (MoveValue mv : candidates){
-                    TicTacToeMove move = (TicTacToeMove)mv.getMove();
-                    mBoard[move.getRow()][move.getColumn()].setValue(Double.toString(mv.getValue()));
-                }
-            }else{
-                for (row=0; row<3; row++){
-                    for(int col=0; col<3; col++){
-                        mBoard[row][col].setValue("");
-                    }
-                }
-            }
+
         }
     }
 

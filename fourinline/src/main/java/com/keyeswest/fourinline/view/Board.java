@@ -160,15 +160,14 @@ public class Board {
     }
 
     private void addCandidateValueLabels(List<MoveValue> candidates){
+        for (int col =0; col < NUM_COLS; col++){
+            mMoveValues[col].setText("");
+        }
         if (candidates != null){
             for (MoveValue mv : candidates){
                 FourInLineMove move = (FourInLineMove)mv.getMove();
                 double moveValue = mv.getValue();
                 mMoveValues[move.getColumn()].setText(Double.toString(moveValue));
-            }
-        }else{
-            for (int col =0; col < NUM_COLS; col++){
-                mMoveValues[col].setText("");
             }
         }
     }
