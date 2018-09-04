@@ -1,6 +1,5 @@
 package com.keyeswest.mcts;
 
-import sun.jvm.hotspot.utilities.Assert;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -24,7 +23,10 @@ class UCB1 {
         List<Node> candidates = new ArrayList<>();
         int parentVisit = node.getVisitCount();
         int childCount = node.getChildNodes().size();
-        Assert.that(childCount > 0,"Must have child nodes");
+        if (childCount <= 0){
+            return null;
+        }
+
         Node candidateNode = node.getChildNodes().get(0);
         candidates.add(candidateNode);
         double averageNodeValue = candidateNode.getAverageValue();

@@ -33,7 +33,7 @@ public class GameControllerApp extends Application implements GameCallback {
     private static final Logger LOGGER = Logger.getLogger(GameControllerApp.class.getName());
     private static FileHandler fh = null;
 
-    private static final int MAX_ITERATIONS = 3000;
+    private static final int MAX_ITERATIONS = 6000;
 
     private static Stage pStage;
 
@@ -112,8 +112,8 @@ public class GameControllerApp extends Application implements GameCallback {
     @Override
     public void start(Stage primaryStage) {
         setPrimaryStage(primaryStage);
-       // startNewFourInLineGame(P1);
-        startNewTicTacGame(P1);
+        startNewFourInLineGame(P2);
+        //startNewTicTacGame(P1);
     }
 
 
