@@ -8,6 +8,10 @@ import java.util.List;
 public class Node {
 
 
+    public GameState getGameState() {
+        return mGameState;
+    }
+
     private GameState mGameState;
 
 
@@ -55,7 +59,7 @@ public class Node {
         if (mAvailableMoves.size() == 0) {
             throw new IllegalStateException("No moves available for board, precondition requires check.");
         }
-        int randomSelection = (int) (Math.random() * mAvailableMoves.size());
+        int randomSelection = RandomIntegerGenerator.randomIntegerIndex( mAvailableMoves.size());
 
         return mAvailableMoves.remove(randomSelection);
 
@@ -98,10 +102,9 @@ public class Node {
     boolean isNonTerminal() {
         // a node is terminal if there are no more moves available or the state of the
         // board is won or loss when the corresponding  move is executed
-        boolean hasChildren = !mChildNodes.isEmpty();
         boolean hasAvailableMoves = !mGameState.getAvailableMoves().isEmpty();
         boolean terminalState = mGameState.getStatus() != GameStatus.IN_PROGRESS;
-        return !terminalState && (hasChildren || hasAvailableMoves);
+        return !terminalState &&  hasAvailableMoves;
     }
 
     boolean fullyExpanded() {

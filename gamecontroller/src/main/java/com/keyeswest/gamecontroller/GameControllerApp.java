@@ -113,14 +113,14 @@ public class GameControllerApp extends Application implements GameCallback {
     @Override
     public void start(Stage primaryStage) {
         setPrimaryStage(primaryStage);
-        startNewFourInLineGame(P2);
-       // startNewTicTacGame(chooseFirstMove());
+        //startNewFourInLineGame(chooseFirstMove());
+        startNewTicTacGame(chooseFirstMove());
     }
 
 
     private  Player chooseFirstMove(){
         Player firstToMove;
-        int randomSelection = (int)(Math.random() * 2);
+        int randomSelection = RandomIntegerGenerator.randomIntegerIndex( 2);
         if ((randomSelection %2) == 0){
             firstToMove= P1;
         }else{

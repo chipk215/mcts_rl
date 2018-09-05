@@ -19,6 +19,8 @@ public class MonteCarloTreeSearch {
     private static final double TIE_VALUE = 0.5d;
     private final int MAX_ITERATIONS;
 
+    private StringBuilder sBuilder;
+
     public MonteCarloTreeSearch(int iterations, Logger clientLogger) {
         if (clientLogger != null) {
             LOGGER = clientLogger;
@@ -38,14 +40,14 @@ public class MonteCarloTreeSearch {
 
             double rewardValue;
 
-            StringBuilder sBuilder = new StringBuilder(System.lineSeparator());
+            sBuilder = new StringBuilder(System.lineSeparator());
             sBuilder.append("***Iteration:").append(iterationCount).append(System.lineSeparator());
 
             Node searchNode = treePolicy(tree.getRootNode());
             sBuilder.append("Candidate Selection: ").append(searchNode.getName()).append(System.lineSeparator());
 
             if (searchNode.isNonTerminal()) {
-                GameState copyState = new GameState(gameState);
+                GameState copyState = new GameState(searchNode.getGameState());
                 GameState simState = GameState.playRandomGame(copyState);
 
                 sBuilder.append("Simulation results: ").append(System.lineSeparator());
@@ -137,6 +139,7 @@ public class MonteCarloTreeSearch {
 
     private Node expand(Node parentNode) {
         GameState expandedState = parentNode.executeRandomMove();
+        sBuilder.append("Expanding node:  " + parentNode.getName() + System.lineSeparator());
         return parentNode.addChild(expandedState);
     }
 

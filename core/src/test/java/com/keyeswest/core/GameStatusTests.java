@@ -1,24 +1,34 @@
 package com.keyeswest.core;
 
+
 import org.junit.Assert;
 import org.junit.Test;
 
+import java.util.Hashtable;
+
 public class GameStatusTests {
 
+    private static int MAXIMUM = 5;
+
+
     @Test
-    public void makeCopyTest(){
-        Player player = Player.P1;
-       // GameState gameStatus = new GameState(player);
-       // gameStatus.setWinningPlayer(null);
+    public void randomTest(){
+        Hashtable<Integer, Integer> distribution;
+        distribution = new Hashtable<>();
 
-       // GameState copyStatus = gameStatus.makeCopy();
-      //  copyStatus.setWinningPlayer(player);
-       // copyStatus.setStatus(GameStatus.GAME_WON);
+        for (int i=0; i<=MAXIMUM; i++){
+            distribution.put(i,0);
+        }
 
-       // Assert.assertEquals(GameStatus.IN_PROGRESS,gameStatus.getStatus());
-      //  Assert.assertEquals(GameStatus.GAME_WON, copyStatus.getStatus());
+        for (int i=0; i< 1000; i++){
+            int randomInt = RandomIntegerGenerator.randomIntegerIndex(MAXIMUM);
+            distribution.put(randomInt, distribution.get(randomInt)+1);
+        }
 
-      //  Assert.assertNull(gameStatus.getWinningPlayer());
-      //  Assert.assertEquals(player,copyStatus.getWinningPlayer());
+        for (int i=0; i<=MAXIMUM; i++){
+            System.out.println("Key: " + Integer.toString(i) + "  Count= " + Integer.toString(distribution.get(i)));
+        }
+
+        Assert.assertEquals(0, (int) distribution.get(MAXIMUM));
     }
 }

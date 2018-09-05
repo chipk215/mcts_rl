@@ -61,7 +61,12 @@ public final class GameState {
 
     public String describe(){
         StringBuilder sBuilder = new StringBuilder("Game State" + System.lineSeparator());
-        sBuilder.append("Status= " + mStatus.toString() + System.lineSeparator());
+        sBuilder.append("Status= ").append(mStatus.toString()+ "  ");
+        if (mStatus == GameStatus.GAME_TIED){
+            sBuilder.append( System.lineSeparator());
+        }else{
+            sBuilder.append(mNextToMove.getOpponent()).append(System.lineSeparator());
+        }
 
         return sBuilder.toString();
     }
@@ -123,7 +128,7 @@ public final class GameState {
                         GameStatus.GAME_TIED,gameState.getStateMove());
 
             }else{
-                int randomSelection = (int)(Math.random() * numberMovesAvailable);
+                int randomSelection = RandomIntegerGenerator.randomIntegerIndex(numberMovesAvailable);
                 Move selectedMove = availableMoves.get(randomSelection);
                 gameState = gameState.moveToNextState(selectedMove);
             }
