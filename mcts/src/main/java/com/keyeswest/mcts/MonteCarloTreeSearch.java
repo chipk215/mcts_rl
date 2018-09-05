@@ -74,6 +74,13 @@ public class MonteCarloTreeSearch {
 
                     GameStatus searchStatus = searchNode.getNodeStatus();
                     rewardValue = computeRewardValue(searchStatus, searchNode.getPlayer().getOpponent());
+                    if (rewardValue == LOSS_VALUE){
+                        sBuilder.append("Player wins iteration.").append(System.lineSeparator());
+                    }else if (rewardValue == WIN_VALUE){
+                        sBuilder.append("Computer wins iteration.").append(System.lineSeparator());
+                    }else{
+                        sBuilder.append("Tie game for iteration.").append(System.lineSeparator());
+                    }
                 }
             }
 
